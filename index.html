@@ -3,24 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>環遊世界找分數</title>
+  <title>平分小偵探</title>
   <style>
     :root {
       --ink: #18324a;
-      --muted: #5c7182;
-      --line: #cfdce6;
+      --muted: #557086;
+      --line: #cddbe7;
       --paper: #fffdfa;
-      --blue: #256aa3;
-      --blue-soft: #e8f3ff;
+      --sky: #e8f4ff;
       --leaf: #2f8068;
       --leaf-soft: #e8f6ef;
-      --sun: #f4b63f;
-      --sun-soft: #fff6dd;
-      --coral: #d95d4e;
+      --sun: #ffd36e;
+      --sun-soft: #fff5d5;
+      --coral: #d65a4a;
       --coral-soft: #fff0ed;
-      --plum: #7356a6;
-      --shadow: 0 12px 28px rgba(34, 54, 74, .13);
-      --radius: 8px;
+      --blue: #2369a1;
+      --blue-soft: #eaf4ff;
+      --shadow: 0 10px 26px rgba(36, 55, 75, .12);
     }
 
     * { box-sizing: border-box; }
@@ -30,1219 +29,1393 @@
       font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
       color: var(--ink);
       background:
-        linear-gradient(180deg, rgba(232, 243, 255, .96), rgba(235, 247, 239, .96)),
-        repeating-linear-gradient(90deg, rgba(24, 50, 74, .05) 0 1px, transparent 1px 72px);
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow: hidden;
+        linear-gradient(180deg, #f2f8ff 0%, #edf7f0 100%);
+      line-height: 1.55;
     }
 
-    button {
-      font: inherit;
-      border: 0;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
-    }
-
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(33, 58, 80, .15);
-    }
-
-    button:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    .app {
-      width: min(1280px, calc(100% - 16px));
-      height: 100vh;
-      height: 100dvh;
-      margin: 0 auto;
-      padding: clamp(6px, 1.4vh, 14px) 0;
-      display: grid;
-      grid-template-rows: auto 1fr;
-      gap: clamp(6px, 1.2vh, 12px);
-      overflow: hidden;
+    header {
+      padding: 20px 18px 14px;
+      background: linear-gradient(135deg, #fff7d8, #e4f5ff 55%, #eaf7ee);
+      border-bottom: 1px solid var(--line);
     }
 
     .topbar {
-      display: flex;
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 14px;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 0;
-      min-height: 0;
+    }
+
+    .mascot {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: white;
+      border: 2px solid #b8d7eb;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow);
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(22px, 3vw, 38px);
+      font-size: 30px;
       letter-spacing: 0;
     }
 
-    .subtitle {
-      margin: 2px 0 0;
+    header p {
+      margin: 4px 0 0;
       color: var(--muted);
-      font-size: clamp(12px, 1.5vw, 15px);
-      line-height: 1.35;
+      font-size: 17px;
     }
 
-    .target {
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px;
       display: grid;
-      place-items: center;
-      min-width: 104px;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      background: var(--paper);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      text-align: center;
-    }
-
-    .target strong {
-      display: block;
-      font-size: clamp(24px, 3.4vw, 32px);
-      line-height: 1;
-      color: var(--coral);
-    }
-
-    .target span {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    .stage {
-      display: grid;
-      grid-template-columns: minmax(210px, 1fr) minmax(330px, 1.24fr) minmax(210px, 1fr);
-      gap: clamp(8px, 1.2vw, 14px);
-      align-items: stretch;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    .panel, .center, .summary, .start-screen {
-      border: 1px solid var(--line);
-      background: rgba(255, 253, 250, .94);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      grid-template-columns: minmax(320px, 400px) minmax(360px, 1fr);
+      gap: 16px;
     }
 
     .panel {
-      padding: clamp(8px, 1.4vw, 14px);
-      display: flex;
-      flex-direction: column;
-      gap: clamp(6px, 1.1vh, 10px);
-      min-height: 0;
-      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
 
-    .player-a { border-top: 8px solid var(--blue); }
-    .player-b { border-top: 8px solid var(--plum); }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
 
-    .player-head {
-      display: flex;
-      justify-content: space-between;
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 10px;
       align-items: center;
-      gap: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #d9e6ef;
+      background: #f8fbfd;
     }
 
-    .player-name {
-      margin: 0;
-      font-size: clamp(18px, 2.2vw, 23px);
-    }
-
-    .score {
-      min-width: clamp(50px, 6vw, 66px);
-      height: clamp(50px, 6vw, 66px);
+    .step-icon,
+    .big-icon {
       display: grid;
       place-items: center;
-      color: white;
-      background: var(--ink);
-      border-radius: var(--radius);
-      font-size: clamp(28px, 4vw, 36px);
+      border-radius: 8px;
+      background: white;
+      border: 2px solid #b8d7eb;
+      color: var(--blue);
+    }
+
+    .step-icon {
+      width: 52px;
+      height: 52px;
+    }
+
+    .step-title {
       font-weight: 800;
-      line-height: 1;
+      font-size: 17px;
     }
 
-    .answer-grid {
+    .step-text {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 800;
+      margin: 14px 0 8px;
+      font-size: 17px;
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      border: 2px solid #b8cbdc;
+      border-radius: 8px;
+      padding: 12px;
+      font: inherit;
+      font-size: 18px;
+      background: white;
+      color: var(--ink);
+    }
+
+    .fraction-row {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: clamp(5px, .9vh, 8px);
-      margin-top: 0;
-      min-height: 0;
-      flex: 1 1 auto;
-    }
-
-    .answer-btn {
-      min-height: 0;
-      color: white;
-      background: var(--blue);
-      padding: clamp(7px, 1.1vh, 10px);
-      text-align: left;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
-    .player-b .answer-btn { background: var(--plum); }
-    .answer-btn.no-equal { background: #4b6578; }
-
-    .fraction-label {
-      display: block;
-      font-size: clamp(21px, 2.8vw, 29px);
-      font-weight: 850;
-      line-height: 1;
+    .mode-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
     }
 
-    .answer-text {
-      display: block;
-      font-size: clamp(11px, 1.3vw, 13px);
-      opacity: .92;
-      margin-top: 3px;
-      line-height: 1.25;
-    }
-
-    .btn-mark {
-      width: clamp(30px, 3.8vw, 40px);
-      height: clamp(30px, 3.8vw, 40px);
+    .file-picker {
+      position: relative;
       display: grid;
       place-items: center;
-      flex: 0 0 auto;
-      border: 2px solid rgba(255, 255, 255, .65);
-      border-radius: 50%;
+      min-height: 120px;
+      border: 3px dashed #9cc3dd;
+      border-radius: 8px;
+      background: var(--blue-soft);
+      text-align: center;
+      padding: 14px;
+      cursor: pointer;
+    }
+
+    .file-picker input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-title {
       font-size: 20px;
       font-weight: 900;
+      color: var(--blue);
     }
 
-    .last-feedback {
-      min-height: 0;
-      padding: clamp(7px, 1.1vh, 10px);
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      background: #f5f9fc;
+    .file-text {
       color: var(--muted);
-      line-height: 1.35;
-      font-size: clamp(12px, 1.35vw, 14px);
+      font-size: 15px;
+      margin-top: 4px;
     }
 
-    .last-feedback.good {
-      color: #1f654f;
-      border-color: #8ec9aa;
-      background: var(--leaf-soft);
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
     }
 
-    .last-feedback.miss {
-      color: #8b352b;
-      border-color: #eba39a;
-      background: var(--coral-soft);
-    }
-
-    .center {
-      min-height: 0;
-      padding: clamp(8px, 1.5vw, 16px);
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: space-between;
-      gap: clamp(6px, 1.2vh, 10px);
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .round-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      font-size: clamp(12px, 1.4vw, 14px);
-    }
-
-    .pill {
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 13px 12px;
+      min-height: 54px;
+      font: inherit;
+      font-weight: 900;
+      font-size: 18px;
+      cursor: pointer;
+      color: white;
+      background: var(--blue);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 34px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .flag-box {
-      display: grid;
-      place-items: center;
-      width: 100%;
-      min-height: 0;
-      flex: 1 1 auto;
-      padding: clamp(8px, 1.4vw, 14px);
-      border: 1px solid #d9e5ee;
-      background:
-        linear-gradient(45deg, #f3f7fa 25%, transparent 25%),
-        linear-gradient(-45deg, #f3f7fa 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #f3f7fa 75%),
-        linear-gradient(-45deg, transparent 75%, #f3f7fa 75%);
-      background-size: 24px 24px;
-      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
-      border-radius: var(--radius);
-    }
-
-    .flag-img {
-      display: block;
-      width: min(100%, 420px);
-      max-height: min(34vh, 250px);
-      object-fit: contain;
-      border: 1px solid rgba(24, 50, 74, .2);
-      box-shadow: 0 10px 24px rgba(24, 50, 74, .18);
-      background: white;
-    }
-
-    .flag-emoji {
-      display: none;
-      font-size: clamp(110px, 18vw, 190px);
-      line-height: 1;
-    }
-
-    .country-name {
-      margin: 0;
-      font-size: clamp(24px, 3.7vw, 40px);
-      line-height: 1.16;
-    }
-
-    .hint {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.35;
-      font-size: clamp(12px, 1.5vw, 15px);
-    }
-
-    .notice {
-      min-height: 0;
-      display: grid;
-      place-items: center;
-      padding: clamp(7px, 1.1vh, 10px) 12px;
-      border-radius: var(--radius);
-      background: var(--sun-soft);
-      border: 1px solid #f2cf79;
-      color: #765415;
-      font-weight: 700;
-      line-height: 1.3;
-      font-size: clamp(12px, 1.5vw, 14px);
-    }
-
-    .teacher-tools {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .primary-action, .secondary-action {
-      min-height: clamp(34px, 5vh, 44px);
-      padding: 7px 14px;
-      font-weight: 800;
-    }
-
-    .primary-action {
-      color: white;
-      background: var(--leaf);
-    }
-
-    .secondary-action {
-      color: var(--ink);
-      border: 2px solid #c5d5e0;
-      background: #edf4f9;
-    }
-
-    .start-screen, .summary {
-      margin-top: 0;
-      padding: clamp(10px, 1.8vw, 16px);
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    .summary {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .start-screen {
-      display: grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap: clamp(8px, 1.5vw, 14px);
-      align-items: stretch;
-      height: 100%;
-    }
-
-    .start-screen > div {
-      min-height: 0;
-      height: 100%;
-      border-radius: var(--radius);
-    }
-
-    .start-screen > div:first-child {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      padding: clamp(16px, 3vw, 34px);
-      background:
-        linear-gradient(135deg, rgba(232, 243, 255, .86), rgba(232, 246, 239, .86));
-      border: 1px solid #d8e6ef;
-    }
-
-    .start-screen h2, .summary h2 {
-      margin: 0 0 10px;
-      font-size: clamp(22px, 2.8vw, 34px);
-    }
-
-    .start-screen p {
-      margin: 0;
-      line-height: 1.45;
-      color: var(--muted);
-      font-size: clamp(15px, 1.55vw, 18px);
-    }
-
-    .rule-list {
-      margin: clamp(12px, 2.2vh, 22px) 0 0;
-      padding-left: 1.2em;
-      line-height: 1.6;
-      font-size: clamp(15px, 1.55vw, 18px);
-    }
-
-    .start-actions {
-      display: grid;
-      grid-template-rows: repeat(2, minmax(72px, 112px));
-      gap: clamp(10px, 2vh, 18px);
-      align-content: center;
-      padding: clamp(16px, 3vw, 34px);
-      background: #f4f9fd;
-      border: 1px solid #d8e6ef;
-    }
-
-    .start-actions .primary-action,
-    .start-actions .secondary-action {
-      width: 100%;
-      min-height: 0;
-      font-size: clamp(18px, 2vw, 24px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .summary[hidden], .start-screen[hidden], .stage[hidden] {
-      display: none;
-    }
-
-    .winner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 8px;
-      padding: 10px;
-      border-radius: var(--radius);
-      background: var(--leaf-soft);
-      border: 1px solid #8ec9aa;
-    }
-
-    .winner h2 { margin: 0; }
-    .winner p {
-      margin: 6px 0 0;
-      color: #276b55;
-      line-height: 1.35;
-      font-size: clamp(12px, 1.4vw, 14px);
-    }
-
-    .review-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      grid-auto-rows: minmax(0, 1fr);
       gap: 8px;
-      margin-top: 8px;
-      flex: 1 1 auto;
-      height: auto;
-      min-height: 0;
-      overflow: hidden;
     }
 
-    .review-card {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: white;
-      overflow: hidden;
-      min-height: 0;
+    button.secondary {
+      color: var(--ink);
+      background: #edf4f9;
+      border: 2px solid #c7d6e2;
     }
 
-    .review-flag {
-      min-height: 0;
-      height: clamp(50px, 10vh, 82px);
+    button:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+    }
+
+    .preview-wrap {
+      width: 100%;
+      min-height: 430px;
+      background: #dfeaf2;
+      border: 1px solid #c4d2de;
+      border-radius: 8px;
+      overflow: hidden;
       display: grid;
       place-items: center;
-      padding: 10px;
-      background: #f4f8fb;
-      border-bottom: 1px solid var(--line);
     }
 
-    .review-flag img {
+    canvas {
       max-width: 100%;
-      max-height: clamp(42px, 8.5vh, 68px);
-      object-fit: contain;
-      border: 1px solid rgba(24, 50, 74, .18);
+      max-height: 70vh;
+      background: white;
+      display: block;
+    }
+
+    .result {
+      margin-top: 14px;
+      border-radius: 8px;
+      padding: 14px;
+      border: 2px solid #b8d7eb;
+      background: white;
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .result.ready { border-color: #b8d7eb; background: #f8fcff; }
+    .result.good { border-color: #7bc49a; background: var(--leaf-soft); }
+    .result.try { border-color: #f0bd51; background: var(--sun-soft); }
+    .result.fix { border-color: #eba095; background: var(--coral-soft); }
+
+    .big-icon {
+      width: 58px;
+      height: 58px;
       background: white;
     }
 
-    .review-body {
-      padding: 7px;
+    .result-title {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 4px;
     }
 
-    .review-body h3 {
-      margin: 0 0 4px;
-      font-size: clamp(13px, 1.7vw, 16px);
-      line-height: 1.15;
+    .result-message {
+      font-size: 18px;
     }
 
-    .answer-chip {
+    .check-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .7);
+      border: 1px solid rgba(150, 175, 195, .42);
+      font-size: 16px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .standard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .standard-card {
+      border: 1px solid #d6e3ed;
+      border-radius: 8px;
+      background: #fbfdff;
+      padding: 10px;
+      min-height: 104px;
+    }
+
+    .standard-card strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 5px;
+    }
+
+    .pattern-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .badge {
       display: inline-flex;
       align-items: center;
-      min-height: 0;
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-weight: 800;
-      margin-bottom: 4px;
-      font-size: clamp(11px, 1.35vw, 13px);
-    }
-
-    .answer-chip.none {
-      color: #4b6578;
-      background: #edf2f5;
-    }
-
-    .review-body p {
-      margin: 0 0 5px;
-      color: var(--muted);
-      line-height: 1.28;
-      font-size: clamp(10px, 1.2vw, 12px);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .fraction-model {
-      display: grid;
-      gap: 4px;
-      width: 100%;
-      min-height: 0;
-      height: clamp(32px, 6.4vh, 48px);
-      border: 1px solid #bacbd8;
-      background: #f9fbfd;
-      padding: 5px;
-    }
-
-    .fraction-model.horizontal { grid-template-rows: repeat(var(--parts), 1fr); }
-    .fraction-model.vertical { grid-template-columns: repeat(var(--parts), 1fr); }
-    .fraction-model.quarter { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
-    .fraction-model.none { grid-template-columns: 1fr 1.45fr .75fr; }
-
-    .fraction-piece {
-      display: grid;
-      place-items: center;
-      min-height: 0;
-      color: white;
+      min-height: 28px;
+      border-radius: 8px;
+      padding: 3px 8px;
+      background: #eef6fb;
+      border: 1px solid #c7dce9;
+      color: var(--ink);
       font-size: 13px;
-      font-weight: 850;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+      font-weight: 800;
     }
 
-    .summary-actions {
+    details {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbfd;
+      padding: 10px 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--blue);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      margin-top: 10px;
+      border: 1px solid #b8cbdc;
+      border-radius: 8px;
+      padding: 10px;
+      font: inherit;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    .teacher-actions {
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
-    @media (max-width: 920px) {
-      .topbar, .start-screen, .winner {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        align-items: stretch;
-      }
-
-      .stage {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: minmax(0, 1fr) minmax(0, .95fr);
-        grid-template-areas:
-          "center center"
-          "left right";
-      }
-
-      .center { grid-area: center; }
-      .player-a { grid-area: left; }
-      .player-b { grid-area: right; }
-      .panel { min-height: 0; }
-
-      .answer-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .flag-img {
-        max-height: min(26vh, 220px);
-      }
-
-      .review-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+    .teacher-actions button {
+      font-size: 15px;
+      min-height: 42px;
+      padding: 8px 10px;
     }
 
-    @media (max-width: 560px) {
-      .app {
-        width: min(100% - 8px, 1180px);
-        padding: 4px 0;
-        gap: 4px;
-      }
+    svg {
+      width: 30px;
+      height: 30px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-      .topbar {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 6px;
-      }
+    .mascot svg {
+      width: 46px;
+      height: 46px;
+      color: var(--leaf);
+    }
 
-      .subtitle, .answer-text, .hint, .teacher-tools {
-        display: none;
-      }
-
-      .target {
-        min-width: 60px;
-        padding: 5px 6px;
-      }
-
-      .target span {
-        font-size: 11px;
-      }
-
-      .stage {
-        gap: 5px;
-        grid-template-rows: minmax(0, 1fr) minmax(0, .84fr);
-      }
-
-      .answer-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 4px;
-      }
-
-      .player-head {
-        align-items: center;
-        gap: 5px;
-      }
-
-      .panel {
-        padding: 5px;
-        gap: 4px;
-        border-top-width: 5px;
-      }
-
-      .player-name {
-        font-size: 14px;
-      }
-
-      .score {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        font-size: 22px;
-      }
-
-      .answer-btn {
-        min-height: 40px;
-        padding: 5px;
-        justify-content: center;
-        text-align: center;
-      }
-
-      .fraction-label {
-        font-size: 18px;
-      }
-
-      .btn-mark {
-        display: none;
-      }
-
-      .last-feedback {
-        padding: 5px;
-        font-size: 10px;
-        line-height: 1.25;
-      }
-
-      .center {
-        padding: 6px;
-        gap: 4px;
-      }
-
-      .round-row {
-        flex-direction: row;
-        align-items: center;
-        font-size: 11px;
-      }
-
-      .pill {
-        min-height: 24px;
-        padding: 3px 7px;
-      }
-
-      .flag-box {
-        padding: 6px;
-      }
-
-      .flag-img {
-        max-height: min(22vh, 150px);
-      }
-
-      .country-name {
-        font-size: 24px;
-      }
-
-      .notice {
-        padding: 5px 7px;
-        font-size: 11px;
-      }
-
-      .start-screen {
-        grid-template-columns: 1fr;
-        align-content: center;
-      }
-
-      .start-screen > div:first-child {
-        padding: 10px;
-      }
-
-      .start-actions {
-        grid-template-rows: repeat(2, minmax(44px, 56px));
-        padding: 10px;
-        gap: 8px;
-      }
-
-      .start-actions .primary-action,
-      .start-actions .secondary-action {
-        font-size: 16px;
-      }
-
-      .start-screen p, .rule-list {
-        font-size: 13px;
-        line-height: 1.35;
-      }
-
-      .review-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 5px;
-      }
-
-      .review-flag {
-        height: 42px;
-        padding: 4px;
-      }
-
-      .review-flag img {
-        max-height: 34px;
-      }
-
-      .review-body {
-        padding: 4px;
-      }
-
-      .review-body h3 {
-        font-size: 12px;
-        margin-bottom: 2px;
-      }
-
-      .answer-chip {
-        font-size: 10px;
-        padding: 2px 5px;
-        margin-bottom: 2px;
-      }
-
-      .review-body p {
-        -webkit-line-clamp: 1;
-        font-size: 9px;
-        margin-bottom: 3px;
-      }
-
-      .fraction-model {
-        height: 24px;
-        padding: 3px;
-        gap: 2px;
-      }
-
-      .fraction-piece {
-        font-size: 9px;
-      }
-
-      .winner {
-        padding: 6px;
-        margin-bottom: 5px;
-      }
-
-      .winner p {
-        font-size: 10px;
-        line-height: 1.25;
-      }
-
-      .summary {
-        padding: 6px;
-      }
-
-      .summary h2 {
-        margin-bottom: 4px;
-        font-size: 16px;
-      }
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; padding: 12px; }
+      h1 { font-size: 26px; }
+      header p { font-size: 16px; }
+      .preview-wrap { min-height: 300px; }
+      .standard-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
+  <header>
+    <div class="topbar">
+      <div class="mascot" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M12 4v16"></path><path d="M8 8h.01"></path><path d="M16 8h.01"></path><path d="M8 15c2.2 1.5 5.8 1.5 8 0"></path></svg>
+      </div>
       <div>
-        <h1>環遊世界找分數</h1>
-        <p class="subtitle">看國旗色塊有沒有平均分成一樣大的部分，兩位學生搶答。先到 10 分就進入課後整理。</p>
+        <h1>平分小偵探</h1>
+        <p>拍下你的色紙作品，看看是不是「每一份一樣大」。</p>
       </div>
-      <div class="target" aria-label="目標分數">
-        <strong>10</strong>
-        <span>分獲勝</span>
-      </div>
-    </header>
+    </div>
+  </header>
 
-    <section id="startScreen" class="start-screen">
-      <div>
-        <h2>玩法</h2>
-        <p>中間會出現一面國旗。兩邊玩家各自按下「1/2、1/3、1/4、沒有平分」其中一個答案。</p>
-        <ul class="rule-list">
-          <li>答對加 1 分，答錯扣 1 分。</li>
-          <li>先到 10 分者獲勝。</li>
-          <li>遊戲結束後會列出本局出現過的國旗與可討論的單位分數。</li>
-          <li>按「完成學習」後，才會出現「再來一盤」。下一盤會避開前一盤用過的題目。</li>
-        </ul>
-      </div>
-      <div class="start-actions">
-        <button id="startBtn" class="primary-action">開始對戰</button>
-        <button id="shuffleBtn" class="secondary-action">換一批題目順序</button>
-      </div>
-    </section>
-
-    <section id="gameStage" class="stage" hidden>
-      <aside class="panel player-a" aria-label="玩家一作答區">
-        <div class="player-head">
-          <h2 class="player-name">左邊玩家</h2>
-          <div id="scoreA" class="score">0</div>
+  <main>
+    <aside class="panel">
+      <h2>跟著 3 步驟</h2>
+      <div class="steps" aria-label="操作步驟">
+        <div class="step">
+          <div class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"></path><path d="M12 4v16"></path></svg>
+          </div>
+          <div>
+            <div class="step-title">1. 上傳照片</div>
+            <div class="step-text">色紙要拍完整，線條要清楚。</div>
+          </div>
         </div>
-        <div class="answer-grid" data-player="A"></div>
-        <div id="feedbackA" class="last-feedback">選出你看到的平均分法。</div>
-      </aside>
-
-      <section class="center" aria-label="國旗題目區">
-        <div class="round-row">
-          <span id="roundInfo" class="pill">第 1 題</span>
-          <span id="poolInfo">本盤題目不重複</span>
+        <div class="step">
+          <div class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+          </div>
+          <div>
+            <div class="step-title">2. 開始檢查</div>
+            <div class="step-text">我會先確認是不是等分。</div>
+          </div>
         </div>
-        <div class="flag-box">
-          <img id="flagImg" class="flag-img" alt="">
-          <div id="flagEmoji" class="flag-emoji" aria-hidden="true"></div>
+        <div class="step">
+          <div class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-5"></path><circle cx="12" cy="12" r="9"></circle></svg>
+          </div>
+          <div>
+            <div class="step-title">3. 看回饋</div>
+            <div class="step-text">等分成立後，再核對分數。</div>
+          </div>
+        </div>
+      </div>
+
+      <label for="studentName">我的座號或名字</label>
+      <input id="studentName" type="text" placeholder="例：12號">
+
+      <label for="targetFraction">我要檢查的分數</label>
+      <select id="targetFraction">
+        <option value="auto">讓平臺先判斷</option>
+        <option value="2">1/2</option>
+        <option value="4">1/4</option>
+        <option value="8">1/8</option>
+      </select>
+      <div class="mode-note">先看色紙有沒有被平分，再判斷應該寫哪一個單位分數。</div>
+
+      <label>我的作品照片</label>
+      <div class="file-picker">
+        <input id="imageInput" type="file" accept="image/*">
+        <div>
+          <div aria-hidden="true">
+            <svg viewBox="0 0 24 24" style="width:42px;height:42px;color:var(--blue)"><path d="M4 7h3l2-2h6l2 2h3v12H4z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+          </div>
+          <div class="file-title">點這裡選照片</div>
+          <div id="fileText" class="file-text">請拍清楚一點喔</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="analyzeBtn" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l2 2 4-5"></path><circle cx="12" cy="12" r="9"></circle></svg>
+          開始檢查
+        </button>
+        <button id="resetBtn" class="secondary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
+          重選照片
+        </button>
+      </div>
+
+      <details>
+        <summary>老師用：AI 圖片檢查提示語</summary>
+        <textarea id="prompt" readonly></textarea>
+        <div class="teacher-actions">
+          <button id="copyPrompt" class="secondary" type="button">複製提示語</button>
+        </div>
+      </details>
+
+      <details open>
+        <summary>老師用：判定標準</summary>
+        <div class="standard-grid">
+          <div class="standard-card">
+            <strong>1/2</strong>
+            每一半面積一樣大。
+            <div class="pattern-list">
+              <span class="badge">橫向對半</span>
+              <span class="badge">直向對半</span>
+              <span class="badge">斜向對半</span>
+            </div>
+          </div>
+          <div class="standard-card">
+            <strong>1/4</strong>
+            全部要四等分，單位分數是其中一份。
+            <div class="pattern-list">
+              <span class="badge">四條狀</span>
+              <span class="badge">十字</span>
+              <span class="badge">兩對角線</span>
+            </div>
+          </div>
+          <div class="standard-card">
+            <strong>1/8</strong>
+            全部要八等分，單位分數是其中一份。
+            <div class="pattern-list">
+              <span class="badge">八條狀</span>
+              <span class="badge">中心放射</span>
+              <span class="badge">等距重複對半</span>
+            </div>
+          </div>
+        </div>
+        <p class="small-note">只要每一份面積一樣大，方向和摺法可以不同；若線條讓某一份明顯比較大或比較小，就需要修正。</p>
+      </details>
+    </aside>
+
+    <section class="panel">
+      <h2>我的作品</h2>
+      <div class="preview-wrap">
+        <canvas id="canvas" width="900" height="620"></canvas>
+      </div>
+
+      <div id="summary" class="result ready">
+        <div class="big-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4z"></path><circle cx="12" cy="13" r="3"></circle></svg>
         </div>
         <div>
-          <h2 id="countryName" class="country-name">準備中</h2>
-          <p id="questionHint" class="hint">觀察主要色塊是否被平均分成一樣大的部分。</p>
+          <div class="result-title">先上傳照片</div>
+          <div class="result-message">我會幫你看看：有沒有平分？分數有沒有寫對？</div>
         </div>
-        <div id="notice" class="notice">請任一邊先作答。</div>
-        <div class="teacher-tools">
-          <button id="skipBtn" class="secondary-action">老師略過這題</button>
-          <button id="endBtn" class="secondary-action">提前結束並整理</button>
-        </div>
-      </section>
-
-      <aside class="panel player-b" aria-label="玩家二作答區">
-        <div class="player-head">
-          <h2 class="player-name">右邊玩家</h2>
-          <div id="scoreB" class="score">0</div>
-        </div>
-        <div class="answer-grid" data-player="B"></div>
-        <div id="feedbackB" class="last-feedback">選出你看到的平均分法。</div>
-      </aside>
-    </section>
-
-    <section id="summary" class="summary" hidden>
-      <div class="winner">
-        <div>
-          <h2 id="winnerTitle">本局結束</h2>
-          <p id="winnerText">一起看本局國旗，把「有平分」和「沒有平分」說清楚。</p>
-        </div>
-        <button id="learnDoneBtn" class="primary-action">完成學習</button>
       </div>
-      <h2>本局國旗整理</h2>
-      <div id="reviewGrid" class="review-grid"></div>
-      <div class="summary-actions">
-        <button id="playAgainBtn" class="primary-action" hidden>再來一盤</button>
-      </div>
+
+      <div id="details"></div>
+      <p class="small-note">小提醒：橫分、直分、斜分、十字分、條狀分、中心放射分都可能是對的；重點是每一份面積一樣大。照片中的手寫分數和塗色，請搭配老師提示語再做最後確認。</p>
     </section>
   </main>
 
   <script>
-    const ANSWERS = [
-      { value: "1/2", title: "1/2", text: "分成 2 份，一份是其中 1 份", mark: "2" },
-      { value: "1/3", title: "1/3", text: "分成 3 份，一份是其中 1 份", mark: "3" },
-      { value: "1/4", title: "1/4", text: "分成 4 份，一份是其中 1 份", mark: "4" },
-      { value: "none", title: "沒有平分", text: "不是一樣大的等分", mark: "無", className: "no-equal" }
-    ];
+    const imageInput = document.getElementById('imageInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const summary = document.getElementById('summary');
+    const details = document.getElementById('details');
+    const studentName = document.getElementById('studentName');
+    const promptBox = document.getElementById('prompt');
+    const copyPrompt = document.getElementById('copyPrompt');
+    const fileText = document.getElementById('fileText');
+    const targetFraction = document.getElementById('targetFraction');
+    let loadedImage = null;
+    let imageLoadToken = 0;
 
-    const FLAG_POOL = [
-      { code: "pl", emoji: "🇵🇱", country: "波蘭", answer: "1/2", model: "horizontal", colors: ["#ffffff", "#dc143c"], note: "上下兩個一樣高的色塊，可以說每一條是整面旗的 1/2。" },
-      { code: "ua", emoji: "🇺🇦", country: "烏克蘭", answer: "1/2", model: "horizontal", colors: ["#0057b7", "#ffd700"], note: "藍色和黃色上下各占一半，是很清楚的 1/2。" },
-      { code: "id", emoji: "🇮🇩", country: "印尼", answer: "1/2", model: "horizontal", colors: ["#ce1126", "#ffffff"], note: "紅、白上下平分，任一色塊都是 1/2。" },
-      { code: "mc", emoji: "🇲🇨", country: "摩納哥", answer: "1/2", model: "horizontal", colors: ["#ce1126", "#ffffff"], note: "紅、白上下兩等分，與印尼國旗很像，可讓學生比較比例。" },
-      { code: "sg", emoji: "🇸🇬", country: "新加坡", answer: "1/2", model: "horizontal", colors: ["#ef3340", "#ffffff"], note: "主要底色上下平分；可提醒學生先觀察大色塊，再討論月亮與星星。" },
-      { code: "mt", emoji: "🇲🇹", country: "馬爾他", answer: "1/2", model: "vertical", colors: ["#ffffff", "#cf142b"], note: "左右兩個一樣寬的色塊，任一邊都是 1/2。" },
-      { code: "va", emoji: "🇻🇦", country: "梵蒂岡", answer: "1/2", model: "vertical", colors: ["#ffe000", "#ffffff"], note: "黃、白左右平分；徽章可作為延伸討論。" },
-      { code: "dz", emoji: "🇩🇿", country: "阿爾及利亞", answer: "1/2", model: "vertical", colors: ["#006233", "#ffffff"], note: "綠、白兩個直條一樣寬，主要色塊是 1/2。" },
-      { code: "li", emoji: "🇱🇮", country: "列支敦斯登", answer: "1/2", model: "horizontal", colors: ["#002b7f", "#ce1126"], note: "藍色與紅色上下等高，可看成兩個 1/2。" },
-      { code: "ht", emoji: "🇭🇹", country: "海地", answer: "1/2", model: "horizontal", colors: ["#00209f", "#d21034"], note: "上下兩條主要色塊一樣高，中央徽章可留到整理時討論。" },
+    const teacherPrompt = `你是一位嚴謹且溫暖的國小二年級數學老師。請針對上傳的每一張學生作品圖片分別分析，不要把不同學生混在一起。
 
-      { code: "fr", emoji: "🇫🇷", country: "法國", answer: "1/3", model: "vertical", colors: ["#0055a4", "#ffffff", "#ef4135"], note: "藍、白、紅三個直條一樣寬，每一條是 1/3。" },
-      { code: "it", emoji: "🇮🇹", country: "義大利", answer: "1/3", model: "vertical", colors: ["#009246", "#ffffff", "#ce2b37"], note: "綠、白、紅三個直條等寬，可對應 1/3。" },
-      { code: "be", emoji: "🇧🇪", country: "比利時", answer: "1/3", model: "vertical", colors: ["#000000", "#fae042", "#ed2939"], note: "三個直條一樣寬，每一條都是整面旗的 1/3。" },
-      { code: "ie", emoji: "🇮🇪", country: "愛爾蘭", answer: "1/3", model: "vertical", colors: ["#169b62", "#ffffff", "#ff883e"], note: "綠、白、橘直向三等分，適合讓學生說出三份一樣大。" },
-      { code: "ng", emoji: "🇳🇬", country: "奈及利亞", answer: "1/3", model: "vertical", colors: ["#008751", "#ffffff", "#008751"], note: "三個直條一樣寬，雖然兩邊同色，仍是三等分。" },
-      { code: "pe", emoji: "🇵🇪", country: "祕魯", answer: "1/3", model: "vertical", colors: ["#d91023", "#ffffff", "#d91023"], note: "紅、白、紅三個直條等寬，可以討論同色不代表合成一份。" },
-      { code: "de", emoji: "🇩🇪", country: "德國", answer: "1/3", model: "horizontal", colors: ["#000000", "#dd0000", "#ffce00"], note: "黑、紅、黃上下三等分，每一條是 1/3。" },
-      { code: "nl", emoji: "🇳🇱", country: "荷蘭", answer: "1/3", model: "horizontal", colors: ["#ae1c28", "#ffffff", "#21468b"], note: "紅、白、藍三條一樣高，可對應 1/3。" },
-      { code: "lu", emoji: "🇱🇺", country: "盧森堡", answer: "1/3", model: "horizontal", colors: ["#ef3340", "#ffffff", "#00a3e0"], note: "紅、白、淺藍上下三等分，和荷蘭可比較顏色差異。" },
-      { code: "ru", emoji: "🇷🇺", country: "俄羅斯", answer: "1/3", model: "horizontal", colors: ["#ffffff", "#0039a6", "#d52b1e"], note: "白、藍、紅三條一樣高，每一條是 1/3。" },
-      { code: "hu", emoji: "🇭🇺", country: "匈牙利", answer: "1/3", model: "horizontal", colors: ["#ce2939", "#ffffff", "#477050"], note: "紅、白、綠上下三等分，可讓學生用手比出三份。" },
-      { code: "bg", emoji: "🇧🇬", country: "保加利亞", answer: "1/3", model: "horizontal", colors: ["#ffffff", "#00966e", "#d62612"], note: "白、綠、紅三條一樣高，是 1/3 的例子。" },
-      { code: "ee", emoji: "🇪🇪", country: "愛沙尼亞", answer: "1/3", model: "horizontal", colors: ["#0072ce", "#000000", "#ffffff"], note: "藍、黑、白三條一樣高，任一條是 1/3。" },
-      { code: "lt", emoji: "🇱🇹", country: "立陶宛", answer: "1/3", model: "horizontal", colors: ["#fdb913", "#006a44", "#c1272d"], note: "黃、綠、紅上下三等分，可和其他三色旗比較。" },
-      { code: "am", emoji: "🇦🇲", country: "亞美尼亞", answer: "1/3", model: "horizontal", colors: ["#d90012", "#0033a0", "#f2a800"], note: "紅、藍、橘三條一樣高，每條是 1/3。" },
-      { code: "in", emoji: "🇮🇳", country: "印度", answer: "1/3", model: "horizontal", colors: ["#ff9933", "#ffffff", "#138808"], note: "橘白綠三條等高；中間圖案可作為延伸討論。" },
-      { code: "ar", emoji: "🇦🇷", country: "阿根廷", answer: "1/3", model: "horizontal", colors: ["#74acdf", "#ffffff", "#74acdf"], note: "三條一樣高，雖然上下同色，仍可說成三等分。" },
-      { code: "ga", emoji: "🇬🇦", country: "加彭", answer: "1/3", model: "horizontal", colors: ["#009e60", "#fcd116", "#3a75c4"], note: "綠、黃、藍上下三等分，是清楚的 1/3。" },
-      { code: "sl", emoji: "🇸🇱", country: "獅子山", answer: "1/3", model: "horizontal", colors: ["#1eb53a", "#ffffff", "#0072c6"], note: "綠、白、藍三條等高，適合學生快速辨認。" },
-      { code: "gh", emoji: "🇬🇭", country: "迦納", answer: "1/3", model: "horizontal", colors: ["#ce1126", "#fcd116", "#006b3f"], note: "紅、黃、綠三等分；星星可先不看，再討論是否完全一樣。" },
-      { code: "cm", emoji: "🇨🇲", country: "喀麥隆", answer: "1/3", model: "vertical", colors: ["#007a5e", "#ce1126", "#fcd116"], note: "三個直條一樣寬；星星可以作為整理時的討論點。" },
-      { code: "td", emoji: "🇹🇩", country: "查德", answer: "1/3", model: "vertical", colors: ["#002664", "#fecb00", "#c60c30"], note: "藍、黃、紅三個直條等寬，任一條是 1/3。" },
-      { code: "ml", emoji: "🇲🇱", country: "馬利", answer: "1/3", model: "vertical", colors: ["#14b53a", "#fcd116", "#ce1126"], note: "綠、黃、紅直向三等分，是 1/3 的例子。" },
-      { code: "gn", emoji: "🇬🇳", country: "幾內亞", answer: "1/3", model: "vertical", colors: ["#ce1126", "#fcd116", "#009460"], note: "紅、黃、綠三個直條等寬，可對應 1/3。" },
-      { code: "ro", emoji: "🇷🇴", country: "羅馬尼亞", answer: "1/3", model: "vertical", colors: ["#002b7f", "#fcd116", "#ce1126"], note: "藍、黃、紅三個直條等寬，和查德很像，可比較色調。" },
+請用二年級孩子聽得懂的話判斷：
+1. 先不要看學生寫的分數，只看圖形有沒有被平分。平分是每一份大小一樣，不是只有畫線。
+2. 平分的方法可以很多種。1/2 可以是橫向、直向、斜向對半，只要兩份面積一樣大。1/4 可以是四條狀、十字四等分、兩條對角線四等分，或其他四份面積相等的分法。1/8 可以是八條狀、中心放射八等分、重複對半後形成八份相等，或其他八份面積相等的分法。不要因為樣式不同就判錯。
+3. 判斷全部分成幾等份，本網站主要挑戰 2 等份、4 等份、8 等份。只有每份一樣大時，才可以說是二等分、四等分或八等分；若只是畫出 2、4、8 份但大小不同，不能算正確。
+4. 再看學生寫的分數是否符合圖形。分母代表全部平分成幾份，分子代表取了幾份。例如 2/4 要先四等分，再清楚標出其中 2 份；1/8 要先八等分，再標出其中 1 份。
+5. 如果沒有塗色、圈選、斜線或其他標記表示取幾份，請提醒孩子要標出取了哪幾份。
+6. 若照片中多畫了線，導致圖形其實被分成更多份，請提醒孩子：要看現在紙上所有清楚的分隔線造成幾份，不只看自己心裡想的那一條線。
 
-      { code: "pa", emoji: "🇵🇦", country: "巴拿馬", answer: "1/4", model: "quarter", colors: ["#ffffff", "#d21034", "#005293", "#ffffff"], note: "四個角落大小一樣，可說每一格是整面旗的 1/4；星星是延伸觀察。" },
-      { code: "do", emoji: "🇩🇴", country: "多明尼加", answer: "1/4", model: "quarter", colors: ["#002d62", "#ce1126", "#ce1126", "#002d62"], note: "白色十字把角落分成四個大小相近的區塊，可用來討論 1/4。" },
-      { code: "mu", emoji: "🇲🇺", country: "模里西斯", answer: "1/4", model: "horizontal", colors: ["#ea2839", "#1a206d", "#ffd500", "#00a551"], note: "紅、藍、黃、綠四條一樣高，每一條是 1/4。" },
+回饋請包含：
+- 給學生的一句肯定。
+- 一個具體觀察點，例如「左邊比較大」或「每一份一樣大」。
+- 一個可以馬上做的修正動作，例如「重新摺一次，看看兩邊能不能完全重疊」。
+- 語氣要溫暖、短句、適合國小二年級。`;
+    promptBox.value = teacherPrompt;
 
-      { code: "jp", emoji: "🇯🇵", country: "日本", answer: "none", model: "none", colors: ["#ffffff", "#bc002d", "#ffffff"], note: "主要畫面是白底加圓形，沒有把整面旗平均分成一樣大的幾份。" },
-      { code: "br", emoji: "🇧🇷", country: "巴西", answer: "none", model: "none", colors: ["#009b3a", "#ffdf00", "#002776"], note: "有菱形、圓形與文字，沒有清楚的等大分割。" },
-      { code: "kr", emoji: "🇰🇷", country: "韓國", answer: "none", model: "none", colors: ["#ffffff", "#c60c30", "#003478"], note: "圖案分布在白底上，不是把整面旗切成一樣大的幾份。" },
-      { code: "ca", emoji: "🇨🇦", country: "加拿大", answer: "none", model: "none", colors: ["#ff0000", "#ffffff", "#ff0000"], note: "左右紅色較窄，中間白色較寬，不是三個一樣大的部分。" },
-      { code: "es", emoji: "🇪🇸", country: "西班牙", answer: "none", model: "none", colors: ["#aa151b", "#f1bf00", "#aa151b"], note: "黃色中段比較高，上下紅色較窄，三條不是一樣大。" },
-      { code: "co", emoji: "🇨🇴", country: "哥倫比亞", answer: "none", model: "none", colors: ["#fcd116", "#003893", "#ce1126"], note: "黃色占一半，藍色和紅色各占較小部分，不是三等分。" },
-      { code: "th", emoji: "🇹🇭", country: "泰國", answer: "none", model: "none", colors: ["#a51931", "#ffffff", "#2d2a4a", "#ffffff", "#a51931"], note: "中間藍色條較寬，五條不是一樣高，不適合直接說 1/5。" },
-      { code: "lv", emoji: "🇱🇻", country: "拉脫維亞", answer: "none", model: "none", colors: ["#9e3039", "#ffffff", "#9e3039"], note: "中間白條比較窄，三條不是一樣大。" },
-      { code: "cz", emoji: "🇨🇿", country: "捷克", answer: "none", model: "none", colors: ["#ffffff", "#d7141a", "#11457e"], note: "左側有三角形，整面旗不是被切成一樣大的幾份。" },
-      { code: "ph", emoji: "🇵🇭", country: "菲律賓", answer: "none", model: "none", colors: ["#0038a8", "#ce1126", "#ffffff"], note: "左邊三角形和上下色塊大小不同，沒有整面平均分割。" },
-      { code: "cl", emoji: "🇨🇱", country: "智利", answer: "none", model: "none", colors: ["#0039a6", "#ffffff", "#d52b1e"], note: "上半部被分成藍白兩塊，下半部是紅色，不是整面旗平均分成同樣大小。" },
-      { code: "np", emoji: "🇳🇵", country: "尼泊爾", answer: "none", model: "none", colors: ["#dc143c", "#003893", "#ffffff"], note: "國旗外形不是長方形，適合討論形狀不同時不易直接做等分判斷。" },
-      { code: "cn", emoji: "🇨🇳", country: "中國", answer: "none", model: "none", colors: ["#de2910", "#ffde00", "#de2910"], note: "紅底加星星，沒有把整面旗平均分成幾個一樣大的區塊。" },
-      { code: "tr", emoji: "🇹🇷", country: "土耳其", answer: "none", model: "none", colors: ["#e30a17", "#ffffff", "#e30a17"], note: "主要是紅底加月亮星星，沒有等分色塊。" },
-      { code: "ma", emoji: "🇲🇦", country: "摩洛哥", answer: "none", model: "none", colors: ["#c1272d", "#006233", "#c1272d"], note: "紅底加星形圖案，沒有平均分割。" },
-      { code: "za", emoji: "🇿🇦", country: "南非", answer: "none", model: "none", colors: ["#007a4d", "#ffb612", "#de3831"], note: "線條與色塊方向複雜，沒有形成相同大小的幾份。" }
-    ];
-
-    const state = {
-      scores: { A: 0, B: 0 },
-      current: null,
-      round: 0,
-      gameHistory: [],
-      usedCodesAcrossGames: new Set(),
-      deck: [],
-      locked: false,
-      gameActive: false
-    };
-
-    const els = {
-      startScreen: document.getElementById("startScreen"),
-      gameStage: document.getElementById("gameStage"),
-      summary: document.getElementById("summary"),
-      startBtn: document.getElementById("startBtn"),
-      shuffleBtn: document.getElementById("shuffleBtn"),
-      scoreA: document.getElementById("scoreA"),
-      scoreB: document.getElementById("scoreB"),
-      feedbackA: document.getElementById("feedbackA"),
-      feedbackB: document.getElementById("feedbackB"),
-      flagImg: document.getElementById("flagImg"),
-      flagEmoji: document.getElementById("flagEmoji"),
-      countryName: document.getElementById("countryName"),
-      questionHint: document.getElementById("questionHint"),
-      roundInfo: document.getElementById("roundInfo"),
-      poolInfo: document.getElementById("poolInfo"),
-      notice: document.getElementById("notice"),
-      skipBtn: document.getElementById("skipBtn"),
-      endBtn: document.getElementById("endBtn"),
-      winnerTitle: document.getElementById("winnerTitle"),
-      winnerText: document.getElementById("winnerText"),
-      reviewGrid: document.getElementById("reviewGrid"),
-      learnDoneBtn: document.getElementById("learnDoneBtn"),
-      playAgainBtn: document.getElementById("playAgainBtn")
-    };
-
-    function shuffle(items) {
-      const list = [...items];
-      for (let i = list.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [list[i], list[j]] = [list[j], list[i]];
-      }
-      return list;
+    function iconSvg(type) {
+      const icons = {
+        ready: '<svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4z"></path><circle cx="12" cy="13" r="3"></circle></svg>',
+        good: '<svg viewBox="0 0 24 24"><path d="M8 12l3 3 5-7"></path><circle cx="12" cy="12" r="9"></circle></svg>',
+        try: '<svg viewBox="0 0 24 24"><path d="M12 3v4"></path><path d="M12 17v4"></path><path d="M4.9 4.9l2.8 2.8"></path><path d="M16.3 16.3l2.8 2.8"></path><circle cx="12" cy="12" r="4"></circle></svg>',
+        fix: '<svg viewBox="0 0 24 24"><path d="M12 8v5"></path><path d="M12 17h.01"></path><path d="M10.3 3.9 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>'
+      };
+      return icons[type] || icons.ready;
     }
 
-    function buildAnswerButtons() {
-      document.querySelectorAll(".answer-grid").forEach((grid) => {
-        grid.innerHTML = "";
-        const player = grid.dataset.player;
-        ANSWERS.forEach((answer) => {
-          const btn = document.createElement("button");
-          btn.className = `answer-btn ${answer.className || ""}`;
-          btn.type = "button";
-          btn.dataset.answer = answer.value;
-          btn.dataset.player = player;
-          btn.innerHTML = `
-            <span>
-              <span class="fraction-label">${answer.title}</span>
-              <span class="answer-text">${answer.text}</span>
-            </span>
-            <span class="btn-mark">${answer.mark}</span>
-          `;
-          btn.addEventListener("click", () => answerQuestion(player, answer.value));
-          grid.appendChild(btn);
-        });
-      });
+    function drawPlaceholder() {
+      ctx.fillStyle = '#f8fbfd';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#9cc3dd';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(260, 150, 380, 260);
+      ctx.beginPath();
+      ctx.moveTo(450, 150);
+      ctx.lineTo(450, 410);
+      ctx.stroke();
+      ctx.fillStyle = '#466780';
+      ctx.font = 'bold 30px Microsoft JhengHei';
+      ctx.textAlign = 'center';
+      ctx.fillText('請上傳你的作品照片', canvas.width / 2, 480);
     }
 
-    function startGame() {
-      state.scores = { A: 0, B: 0 };
-      state.current = null;
-      state.round = 0;
-      state.gameHistory = [];
-      state.locked = false;
-      state.gameActive = true;
+    drawPlaceholder();
 
-      const freshItems = FLAG_POOL.filter((item) => !state.usedCodesAcrossGames.has(item.code));
-      if (freshItems.length < 10) {
-        state.usedCodesAcrossGames.clear();
-        state.deck = shuffle(FLAG_POOL);
-        els.poolInfo.textContent = "題庫已重新洗牌";
-      } else {
-        state.deck = shuffle(freshItems);
-        els.poolInfo.textContent = `尚有 ${freshItems.length} 題可用`;
-      }
+    imageInput.addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const currentToken = ++imageLoadToken;
+      loadedImage = null;
+      analyzeBtn.disabled = true;
+      fileText.textContent = file.name;
+      showResult('ready', '照片正在準備', '請等照片出現後，再按「開始檢查」。');
+      details.innerHTML = '';
+      ctx.fillStyle = '#f8fbfd';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#466780';
+      ctx.font = 'bold 30px Microsoft JhengHei';
+      ctx.textAlign = 'center';
+      ctx.fillText('照片讀取中', canvas.width / 2, canvas.height / 2);
+      const image = new Image();
+      image.onload = () => {
+        if (currentToken !== imageLoadToken) return;
+        loadedImage = image;
+        fitAndDrawImage();
+        analyzeBtn.disabled = false;
+        showResult('ready', '照片準備好了', '按「開始檢查」，看看你的每一份是不是一樣大。');
+        details.innerHTML = '';
+      };
+      image.src = URL.createObjectURL(file);
+    });
 
-      updateScoreboard();
-      resetFeedback();
-      els.startScreen.hidden = true;
-      els.summary.hidden = true;
-      els.gameStage.hidden = false;
-      els.playAgainBtn.hidden = true;
-      nextQuestion();
-    }
+    resetBtn.addEventListener('click', () => {
+      imageLoadToken++;
+      imageInput.value = '';
+      loadedImage = null;
+      analyzeBtn.disabled = true;
+      fileText.textContent = '請拍清楚一點喔';
+      drawPlaceholder();
+      showResult('ready', '先上傳照片', '我會幫你看看：有沒有平分？分數有沒有寫對？');
+      details.innerHTML = '';
+    });
 
-    function nextQuestion() {
-      if (!state.gameActive) return;
-      if (state.deck.length === 0) {
-        finishGame("題庫已完成");
+    analyzeBtn.addEventListener('click', () => {
+      if (!loadedImage) {
+        showResult('ready', '照片還沒準備好', '請等照片出現後，再按「開始檢查」。');
         return;
       }
-      state.locked = false;
-      state.current = state.deck.shift();
-      state.round += 1;
-      state.gameHistory.push(state.current);
-      state.usedCodesAcrossGames.add(state.current.code);
-      renderCurrentFlag();
-      setButtonsDisabled(false);
-      els.roundInfo.textContent = `第 ${state.round} 題`;
-      els.poolInfo.textContent = `本盤已出現 ${state.gameHistory.length} 面`;
-      els.notice.textContent = "請任一邊先作答。";
-    }
-
-    function renderCurrentFlag() {
-      const item = state.current;
-      els.countryName.textContent = item.country;
-      els.questionHint.textContent = "觀察主要色塊是否被平均分成一樣大的部分。";
-      els.flagEmoji.textContent = item.emoji;
-      els.flagEmoji.style.display = "none";
-      els.flagImg.style.display = "block";
-      els.flagImg.alt = `${item.country}國旗`;
-      els.flagImg.src = `https://flagcdn.com/w640/${item.code}.png`;
-    }
-
-    els.flagImg.addEventListener("error", () => {
-      els.flagImg.style.display = "none";
-      els.flagEmoji.style.display = "block";
+      renderResult(analyzeImage());
     });
 
-    function answerQuestion(player, selected) {
-      if (state.locked || !state.current) return;
-      state.locked = true;
-      setButtonsDisabled(true);
+    copyPrompt.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(promptBox.value);
+      copyPrompt.textContent = '已複製';
+      setTimeout(() => copyPrompt.textContent = '複製提示語', 1200);
+    });
 
-      const correct = selected === state.current.answer;
-      state.scores[player] += correct ? 1 : -1;
-      updateScoreboard();
-      showFeedback(player, selected, correct);
-
-      const playerName = player === "A" ? "左邊玩家" : "右邊玩家";
-      const answerText = getAnswerText(state.current.answer);
-      els.notice.textContent = correct
-        ? `${playerName}答對了！答案是 ${answerText}。`
-        : `${playerName}答錯了，正確答案是 ${answerText}。`;
-
-      if (state.scores[player] >= 10) {
-        window.setTimeout(() => finishGame(`${playerName}達到 10 分`), 850);
-      } else {
-        window.setTimeout(nextQuestion, 1050);
+    function fitAndDrawImage(overlays = null) {
+      ctx.fillStyle = '#eef5fa';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const scale = Math.min(canvas.width / loadedImage.width, canvas.height / loadedImage.height);
+      const width = loadedImage.width * scale;
+      const height = loadedImage.height * scale;
+      const x = (canvas.width - width) / 2;
+      const y = (canvas.height - height) / 2;
+      ctx.drawImage(loadedImage, x, y, width, height);
+      if (overlays && overlays.showStudentOverlay) {
+        ctx.strokeStyle = '#2369a1';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(overlays.bounds.x, overlays.bounds.y, overlays.bounds.w, overlays.bounds.h);
+        ctx.strokeStyle = '#d65a4a';
+        ctx.lineWidth = 5;
+        overlays.lines.forEach(line => {
+          ctx.beginPath();
+          ctx.moveTo(line.x1, line.y1);
+          ctx.lineTo(line.x2, line.y2);
+          ctx.stroke();
+        });
       }
     }
 
-    function showFeedback(player, selected, correct) {
-      const box = player === "A" ? els.feedbackA : els.feedbackB;
-      const other = player === "A" ? els.feedbackB : els.feedbackA;
-      box.className = `last-feedback ${correct ? "good" : "miss"}`;
-      box.textContent = correct
-        ? `答對：${state.current.country}可以判斷為 ${getAnswerText(state.current.answer)}。`
-        : `再想想：你按的是 ${getAnswerText(selected)}，這面旗比較適合判斷為 ${getAnswerText(state.current.answer)}。`;
-      other.className = "last-feedback";
-      other.textContent = "這題已被對方搶答，準備下一題。";
+    function analyzeImage() {
+      fitAndDrawImage();
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      const bounds = detectPaperBounds(data, canvas.width, canvas.height);
+      const selectedParts = targetFraction.value === 'auto' ? null : Number(targetFraction.value);
+      let analysis;
+      if (selectedParts) {
+        const targetAnalysis = {
+          ...findBestEqualDivision(data, canvas.width, canvas.height, bounds, selectedParts),
+          expectedParts: selectedParts,
+          actualParts: null,
+          targetMode: true
+        };
+        const autoAnalysis = findBestDetectedDivision(data, canvas.width, canvas.height, bounds);
+        analysis = targetAnalysis;
+        if (autoAnalysis.isEqual && autoAnalysis.expectedParts !== selectedParts) {
+          analysis = {
+            ...autoAnalysis,
+            expectedParts: selectedParts,
+            actualParts: autoAnalysis.expectedParts,
+            targetMode: true,
+            isEqual: false,
+            isClearlyEqual: false,
+            isLikelyEqual: false,
+            hasEnoughLines: true,
+            autoReason: 'wrong-parts'
+          };
+        }
+      } else {
+        analysis = {
+          ...findBestDetectedDivision(data, canvas.width, canvas.height, bounds),
+          actualParts: null,
+          targetMode: false
+        };
+      }
+      fitAndDrawImage({ showStudentOverlay: true, bounds, lines: analysis.lines || [] });
+      return analysis;
     }
 
-    function updateScoreboard() {
-      els.scoreA.textContent = state.scores.A;
-      els.scoreB.textContent = state.scores.B;
+    function findBestDetectedDivision(data, width, height, bounds) {
+      const analyses = [8, 4, 2].map(parts => ({
+        ...findBestEqualDivision(data, width, height, bounds, parts),
+        expectedParts: parts
+      }));
+      const centerLineCount = estimateCenterLineCount(data, width, height, bounds);
+      const eighth = analyses.find(analysis => analysis.expectedParts === 8);
+      if (centerLineCount >= 4 && !eighth.isEqual) {
+        return {
+          ...eighth,
+          autoReason: 'center-lines-not-equal',
+          hasEnoughLines: true,
+          estimatedParts: 8,
+          lineCount: Math.max(eighth.lineCount, centerLineCount)
+        };
+      }
+      const equalAnalyses = analyses.filter(analysis => analysis.isEqual);
+      if (equalAnalyses.length) {
+        return equalAnalyses.sort((a, b) => b.expectedParts - a.expectedParts || b.score - a.score)[0];
+      }
+      return analyses.sort((a, b) => {
+        if (a.hasEnoughLines !== b.hasEnoughLines) return b.hasEnoughLines - a.hasEnoughLines;
+        if (a.lineCount !== b.lineCount) return b.lineCount - a.lineCount;
+        return b.score - a.score;
+      })[0];
     }
 
-    function resetFeedback() {
-      [els.feedbackA, els.feedbackB].forEach((box) => {
-        box.className = "last-feedback";
-        box.textContent = "選出你看到的平均分法。";
+    function detectPaperBounds(data, width, height) {
+      const yellowBounds = detectSpecificColorBounds(data, width, height, isYellowPaperPixel);
+      if (yellowBounds) return yellowBounds;
+
+      let minX = width, minY = height, maxX = 0, maxY = 0;
+      let brightColorCount = 0;
+      for (let y = 0; y < height; y += 3) {
+        for (let x = 0; x < width; x += 3) {
+          const i = (y * width + x) * 4;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+          const brightness = (r + g + b) / 3;
+          if (brightness > 145 && brightness < 252 && saturation > 24) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+            brightColorCount++;
+          }
+        }
+      }
+      if (brightColorCount < 180 || maxX <= minX || maxY <= minY) {
+        minX = width; minY = height; maxX = 0; maxY = 0;
+        for (let y = 0; y < height; y += 3) {
+          for (let x = 0; x < width; x += 3) {
+            const i = (y * width + x) * 4;
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+            const brightness = (r + g + b) / 3;
+            if (brightness < 246 && brightness > 65 && saturation > 16) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        }
+      }
+      if (maxX <= minX || maxY <= minY) return { x: 120, y: 90, w: 660, h: 440 };
+      const pad = 16;
+      return {
+        x: Math.max(0, minX - pad),
+        y: Math.max(0, minY - pad),
+        w: Math.min(width - minX, maxX - minX + pad * 2),
+        h: Math.min(height - minY, maxY - minY + pad * 2)
+      };
+    }
+
+    function detectSpecificColorBounds(data, width, height, predicate) {
+      let minX = width, minY = height, maxX = 0, maxY = 0, count = 0;
+      for (let y = 0; y < height; y += 2) {
+        for (let x = 0; x < width; x += 2) {
+          const i = (y * width + x) * 4;
+          if (predicate(data[i], data[i + 1], data[i + 2])) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+            count++;
+          }
+        }
+      }
+      if (count < 220 || maxX <= minX || maxY <= minY) return null;
+      const pad = 12;
+      return {
+        x: Math.max(0, minX - pad),
+        y: Math.max(0, minY - pad),
+        w: Math.min(width - minX, maxX - minX + pad * 2),
+        h: Math.min(height - minY, maxY - minY + pad * 2)
+      };
+    }
+
+    function isYellowPaperPixel(r, g, b) {
+      const brightness = (r + g + b) / 3;
+      return r > 145 && g > 120 && b < 185 && brightness > 120 && r > b + 35 && g > b + 20;
+    }
+
+    function findBestEqualDivision(data, width, height, bounds, expectedParts) {
+      const angles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
+      const projections = angles.map(angle => detectLineProjection(data, width, height, bounds, angle));
+      const stripCandidates = projections.map(projection => buildStripCandidate(data, width, height, bounds, projection, expectedParts));
+      const vertical = projections.find(projection => projection.angle === 0);
+      const horizontal = projections.find(projection => projection.angle === 90);
+      const gridCandidate = buildGridCandidate(data, width, height, bounds, vertical, horizontal, expectedParts);
+      const centerCrossCandidate = buildCenterCrossCandidate(data, width, height, bounds, expectedParts);
+      const diagonalFourCandidate = buildDiagonalFourCandidate(data, width, height, bounds, projections, expectedParts);
+      const radialEighthCandidate = buildRadialEighthCandidate(data, width, height, bounds, projections, expectedParts);
+      const candidates = [radialEighthCandidate, diagonalFourCandidate, gridCandidate, centerCrossCandidate, ...stripCandidates]
+        .filter(Boolean)
+        .filter(candidate => isCandidateAllowedForParts(candidate, expectedParts));
+      candidates.sort((a, b) => b.score - a.score);
+      const best = candidates[0] || buildFailedCandidate(expectedParts);
+      const clearThreshold = expectedParts === 8 ? 0.82 : 0.68;
+      const likelyThreshold = expectedParts === 8 ? 0.82 : (expectedParts === 4 ? 0.68 : 0.50);
+      const isClearlyEqual = best.hasEnoughLines && best.equalScore >= clearThreshold;
+      const isLikelyEqual = best.hasEnoughLines && best.equalScore >= likelyThreshold;
+      return { ...best, isEqual: isClearlyEqual || isLikelyEqual, isClearlyEqual, isLikelyEqual };
+    }
+
+    function isCandidateAllowedForParts(candidate, expectedParts) {
+      if (expectedParts === 4) {
+        if (candidate.pattern === 'grid') return candidate.equalScore >= 0.72 && candidate.lineCount === 2;
+        if (candidate.pattern === 'diagonal4') return candidate.equalScore >= 0.74 && candidate.lineCount === 2;
+        if (candidate.pattern === 'strip') return candidate.lineCount >= 3 && candidate.equalScore >= 0.82 && candidate.minLineStrength >= 0.035;
+        return false;
+      }
+      if (expectedParts === 8) {
+        if (candidate.pattern === 'radial8') return candidate.equalScore >= 0.76 && candidate.lineCount === 4;
+        if (candidate.pattern === 'strip') return candidate.lineCount >= 7 && candidate.equalScore >= 0.86 && candidate.minLineStrength >= 0.035;
+        return false;
+      }
+      return true;
+    }
+
+    function buildFailedCandidate(expectedParts) {
+      return {
+        pattern: 'none',
+        score: 0,
+        equalScore: 0,
+        hasEnoughLines: false,
+        estimatedParts: 1,
+        lineCount: 0,
+        lines: [],
+        expectedParts
+      };
+    }
+
+    function detectLineProjection(data, width, height, bounds, angle) {
+      const radians = angle * Math.PI / 180;
+      const nx = Math.cos(radians);
+      const ny = Math.sin(radians);
+      const corners = [
+        [bounds.x, bounds.y],
+        [bounds.x + bounds.w, bounds.y],
+        [bounds.x, bounds.y + bounds.h],
+        [bounds.x + bounds.w, bounds.y + bounds.h]
+      ];
+      const coords = corners.map(([x, y]) => x * nx + y * ny);
+      const minCoord = Math.min(...coords);
+      const maxCoord = Math.max(...coords);
+      const binSize = 4;
+      const binCount = Math.ceil((maxCoord - minCoord) / binSize) + 1;
+      const darkBins = new Array(binCount).fill(0);
+      const totalBins = new Array(binCount).fill(0);
+      for (let y = bounds.y; y < bounds.y + bounds.h; y += 2) {
+        for (let x = bounds.x; x < bounds.x + bounds.w; x += 2) {
+          const roundedX = Math.max(0, Math.min(width - 1, Math.round(x)));
+          const roundedY = Math.max(0, Math.min(height - 1, Math.round(y)));
+          const i = (roundedY * width + roundedX) * 4;
+          const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          const bin = Math.round(((x * nx + y * ny) - minCoord) / binSize);
+          if (bin < 0 || bin >= binCount) continue;
+          totalBins[bin]++;
+          if (brightness < 145) darkBins[bin]++;
+        }
+      }
+      const values = darkBins.map((dark, index) => dark / Math.max(1, totalBins[index]));
+      const smoothed = values.map((_, index) => {
+        let sum = 0, count = 0;
+        for (let k = -1; k <= 1; k++) {
+          if (values[index + k] !== undefined) {
+            sum += values[index + k];
+            count++;
+          }
+        }
+        return sum / count;
       });
-    }
-
-    function setButtonsDisabled(disabled) {
-      document.querySelectorAll(".answer-btn").forEach((btn) => {
-        btn.disabled = disabled;
-      });
-    }
-
-    function getAnswerText(answer) {
-      if (answer === "none") return "沒有平分";
-      return answer;
-    }
-
-    function finishGame(reason) {
-      state.gameActive = false;
-      state.locked = true;
-      setButtonsDisabled(true);
-      els.gameStage.hidden = true;
-      els.summary.hidden = false;
-      els.playAgainBtn.hidden = true;
-
-      const a = state.scores.A;
-      const b = state.scores.B;
-      let title = "本局結束";
-      if (a > b) title = "左邊玩家獲勝";
-      if (b > a) title = "右邊玩家獲勝";
-      if (a === b) title = "平手，一起整理";
-      els.winnerTitle.textContent = title;
-      els.winnerText.textContent = `${reason}。比分：左邊 ${a} 分，右邊 ${b} 分。接著可帶學生說明每面國旗的平分理由。`;
-      renderSummary();
-    }
-
-    function renderSummary() {
-      els.reviewGrid.innerHTML = "";
-      const unique = [];
-      const seen = new Set();
-      state.gameHistory.forEach((item) => {
-        if (!seen.has(item.code)) {
-          seen.add(item.code);
-          unique.push(item);
+      const threshold = Math.max(0.035, Math.max(...smoothed) * 0.52);
+      const peaks = [];
+      let inPeak = false, peakStart = 0, peakMax = 0, peakIndex = 0;
+      smoothed.forEach((value, index) => {
+        if (value >= threshold && !inPeak) {
+          inPeak = true;
+          peakStart = index;
+          peakMax = value;
+          peakIndex = index;
+        } else if (value >= threshold && inPeak) {
+          if (value > peakMax) {
+            peakMax = value;
+            peakIndex = index;
+          }
+        } else if (value < threshold && inPeak) {
+          if (index - peakStart > 2) peaks.push({ pos: minCoord + peakIndex * binSize, score: peakMax });
+          inPeak = false;
         }
       });
+      const maxPeaks = 9;
+      const usable = peaks
+        .filter(peak => peak.pos > minCoord + (maxCoord - minCoord) * .10 && peak.pos < minCoord + (maxCoord - minCoord) * .90)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, maxPeaks)
+        .sort((a, b) => a.pos - b.pos);
+      const strengthByPosition = new Map(usable.map(peak => [Math.round(peak.pos), peak.score]));
+      return { angle, minCoord, maxCoord, positions: usable.map(peak => peak.pos), strengthByPosition };
+    }
 
-      unique.forEach((item) => {
-        const card = document.createElement("article");
-        card.className = "review-card";
-        const answerClass = item.answer === "none" ? "answer-chip none" : "answer-chip";
-        card.innerHTML = `
-          <div class="review-flag">
-            <img src="https://flagcdn.com/w320/${item.code}.png" alt="${item.country}國旗">
-          </div>
-          <div class="review-body">
-            <h3>${item.country}</h3>
-            <span class="${answerClass}">${getAnswerText(item.answer)}</span>
-            <p>${item.note}</p>
-            ${buildFractionModel(item)}
-          </div>
-        `;
-        const image = card.querySelector("img");
-        image.addEventListener("error", () => {
-          image.replaceWith(document.createTextNode(item.emoji));
+    function buildStripCandidate(data, width, height, bounds, projection, expectedParts) {
+      const needed = Math.max(1, expectedParts - 1);
+      const positions = projection.positions
+        .slice()
+        .sort((a, b) => {
+          const aStrength = projection.strengthByPosition.get(Math.round(a)) || 0;
+          const bStrength = projection.strengthByPosition.get(Math.round(b)) || 0;
+          return bStrength - aStrength;
+        })
+        .slice(0, needed)
+        .sort((a, b) => a - b);
+      const equalScore = estimateProjectionEqualScore(positions, projection.minCoord, projection.maxCoord, expectedParts);
+      const hasEnoughLines = positions.length >= needed;
+      const lineAngle = (projection.angle + 90) % 180;
+      if (hasEnoughLines && hasUnexpectedCenterLine(data, width, height, bounds, [lineAngle])) return null;
+      const lineStrength = positions.reduce((sum, position) => sum + (projection.strengthByPosition.get(Math.round(position)) || 0), 0);
+      const minLineStrength = positions.reduce((min, position) => Math.min(min, projection.strengthByPosition.get(Math.round(position)) || 0), positions.length ? Infinity : 0);
+      return {
+        pattern: 'strip',
+        score: (hasEnoughLines ? 0.45 : 0) + equalScore * 0.45 + Math.min(0.1, lineStrength * 0.7),
+        equalScore,
+        hasEnoughLines,
+        minLineStrength,
+        estimatedParts: hasEnoughLines ? expectedParts : positions.length + 1,
+        lineCount: positions.length,
+        lines: positions.map(position => lineSegmentForProjection(bounds, projection.angle, position))
+      };
+    }
+
+    function estimateProjectionEqualScore(positions, minCoord, maxCoord, expectedParts) {
+      if (positions.length < expectedParts - 1) return 0.3;
+      const chosen = positions.slice(0, expectedParts - 1).sort((a, b) => a - b);
+      const cuts = [minCoord, ...chosen, maxCoord];
+      const parts = [];
+      for (let index = 1; index < cuts.length; index++) parts.push(cuts[index] - cuts[index - 1]);
+      const ideal = (maxCoord - minCoord) / expectedParts;
+      const avgError = parts.reduce((sum, part) => sum + Math.abs(part - ideal) / ideal, 0) / parts.length;
+      return Math.max(0, 1 - avgError);
+    }
+
+    function buildGridCandidate(data, width, height, bounds, vertical, horizontal, expectedParts) {
+      if (expectedParts !== 4 || !vertical || !horizontal) return null;
+      if (hasUnexpectedCenterLine(data, width, height, bounds, [0, 90])) return null;
+      const verticalCenter = (vertical.minCoord + vertical.maxCoord) / 2;
+      const horizontalCenter = (horizontal.minCoord + horizontal.maxCoord) / 2;
+      const verticalLine = nearestPosition(vertical.positions, verticalCenter);
+      const horizontalLine = nearestPosition(horizontal.positions, horizontalCenter);
+      if (verticalLine === null || horizontalLine === null) return null;
+      const verticalStrength = vertical.strengthByPosition.get(Math.round(verticalLine)) || 0;
+      const horizontalStrength = horizontal.strengthByPosition.get(Math.round(horizontalLine)) || 0;
+      if (verticalStrength < 0.035 || horizontalStrength < 0.035) return null;
+      const verticalScore = 1 - Math.abs(verticalLine - verticalCenter) / ((vertical.maxCoord - vertical.minCoord) / 2);
+      const horizontalScore = 1 - Math.abs(horizontalLine - horizontalCenter) / ((horizontal.maxCoord - horizontal.minCoord) / 2);
+      const equalScore = Math.max(0, (verticalScore + horizontalScore) / 2);
+      return {
+        pattern: 'grid',
+        score: 0.52 + equalScore * 0.46,
+        equalScore,
+        hasEnoughLines: true,
+        estimatedParts: 4,
+        lineCount: 2,
+        lines: [
+          lineSegmentForProjection(bounds, vertical.angle, verticalLine),
+          lineSegmentForProjection(bounds, horizontal.angle, horizontalLine)
+        ]
+      };
+    }
+
+    function buildCenterCrossCandidate(data, width, height, bounds, expectedParts) {
+      if (expectedParts !== 4) return null;
+      const vertical = strongestCenterDarkLine(data, width, height, bounds, 'vertical');
+      const horizontal = strongestCenterDarkLine(data, width, height, bounds, 'horizontal');
+      if (!vertical || !horizontal) return null;
+      if (hasUnexpectedCenterLine(data, width, height, bounds, [0, 90])) return null;
+      const verticalCenter = bounds.x + bounds.w / 2;
+      const horizontalCenter = bounds.y + bounds.h / 2;
+      const verticalScore = 1 - Math.abs(vertical.position - verticalCenter) / (bounds.w * 0.34);
+      const horizontalScore = 1 - Math.abs(horizontal.position - horizontalCenter) / (bounds.h * 0.34);
+      if (Math.abs(vertical.position - verticalCenter) > bounds.w * 0.12) return null;
+      if (Math.abs(horizontal.position - horizontalCenter) > bounds.h * 0.12) return null;
+      const equalScore = Math.max(0, Math.min(1, (verticalScore + horizontalScore) / 2));
+      const strengthScore = Math.min(1, (vertical.strength + horizontal.strength) * 3.2);
+      if (vertical.strength < 0.04 || horizontal.strength < 0.04) return null;
+      if (vertical.coverage < 0.67 || horizontal.coverage < 0.67) return null;
+      if (equalScore < 0.30 || strengthScore < 0.08) return null;
+      return {
+        pattern: 'grid',
+        score: 0.9 + equalScore * 0.12 + strengthScore * 0.08,
+        equalScore: Math.max(equalScore, 0.72),
+        hasEnoughLines: true,
+        estimatedParts: 4,
+        lineCount: 2,
+        lines: [
+          { x1: vertical.position, y1: bounds.y, x2: vertical.position, y2: bounds.y + bounds.h },
+          { x1: bounds.x, y1: horizontal.position, x2: bounds.x + bounds.w, y2: horizontal.position }
+        ]
+      };
+    }
+
+    function buildDiagonalFourCandidate(data, width, height, bounds, projections, expectedParts) {
+      if (expectedParts !== 4) return null;
+      const targetAngles = [45, 135];
+      const checked = targetAngles.map(angle => centerLineMatch(data, width, height, bounds, angle));
+      if (checked.some(item => item.strength < 0.16)) return null;
+      const equalScore = Math.min(1, checked.reduce((sum, item) => sum + item.strength, 0) / (targetAngles.length * 0.28));
+      return {
+        pattern: 'diagonal4',
+        score: 1.02 + equalScore * 0.12,
+        equalScore,
+        hasEnoughLines: true,
+        estimatedParts: 4,
+        lineCount: 2,
+        lines: checked.map(item => item.line)
+      };
+    }
+
+    function buildRadialEighthCandidate(data, width, height, bounds, projections, expectedParts) {
+      if (expectedParts !== 8) return null;
+      const selected = [0, 45, 90, 135].map(targetAngle =>
+        strongestCenterAngle(data, width, height, bounds, targetAngle, 6)
+      );
+      if (selected.length < 4) return null;
+      if (selected.some(item => item.strength < 0.28)) return null;
+      selected.sort((a, b) => a.angle - b.angle);
+      const gaps = selected.map((item, index) => {
+        const next = selected[(index + 1) % selected.length];
+        return index === selected.length - 1 ? next.angle + 180 - item.angle : next.angle - item.angle;
+      });
+      const minGap = Math.min(...gaps);
+      const maxGap = Math.max(...gaps);
+      if (minGap < 34 || maxGap > 56) return null;
+      const gapError = gaps.reduce((sum, gap) => sum + Math.abs(gap - 45) / 45, 0) / gaps.length;
+      const angleScore = Math.max(0, 1 - gapError * 1.35);
+      const strengthScore = Math.min(1, selected.reduce((sum, item) => sum + item.strength, 0) / (selected.length * 0.22));
+      const equalScore = angleScore * 0.82 + strengthScore * 0.18;
+      if (equalScore < 0.76) return null;
+      return {
+        pattern: 'radial8',
+        score: 1.08 + equalScore * 0.12,
+        equalScore,
+        hasEnoughLines: true,
+        estimatedParts: 8,
+        lineCount: 4,
+        lines: selected.map(item => item.line)
+      };
+    }
+
+    function strongestCenterAngle(data, width, height, bounds, targetAngle, tolerance) {
+      let best = null;
+      for (let offset = -tolerance; offset <= tolerance; offset += 2) {
+        let angle = targetAngle + offset;
+        if (angle < 0) angle += 180;
+        if (angle >= 180) angle -= 180;
+        const line = lineSegmentThroughCenter(bounds, angle);
+        const strength = lineDarkStrength(data, width, height, line);
+        if (!best || strength > best.strength) best = { angle, line, strength };
+      }
+      return best;
+    }
+
+    function estimateCenterLineCount(data, width, height, bounds) {
+      const angleChecks = [];
+      for (let angle = 0; angle < 180; angle += 3) {
+        const line = lineSegmentThroughCenter(bounds, angle);
+        const strength = lineDarkStrength(data, width, height, line);
+        angleChecks.push({ angle, strength });
+      }
+      const peaks = angleChecks
+        .filter((item, index) => {
+          const previous = angleChecks[(index - 1 + angleChecks.length) % angleChecks.length];
+          const next = angleChecks[(index + 1) % angleChecks.length];
+          return item.strength >= 0.16 && item.strength >= previous.strength && item.strength >= next.strength;
+        })
+        .sort((a, b) => b.strength - a.strength);
+      const selected = [];
+      for (const peak of peaks) {
+        const tooClose = selected.some(item => {
+          const diff = Math.abs(item.angle - peak.angle);
+          return Math.min(diff, 180 - diff) < 12;
         });
-        els.reviewGrid.appendChild(card);
+        if (!tooClose) selected.push(peak);
+      }
+      return selected.length;
+    }
+
+    function centerLineMatch(data, width, height, bounds, lineAngle) {
+      const line = lineSegmentThroughCenter(bounds, lineAngle);
+      return { line, strength: lineDarkStrength(data, width, height, line) };
+    }
+
+    function hasUnexpectedCenterLine(data, width, height, bounds, allowedAngles) {
+      const clearExtraThreshold = 0.30;
+      return [0, 45, 90, 135].some(angle => {
+        const isAllowed = allowedAngles.some(allowed => centerAngleDistance(angle, allowed) < 8);
+        if (isAllowed) return false;
+        const line = lineSegmentThroughCenter(bounds, angle);
+        return lineDarkStrength(data, width, height, line) >= clearExtraThreshold;
       });
     }
 
-    function buildFractionModel(item) {
-      const parts = item.answer === "none" ? 3 : Number(item.answer.split("/")[1]);
-      const style = `--parts:${parts}`;
-      const modelClass = item.model || "horizontal";
-      const labels = item.answer === "none"
-        ? ["較大", "較小", "圖案"]
-        : Array.from({ length: parts }, (_, index) => `1/${parts}`);
-      const pieces = labels.map((label, index) => {
-        const color = item.colors[index % item.colors.length];
-        return `<div class="fraction-piece" style="background:${color}">${label}</div>`;
-      }).join("");
-      return `<div class="fraction-model ${modelClass}" style="${style}" aria-label="${item.country}單位分數模型">${pieces}</div>`;
+    function centerAngleDistance(a, b) {
+      const diff = Math.abs(a - b);
+      return Math.min(diff, 180 - diff);
     }
 
-    els.startBtn.addEventListener("click", startGame);
-    els.shuffleBtn.addEventListener("click", () => {
-      state.usedCodesAcrossGames.clear();
-      els.poolInfo.textContent = "已重新洗牌";
-      startGame();
-    });
-    els.skipBtn.addEventListener("click", () => {
-      if (!state.gameActive) return;
-      state.locked = true;
-      setButtonsDisabled(true);
-      els.notice.textContent = `老師略過：${state.current.country}的答案是 ${getAnswerText(state.current.answer)}。`;
-      window.setTimeout(nextQuestion, 750);
-    });
-    els.endBtn.addEventListener("click", () => finishGame("老師提前結束"));
-    els.learnDoneBtn.addEventListener("click", () => {
-      els.playAgainBtn.hidden = false;
-      els.learnDoneBtn.disabled = true;
-      els.winnerText.textContent += " 已完成本局學習整理，可以開始下一盤。";
-    });
-    els.playAgainBtn.addEventListener("click", () => {
-      els.learnDoneBtn.disabled = false;
-      startGame();
-    });
+    function lineSegmentThroughCenter(bounds, lineAngle) {
+      const radians = lineAngle * Math.PI / 180;
+      const dx = Math.cos(radians);
+      const dy = Math.sin(radians);
+      const cx = bounds.x + bounds.w / 2;
+      const cy = bounds.y + bounds.h / 2;
+      const candidates = [];
+      if (Math.abs(dx) > 0.0001) {
+        const tLeft = (bounds.x - cx) / dx;
+        const yLeft = cy + tLeft * dy;
+        if (yLeft >= bounds.y && yLeft <= bounds.y + bounds.h) candidates.push({ x: bounds.x, y: yLeft, t: tLeft });
+        const tRight = (bounds.x + bounds.w - cx) / dx;
+        const yRight = cy + tRight * dy;
+        if (yRight >= bounds.y && yRight <= bounds.y + bounds.h) candidates.push({ x: bounds.x + bounds.w, y: yRight, t: tRight });
+      }
+      if (Math.abs(dy) > 0.0001) {
+        const tTop = (bounds.y - cy) / dy;
+        const xTop = cx + tTop * dx;
+        if (xTop >= bounds.x && xTop <= bounds.x + bounds.w) candidates.push({ x: xTop, y: bounds.y, t: tTop });
+        const tBottom = (bounds.y + bounds.h - cy) / dy;
+        const xBottom = cx + tBottom * dx;
+        if (xBottom >= bounds.x && xBottom <= bounds.x + bounds.w) candidates.push({ x: xBottom, y: bounds.y + bounds.h, t: tBottom });
+      }
+      candidates.sort((a, b) => a.t - b.t);
+      const first = candidates[0] || { x: bounds.x, y: cy };
+      const last = candidates[candidates.length - 1] || { x: bounds.x + bounds.w, y: cy };
+      return { x1: first.x, y1: first.y, x2: last.x, y2: last.y };
+    }
 
-    buildAnswerButtons();
+    function lineDarkStrength(data, width, height, line) {
+      const length = Math.hypot(line.x2 - line.x1, line.y2 - line.y1);
+      const dx = (line.x2 - line.x1) / Math.max(1, length);
+      const dy = (line.y2 - line.y1) / Math.max(1, length);
+      const normalX = -dy;
+      const normalY = dx;
+      let dark = 0;
+      let total = 0;
+      for (let step = 0; step <= length; step += 4) {
+        const ratio = length ? step / length : 0;
+        const baseX = line.x1 + (line.x2 - line.x1) * ratio;
+        const baseY = line.y1 + (line.y2 - line.y1) * ratio;
+        let localDark = false;
+        for (let offset = -3; offset <= 3; offset++) {
+          const x = Math.round(baseX + normalX * offset);
+          const y = Math.round(baseY + normalY * offset);
+          if (x < 0 || y < 0 || x >= width || y >= height) continue;
+          const i = (y * width + x) * 4;
+          if (isDarkLinePixel(data[i], data[i + 1], data[i + 2])) localDark = true;
+        }
+        if (localDark) dark++;
+        total++;
+      }
+      return dark / Math.max(1, total);
+    }
+
+    function strongestLineNearCenter(data, width, height, bounds, angle) {
+      const radians = angle * Math.PI / 180;
+      const nx = Math.cos(radians);
+      const ny = Math.sin(radians);
+      const centerX = bounds.x + bounds.w / 2;
+      const centerY = bounds.y + bounds.h / 2;
+      const centerCoord = centerX * nx + centerY * ny;
+      const searchRadius = Math.max(bounds.w, bounds.h) * 0.12;
+      let best = null;
+      for (let position = centerCoord - searchRadius; position <= centerCoord + searchRadius; position += 2) {
+        const segment = lineSegmentForProjection(bounds, angle, position);
+        const length = Math.hypot(segment.x2 - segment.x1, segment.y2 - segment.y1);
+        let dark = 0;
+        let total = 0;
+        for (let step = 0; step <= length; step += 4) {
+          const ratio = length ? step / length : 0;
+          const baseX = segment.x1 + (segment.x2 - segment.x1) * ratio;
+          const baseY = segment.y1 + (segment.y2 - segment.y1) * ratio;
+          let localDark = false;
+          for (let offset = -2; offset <= 2; offset++) {
+            const x = Math.round(baseX + nx * offset);
+            const y = Math.round(baseY + ny * offset);
+            if (x < 0 || y < 0 || x >= width || y >= height) continue;
+            const i = (y * width + x) * 4;
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            if (isDarkLinePixel(r, g, b)) localDark = true;
+          }
+          if (localDark) dark++;
+          total++;
+        }
+        const strength = dark / Math.max(1, total);
+        if (!best || strength > best.strength) best = { position, strength };
+      }
+      return best && best.strength > 0.01 ? best : null;
+    }
+
+    function projectionCoordinate(x, y, angle) {
+      const radians = angle * Math.PI / 180;
+      return x * Math.cos(radians) + y * Math.sin(radians);
+    }
+
+    function strongestCenterDarkLine(data, width, height, bounds, direction) {
+      const isVertical = direction === 'vertical';
+      const start = isVertical ? bounds.x : bounds.y;
+      const length = isVertical ? bounds.w : bounds.h;
+      const scanStart = start + length * 0.24;
+      const scanEnd = start + length * 0.76;
+      let best = null;
+      for (let fixed = scanStart; fixed <= scanEnd; fixed += 1) {
+        let dark = 0;
+        let total = 0;
+        const segmentHits = new Array(6).fill(0);
+        const movingStart = isVertical ? bounds.y + bounds.h * 0.06 : bounds.x + bounds.w * 0.06;
+        const movingEnd = isVertical ? bounds.y + bounds.h * 0.94 : bounds.x + bounds.w * 0.94;
+        for (let moving = movingStart; moving <= movingEnd; moving += 3) {
+          let localDark = false;
+          for (let offset = -2; offset <= 2; offset++) {
+            const x = Math.round(isVertical ? fixed + offset : moving);
+            const y = Math.round(isVertical ? moving : fixed + offset);
+            if (x < 0 || y < 0 || x >= width || y >= height) continue;
+            const i = (y * width + x) * 4;
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            if (isDarkLinePixel(r, g, b)) localDark = true;
+          }
+          if (localDark) {
+            dark++;
+            const segmentIndex = Math.max(0, Math.min(segmentHits.length - 1, Math.floor(((moving - movingStart) / Math.max(1, movingEnd - movingStart)) * segmentHits.length)));
+            segmentHits[segmentIndex]++;
+          }
+          total++;
+        }
+        const strength = dark / Math.max(1, total);
+        const coverage = segmentHits.filter(hits => hits >= 2).length / segmentHits.length;
+        const weightedStrength = strength * (0.45 + coverage * 0.55);
+        if (!best || weightedStrength > best.weightedStrength) best = { position: fixed, strength, coverage, weightedStrength };
+      }
+      return best && best.strength > 0.025 && best.coverage >= 0.50 ? best : null;
+    }
+
+    function isDarkLinePixel(r, g, b) {
+      const brightness = (r + g + b) / 3;
+      const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+      return brightness < 150 || (brightness < 175 && saturation < 70);
+    }
+
+    function nearestPosition(positions, target) {
+      if (!positions.length) return null;
+      return positions.reduce((best, position) => Math.abs(position - target) < Math.abs(best - target) ? position : best, positions[0]);
+    }
+
+    function lineSegmentForProjection(bounds, angle, position) {
+      const radians = angle * Math.PI / 180;
+      const nx = Math.cos(radians);
+      const ny = Math.sin(radians);
+      const points = [];
+      const left = bounds.x;
+      const right = bounds.x + bounds.w;
+      const top = bounds.y;
+      const bottom = bounds.y + bounds.h;
+      if (Math.abs(ny) > 0.0001) {
+        const yAtLeft = (position - left * nx) / ny;
+        const yAtRight = (position - right * nx) / ny;
+        if (yAtLeft >= top && yAtLeft <= bottom) points.push({ x: left, y: yAtLeft });
+        if (yAtRight >= top && yAtRight <= bottom) points.push({ x: right, y: yAtRight });
+      }
+      if (Math.abs(nx) > 0.0001) {
+        const xAtTop = (position - top * ny) / nx;
+        const xAtBottom = (position - bottom * ny) / nx;
+        if (xAtTop >= left && xAtTop <= right) points.push({ x: xAtTop, y: top });
+        if (xAtBottom >= left && xAtBottom <= right) points.push({ x: xAtBottom, y: bottom });
+      }
+      if (points.length < 2) return { x1: left, y1: top, x2: right, y2: bottom };
+      return { x1: points[0].x, y1: points[0].y, x2: points[1].x, y2: points[1].y };
+    }
+
+    function showResult(kind, title, message, checks = []) {
+      summary.className = `result ${kind}`;
+      summary.innerHTML = `
+        <div class="big-icon" aria-hidden="true">${iconSvg(kind)}</div>
+        <div>
+          <div class="result-title">${title}</div>
+          <div class="result-message">${message}</div>
+          ${checks.length ? `<div class="check-list">${checks.map(item => `<div class="check-item"><span>${item.icon}</span><span>${item.text}</span></div>`).join('')}</div>` : ''}
+        </div>`;
+    }
+
+    function renderResult(analysis) {
+      const name = studentName.value.trim() || '你';
+      const percent = Math.round(analysis.equalScore * 100);
+      const expectedFraction = `1/${analysis.expectedParts}`;
+      const actualFraction = analysis.actualParts ? `1/${analysis.actualParts}` : `1/${analysis.expectedParts}`;
+      const modeText = analysis.targetMode ? `你選的是 ${expectedFraction}` : '平臺先自動判斷';
+      const patternText = patternLabel(analysis.pattern);
+      const successChecks = [
+        { icon: analysis.hasEnoughLines ? '✓' : '1', text: analysis.hasEnoughLines ? '我看得到你的分法。' : '請把分隔線畫清楚，讓我看得出每一份。' },
+        { icon: analysis.isEqual ? '✓' : '2', text: analysis.isEqual ? '我先確認：每一份一樣大，才可以檢查分數。' : '請先修正等分：每一份要一樣大。' },
+        { icon: '✓', text: `${modeText}；這張作品符合 ${analysis.expectedParts} 等分。` },
+        { icon: '✓', text: `如果你要表示一份，正確的單位分數是 ${expectedFraction}。` }
+      ];
+
+      if (analysis.isEqual) {
+        showResult(
+          'good',
+          `${name}，這樣可以！`,
+          analysis.isClearlyEqual
+            ? `我先確認這張作品有等分：每一份一樣大。這是 ${analysis.expectedParts} 等分，所以其中一份可以寫成 ${expectedFraction}。`
+            : `我先確認這張作品接近等分。平分的方法可以很多種，但一定要每一份一樣大，才可以寫 ${expectedFraction}。`,
+          successChecks
+        );
+      } else if (analysis.autoReason === 'wrong-parts') {
+        showResult(
+          'try',
+          `${name}，分得很整齊，但分數要修正`,
+          `我看到你的色紙比較像 ${analysis.actualParts} 等分。如果只取其中一份，應該寫 ${actualFraction}，不是 ${expectedFraction}。`,
+          [
+            { icon: '1', text: `請看全部被分成幾個一樣大的部分：我看到 ${analysis.actualParts} 份。` },
+            { icon: '2', text: `如果要表示 ${expectedFraction}，請重新分成 ${analysis.expectedParts} 個一樣大的部分。` }
+          ]
+        );
+      } else if (!analysis.hasEnoughLines) {
+        showResult(
+          'fix',
+          `${name}，請先修正平分`,
+          `平分的第一關鍵是：每一份一樣大。我沒有穩定看到清楚的分隔線，請先把分隔線畫清楚，再檢查每一份是不是一樣大。`,
+          [
+            { icon: '1', text: '請把分隔線畫清楚。' },
+            { icon: '2', text: analysis.targetMode ? `要寫 ${expectedFraction}，要先分成 ${analysis.expectedParts} 個一樣大的部分。` : '請修正：每一份要一樣大。' }
+          ]
+        );
+      } else {
+        showResult(
+          'try',
+          `${name}，請修正平分`,
+          analysis.autoReason === 'center-lines-not-equal'
+            ? `我看到很多條分隔線，但每一份大小不一樣，所以還不能判定分數正確。分數成立的先決條件是「確實等分」。`
+            : `還不能判定分數正確，因為分數成立的先決條件是「確實等分」。請重新摺一次或重新畫線，確認每一份能不能重疊。`,
+          [
+            { icon: '1', text: '請比一比：有沒有哪一份比較大、哪一份比較小？' },
+            { icon: '2', text: analysis.targetMode ? `要表示 ${expectedFraction}，全部要先分成 ${analysis.expectedParts} 份，而且每份一樣大。` : '等分修正好以後，才能再檢查分數。' }
+          ]
+        );
+      }
+
+      details.innerHTML = `
+        <details>
+          <summary>給老師看的檢查資料</summary>
+          <p class="small-note">模式：${modeText}；推估份數：${analysis.actualParts || analysis.estimatedParts} 份；等大接近度：約 ${percent}%；偵測到的線：${analysis.lineCount} 條；分法類型：${patternText}；建議單位分數：${analysis.isEqual ? expectedFraction : (analysis.autoReason === 'wrong-parts' ? actualFraction : '尚不能標註，需先修正等分')}。照片若太暗、歪斜或線條太淡，請以教師判讀為準。</p>
+        </details>`;
+    }
+
+    function patternLabel(pattern) {
+      if (pattern === 'radial8') return '中心放射八等分';
+      if (pattern === 'diagonal4') return '兩條對角線四等分';
+      if (pattern === 'grid') return '十字四等分';
+      if (pattern === 'strip') return '同方向條狀等分';
+      return '尚未判定';
+    }
   </script>
 </body>
 </html>
