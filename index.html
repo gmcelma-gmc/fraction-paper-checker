@@ -309,86 +309,6 @@
       margin-top: 10px;
     }
 
-    .standard-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .standard-card {
-      border: 1px solid #d6e3ed;
-      border-radius: 8px;
-      background: #fbfdff;
-      padding: 10px;
-      min-height: 104px;
-    }
-
-    .standard-card strong {
-      display: block;
-      font-size: 17px;
-      margin-bottom: 5px;
-    }
-
-    .pattern-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      border-radius: 8px;
-      padding: 3px 8px;
-      background: #eef6fb;
-      border: 1px solid #c7dce9;
-      color: var(--ink);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    details {
-      margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #f8fbfd;
-      padding: 10px 12px;
-    }
-
-    summary {
-      cursor: pointer;
-      font-weight: 800;
-      color: var(--blue);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 220px;
-      margin-top: 10px;
-      border: 1px solid #b8cbdc;
-      border-radius: 8px;
-      padding: 10px;
-      font: inherit;
-      font-size: 14px;
-      resize: vertical;
-    }
-
-    .teacher-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .teacher-actions button {
-      font-size: 15px;
-      min-height: 42px;
-      padding: 8px 10px;
-    }
-
     svg {
       width: 30px;
       height: 30px;
@@ -410,7 +330,6 @@
       h1 { font-size: 26px; }
       header p { font-size: 16px; }
       .preview-wrap { min-height: 300px; }
-      .standard-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -495,47 +414,6 @@
         </button>
       </div>
 
-      <details>
-        <summary>老師用：AI 圖片檢查提示語</summary>
-        <textarea id="prompt" readonly></textarea>
-        <div class="teacher-actions">
-          <button id="copyPrompt" class="secondary" type="button">複製提示語</button>
-        </div>
-      </details>
-
-      <details open>
-        <summary>老師用：判定標準</summary>
-        <div class="standard-grid">
-          <div class="standard-card">
-            <strong>1/2</strong>
-            每一半面積一樣大。
-            <div class="pattern-list">
-              <span class="badge">橫向對半</span>
-              <span class="badge">直向對半</span>
-              <span class="badge">斜向對半</span>
-            </div>
-          </div>
-          <div class="standard-card">
-            <strong>1/4</strong>
-            全部要四等分，單位分數是其中一份。
-            <div class="pattern-list">
-              <span class="badge">四條狀</span>
-              <span class="badge">十字</span>
-              <span class="badge">兩對角線</span>
-            </div>
-          </div>
-          <div class="standard-card">
-            <strong>1/8</strong>
-            全部要八等分，單位分數是其中一份。
-            <div class="pattern-list">
-              <span class="badge">八條狀</span>
-              <span class="badge">中心放射</span>
-              <span class="badge">等距重複對半</span>
-            </div>
-          </div>
-        </div>
-        <p class="small-note">只要每一份面積一樣大，方向和摺法可以不同；若線條讓某一份明顯比較大或比較小，就需要修正。</p>
-      </details>
     </aside>
 
     <section class="panel">
@@ -554,8 +432,7 @@
         </div>
       </div>
 
-      <div id="details"></div>
-      <p class="small-note">小提醒：橫分、直分、斜分、十字分、條狀分、中心放射分都可能是對的；重點是每一份面積一樣大。照片中的手寫分數和塗色，請搭配老師提示語再做最後確認。</p>
+      <p class="small-note">小提醒：橫分、直分、斜分、十字分、條狀分、中心放射分都可能是對的；重點是每一份面積一樣大。</p>
     </section>
   </main>
 
@@ -566,31 +443,11 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const summary = document.getElementById('summary');
-    const details = document.getElementById('details');
     const studentName = document.getElementById('studentName');
-    const promptBox = document.getElementById('prompt');
-    const copyPrompt = document.getElementById('copyPrompt');
     const fileText = document.getElementById('fileText');
     const targetFraction = document.getElementById('targetFraction');
     let loadedImage = null;
     let imageLoadToken = 0;
-
-    const teacherPrompt = `你是一位嚴謹且溫暖的國小二年級數學老師。請針對上傳的每一張學生作品圖片分別分析，不要把不同學生混在一起。
-
-請用二年級孩子聽得懂的話判斷：
-1. 先不要看學生寫的分數，只看圖形有沒有被平分。平分是每一份大小一樣，不是只有畫線。
-2. 平分的方法可以很多種。1/2 可以是橫向、直向、斜向對半，只要兩份面積一樣大。1/4 可以是四條狀、十字四等分、兩條對角線四等分，或其他四份面積相等的分法。1/8 可以是八條狀、中心放射八等分、重複對半後形成八份相等，或其他八份面積相等的分法。不要因為樣式不同就判錯。
-3. 判斷全部分成幾等份，本網站主要挑戰 2 等份、4 等份、8 等份。只有每份一樣大時，才可以說是二等分、四等分或八等分；若只是畫出 2、4、8 份但大小不同，不能算正確。
-4. 再看學生寫的分數是否符合圖形。分母代表全部平分成幾份，分子代表取了幾份。例如 2/4 要先四等分，再清楚標出其中 2 份；1/8 要先八等分，再標出其中 1 份。
-5. 如果沒有塗色、圈選、斜線或其他標記表示取幾份，請提醒孩子要標出取了哪幾份。
-6. 若照片中多畫了線，導致圖形其實被分成更多份，請提醒孩子：要看現在紙上所有清楚的分隔線造成幾份，不只看自己心裡想的那一條線。
-
-回饋請包含：
-- 給學生的一句肯定。
-- 一個具體觀察點，例如「左邊比較大」或「每一份一樣大」。
-- 一個可以馬上做的修正動作，例如「重新摺一次，看看兩邊能不能完全重疊」。
-- 語氣要溫暖、短句、適合國小二年級。`;
-    promptBox.value = teacherPrompt;
 
     function iconSvg(type) {
       const icons = {
@@ -605,17 +462,10 @@
     function drawPlaceholder() {
       ctx.fillStyle = '#f8fbfd';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = '#9cc3dd';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(260, 150, 380, 260);
-      ctx.beginPath();
-      ctx.moveTo(450, 150);
-      ctx.lineTo(450, 410);
-      ctx.stroke();
       ctx.fillStyle = '#466780';
       ctx.font = 'bold 30px Microsoft JhengHei';
       ctx.textAlign = 'center';
-      ctx.fillText('請上傳你的作品照片', canvas.width / 2, 480);
+      ctx.fillText('請上傳你的作品照片', canvas.width / 2, canvas.height / 2);
     }
 
     drawPlaceholder();
@@ -628,7 +478,6 @@
       analyzeBtn.disabled = true;
       fileText.textContent = file.name;
       showResult('ready', '照片正在準備', '請等照片出現後，再按「開始檢查」。');
-      details.innerHTML = '';
       ctx.fillStyle = '#f8fbfd';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#466780';
@@ -642,7 +491,6 @@
         fitAndDrawImage();
         analyzeBtn.disabled = false;
         showResult('ready', '照片準備好了', '按「開始檢查」，看看你的每一份是不是一樣大。');
-        details.innerHTML = '';
       };
       image.src = URL.createObjectURL(file);
     });
@@ -655,7 +503,6 @@
       fileText.textContent = '請拍清楚一點喔';
       drawPlaceholder();
       showResult('ready', '先上傳照片', '我會幫你看看：有沒有平分？分數有沒有寫對？');
-      details.innerHTML = '';
     });
 
     analyzeBtn.addEventListener('click', () => {
@@ -664,12 +511,6 @@
         return;
       }
       renderResult(analyzeImage());
-    });
-
-    copyPrompt.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(promptBox.value);
-      copyPrompt.textContent = '已複製';
-      setTimeout(() => copyPrompt.textContent = '複製提示語', 1200);
     });
 
     function fitAndDrawImage(overlays = null) {
@@ -681,19 +522,6 @@
       const x = (canvas.width - width) / 2;
       const y = (canvas.height - height) / 2;
       ctx.drawImage(loadedImage, x, y, width, height);
-      if (overlays && overlays.showStudentOverlay) {
-        ctx.strokeStyle = '#2369a1';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(overlays.bounds.x, overlays.bounds.y, overlays.bounds.w, overlays.bounds.h);
-        ctx.strokeStyle = '#d65a4a';
-        ctx.lineWidth = 5;
-        overlays.lines.forEach(line => {
-          ctx.beginPath();
-          ctx.moveTo(line.x1, line.y1);
-          ctx.lineTo(line.x2, line.y2);
-          ctx.stroke();
-        });
-      }
     }
 
     function analyzeImage() {
@@ -732,7 +560,7 @@
           targetMode: false
         };
       }
-      fitAndDrawImage({ showStudentOverlay: true, bounds, lines: analysis.lines || [] });
+      fitAndDrawImage();
       return analysis;
     }
 
@@ -1347,11 +1175,9 @@
 
     function renderResult(analysis) {
       const name = studentName.value.trim() || '你';
-      const percent = Math.round(analysis.equalScore * 100);
       const expectedFraction = `1/${analysis.expectedParts}`;
       const actualFraction = analysis.actualParts ? `1/${analysis.actualParts}` : `1/${analysis.expectedParts}`;
       const modeText = analysis.targetMode ? `你選的是 ${expectedFraction}` : '平臺先自動判斷';
-      const patternText = patternLabel(analysis.pattern);
       const successChecks = [
         { icon: analysis.hasEnoughLines ? '✓' : '1', text: analysis.hasEnoughLines ? '我看得到你的分法。' : '請把分隔線畫清楚，讓我看得出每一份。' },
         { icon: analysis.isEqual ? '✓' : '2', text: analysis.isEqual ? '我先確認：每一份一樣大，才可以檢查分數。' : '請先修正等分：每一份要一樣大。' },
@@ -1401,20 +1227,6 @@
           ]
         );
       }
-
-      details.innerHTML = `
-        <details>
-          <summary>給老師看的檢查資料</summary>
-          <p class="small-note">模式：${modeText}；推估份數：${analysis.actualParts || analysis.estimatedParts} 份；等大接近度：約 ${percent}%；偵測到的線：${analysis.lineCount} 條；分法類型：${patternText}；建議單位分數：${analysis.isEqual ? expectedFraction : (analysis.autoReason === 'wrong-parts' ? actualFraction : '尚不能標註，需先修正等分')}。照片若太暗、歪斜或線條太淡，請以教師判讀為準。</p>
-        </details>`;
-    }
-
-    function patternLabel(pattern) {
-      if (pattern === 'radial8') return '中心放射八等分';
-      if (pattern === 'diagonal4') return '兩條對角線四等分';
-      if (pattern === 'grid') return '十字四等分';
-      if (pattern === 'strip') return '同方向條狀等分';
-      return '尚未判定';
     }
   </script>
 </body>
