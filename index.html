@@ -33,6 +33,8 @@
         linear-gradient(180deg, rgba(232, 243, 255, .96), rgba(235, 247, 239, .96)),
         repeating-linear-gradient(90deg, rgba(24, 50, 74, .05) 0 1px, transparent 1px 72px);
       min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
     }
 
     button {
@@ -54,37 +56,44 @@
     }
 
     .app {
-      width: min(1180px, calc(100% - 28px));
+      width: min(1280px, calc(100% - 16px));
+      height: 100vh;
+      height: 100dvh;
       margin: 0 auto;
-      padding: 18px 0 32px;
+      padding: clamp(6px, 1.4vh, 14px) 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: clamp(6px, 1.2vh, 12px);
+      overflow: hidden;
     }
 
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      padding: 14px 0 18px;
+      gap: 10px;
+      padding: 0;
+      min-height: 0;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(26px, 3vw, 42px);
+      font-size: clamp(22px, 3vw, 38px);
       letter-spacing: 0;
     }
 
     .subtitle {
-      margin: 6px 0 0;
+      margin: 2px 0 0;
       color: var(--muted);
-      font-size: 16px;
-      line-height: 1.55;
+      font-size: clamp(12px, 1.5vw, 15px);
+      line-height: 1.35;
     }
 
     .target {
       display: grid;
       place-items: center;
-      min-width: 132px;
-      padding: 12px 14px;
+      min-width: 104px;
+      padding: 8px 10px;
       border: 1px solid var(--line);
       background: var(--paper);
       box-shadow: var(--shadow);
@@ -94,7 +103,7 @@
 
     .target strong {
       display: block;
-      font-size: 32px;
+      font-size: clamp(24px, 3.4vw, 32px);
       line-height: 1;
       color: var(--coral);
     }
@@ -108,8 +117,11 @@
     .stage {
       display: grid;
       grid-template-columns: minmax(210px, 1fr) minmax(330px, 1.24fr) minmax(210px, 1fr);
-      gap: 16px;
+      gap: clamp(8px, 1.2vw, 14px);
       align-items: stretch;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .panel, .center, .summary, .start-screen {
@@ -120,11 +132,12 @@
     }
 
     .panel {
-      padding: 16px;
+      padding: clamp(8px, 1.4vw, 14px);
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      min-height: 540px;
+      gap: clamp(6px, 1.1vh, 10px);
+      min-height: 0;
+      overflow: hidden;
     }
 
     .player-a { border-top: 8px solid var(--blue); }
@@ -139,18 +152,18 @@
 
     .player-name {
       margin: 0;
-      font-size: 24px;
+      font-size: clamp(18px, 2.2vw, 23px);
     }
 
     .score {
-      min-width: 72px;
-      height: 72px;
+      min-width: clamp(50px, 6vw, 66px);
+      height: clamp(50px, 6vw, 66px);
       display: grid;
       place-items: center;
       color: white;
       background: var(--ink);
       border-radius: var(--radius);
-      font-size: 38px;
+      font-size: clamp(28px, 4vw, 36px);
       font-weight: 800;
       line-height: 1;
     }
@@ -158,15 +171,17 @@
     .answer-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 4px;
+      gap: clamp(5px, .9vh, 8px);
+      margin-top: 0;
+      min-height: 0;
+      flex: 1 1 auto;
     }
 
     .answer-btn {
-      min-height: 72px;
+      min-height: 0;
       color: white;
       background: var(--blue);
-      padding: 12px;
+      padding: clamp(7px, 1.1vh, 10px);
       text-align: left;
       display: flex;
       align-items: center;
@@ -179,22 +194,22 @@
 
     .fraction-label {
       display: block;
-      font-size: 30px;
+      font-size: clamp(21px, 2.8vw, 29px);
       font-weight: 850;
       line-height: 1;
     }
 
     .answer-text {
       display: block;
-      font-size: 14px;
+      font-size: clamp(11px, 1.3vw, 13px);
       opacity: .92;
-      margin-top: 6px;
+      margin-top: 3px;
       line-height: 1.25;
     }
 
     .btn-mark {
-      width: 42px;
-      height: 42px;
+      width: clamp(30px, 3.8vw, 40px);
+      height: clamp(30px, 3.8vw, 40px);
       display: grid;
       place-items: center;
       flex: 0 0 auto;
@@ -205,13 +220,14 @@
     }
 
     .last-feedback {
-      min-height: 86px;
-      padding: 12px;
+      min-height: 0;
+      padding: clamp(7px, 1.1vh, 10px);
       border-radius: var(--radius);
       border: 1px solid var(--line);
       background: #f5f9fc;
       color: var(--muted);
-      line-height: 1.55;
+      line-height: 1.35;
+      font-size: clamp(12px, 1.35vw, 14px);
     }
 
     .last-feedback.good {
@@ -227,14 +243,15 @@
     }
 
     .center {
-      min-height: 540px;
-      padding: 18px;
+      min-height: 0;
+      padding: clamp(8px, 1.5vw, 16px);
       display: flex;
       flex-direction: column;
       align-items: stretch;
       justify-content: space-between;
-      gap: 14px;
+      gap: clamp(6px, 1.2vh, 10px);
       text-align: center;
+      overflow: hidden;
     }
 
     .round-row {
@@ -243,7 +260,7 @@
       justify-content: space-between;
       gap: 12px;
       color: var(--muted);
-      font-size: 15px;
+      font-size: clamp(12px, 1.4vw, 14px);
     }
 
     .pill {
@@ -251,7 +268,7 @@
       align-items: center;
       justify-content: center;
       min-height: 34px;
-      padding: 6px 10px;
+      padding: 4px 9px;
       border-radius: 999px;
       background: var(--blue-soft);
       color: var(--blue);
@@ -263,8 +280,9 @@
       display: grid;
       place-items: center;
       width: 100%;
-      min-height: 276px;
-      padding: 16px;
+      min-height: 0;
+      flex: 1 1 auto;
+      padding: clamp(8px, 1.4vw, 14px);
       border: 1px solid #d9e5ee;
       background:
         linear-gradient(45deg, #f3f7fa 25%, transparent 25%),
@@ -279,7 +297,7 @@
     .flag-img {
       display: block;
       width: min(100%, 420px);
-      max-height: 250px;
+      max-height: min(34vh, 250px);
       object-fit: contain;
       border: 1px solid rgba(24, 50, 74, .2);
       box-shadow: 0 10px 24px rgba(24, 50, 74, .18);
@@ -294,27 +312,29 @@
 
     .country-name {
       margin: 0;
-      font-size: clamp(28px, 4vw, 44px);
+      font-size: clamp(24px, 3.7vw, 40px);
       line-height: 1.16;
     }
 
     .hint {
       margin: 0;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.35;
+      font-size: clamp(12px, 1.5vw, 15px);
     }
 
     .notice {
-      min-height: 52px;
+      min-height: 0;
       display: grid;
       place-items: center;
-      padding: 10px 14px;
+      padding: clamp(7px, 1.1vh, 10px) 12px;
       border-radius: var(--radius);
       background: var(--sun-soft);
       border: 1px solid #f2cf79;
       color: #765415;
       font-weight: 700;
-      line-height: 1.45;
+      line-height: 1.3;
+      font-size: clamp(12px, 1.5vw, 14px);
     }
 
     .teacher-tools {
@@ -325,8 +345,8 @@
     }
 
     .primary-action, .secondary-action {
-      min-height: 46px;
-      padding: 10px 18px;
+      min-height: clamp(34px, 5vh, 44px);
+      padding: 7px 14px;
       font-weight: 800;
     }
 
@@ -342,32 +362,41 @@
     }
 
     .start-screen, .summary {
-      margin-top: 16px;
-      padding: 18px;
+      margin-top: 0;
+      padding: clamp(10px, 1.8vw, 16px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .summary {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .start-screen {
       display: grid;
       grid-template-columns: 1.25fr .75fr;
-      gap: 16px;
+      gap: clamp(8px, 1.5vw, 14px);
       align-items: center;
+      height: 100%;
     }
 
     .start-screen h2, .summary h2 {
       margin: 0 0 10px;
-      font-size: 25px;
+      font-size: clamp(19px, 2.4vw, 24px);
     }
 
     .start-screen p {
       margin: 0;
-      line-height: 1.7;
+      line-height: 1.45;
       color: var(--muted);
     }
 
     .rule-list {
       margin: 10px 0 0;
       padding-left: 1.2em;
-      line-height: 1.75;
+      line-height: 1.45;
     }
 
     .start-actions {
@@ -382,10 +411,10 @@
     .winner {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
+      gap: 10px;
       align-items: center;
-      margin-bottom: 14px;
-      padding: 14px;
+      margin-bottom: 8px;
+      padding: 10px;
       border-radius: var(--radius);
       background: var(--leaf-soft);
       border: 1px solid #8ec9aa;
@@ -395,14 +424,20 @@
     .winner p {
       margin: 6px 0 0;
       color: #276b55;
-      line-height: 1.6;
+      line-height: 1.35;
+      font-size: clamp(12px, 1.4vw, 14px);
     }
 
     .review-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .review-card {
@@ -410,10 +445,12 @@
       border-radius: var(--radius);
       background: white;
       overflow: hidden;
+      min-height: 0;
     }
 
     .review-flag {
-      min-height: 112px;
+      min-height: 0;
+      height: clamp(50px, 10vh, 82px);
       display: grid;
       place-items: center;
       padding: 10px;
@@ -422,32 +459,34 @@
     }
 
     .review-flag img {
-      max-width: 190px;
-      max-height: 96px;
+      max-width: 100%;
+      max-height: clamp(42px, 8.5vh, 68px);
       object-fit: contain;
       border: 1px solid rgba(24, 50, 74, .18);
       background: white;
     }
 
     .review-body {
-      padding: 12px;
+      padding: 7px;
     }
 
     .review-body h3 {
-      margin: 0 0 8px;
-      font-size: 19px;
+      margin: 0 0 4px;
+      font-size: clamp(13px, 1.7vw, 16px);
+      line-height: 1.15;
     }
 
     .answer-chip {
       display: inline-flex;
       align-items: center;
-      min-height: 30px;
-      padding: 5px 9px;
+      min-height: 0;
+      padding: 3px 7px;
       border-radius: 999px;
       background: var(--blue-soft);
       color: var(--blue);
       font-weight: 800;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      font-size: clamp(11px, 1.35vw, 13px);
     }
 
     .answer-chip.none {
@@ -456,17 +495,22 @@
     }
 
     .review-body p {
-      margin: 0 0 10px;
+      margin: 0 0 5px;
       color: var(--muted);
-      line-height: 1.55;
-      font-size: 15px;
+      line-height: 1.28;
+      font-size: clamp(10px, 1.2vw, 12px);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .fraction-model {
       display: grid;
       gap: 4px;
       width: 100%;
-      min-height: 54px;
+      min-height: 0;
+      height: clamp(32px, 6.4vh, 48px);
       border: 1px solid #bacbd8;
       background: #f9fbfd;
       padding: 5px;
@@ -480,7 +524,7 @@
     .fraction-piece {
       display: grid;
       place-items: center;
-      min-height: 24px;
+      min-height: 0;
       color: white;
       font-size: 13px;
       font-weight: 850;
@@ -492,7 +536,7 @@
       justify-content: flex-end;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 16px;
+      margin-top: 8px;
     }
 
     @media (max-width: 920px) {
@@ -505,45 +549,215 @@
       }
 
       .stage {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, .95fr);
+        grid-template-areas:
+          "center center"
+          "left right";
       }
 
-      .center { order: -1; }
-      .panel { min-height: auto; }
+      .center { grid-area: center; }
+      .player-a { grid-area: left; }
+      .player-b { grid-area: right; }
+      .panel { min-height: 0; }
 
       .answer-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .flag-img {
+        max-height: min(26vh, 220px);
+      }
+
+      .review-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 560px) {
       .app {
-        width: min(100% - 18px, 1180px);
-        padding-top: 10px;
+        width: min(100% - 8px, 1180px);
+        padding: 4px 0;
+        gap: 4px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px;
+      }
+
+      .subtitle, .answer-text, .hint, .teacher-tools {
+        display: none;
+      }
+
+      .target {
+        min-width: 60px;
+        padding: 5px 6px;
+      }
+
+      .target span {
+        font-size: 11px;
+      }
+
+      .stage {
+        gap: 5px;
+        grid-template-rows: minmax(0, 1fr) minmax(0, .84fr);
       }
 
       .answer-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px;
       }
 
       .player-head {
-        align-items: flex-start;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .panel {
+        padding: 5px;
+        gap: 4px;
+        border-top-width: 5px;
+      }
+
+      .player-name {
+        font-size: 14px;
       }
 
       .score {
-        width: 62px;
-        height: 62px;
-        min-width: 62px;
-        font-size: 32px;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        font-size: 22px;
       }
 
-      .flag-box {
-        min-height: 220px;
+      .answer-btn {
+        min-height: 40px;
+        padding: 5px;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .fraction-label {
+        font-size: 18px;
+      }
+
+      .btn-mark {
+        display: none;
+      }
+
+      .last-feedback {
+        padding: 5px;
+        font-size: 10px;
+        line-height: 1.25;
+      }
+
+      .center {
+        padding: 6px;
+        gap: 4px;
       }
 
       .round-row {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
+        font-size: 11px;
+      }
+
+      .pill {
+        min-height: 24px;
+        padding: 3px 7px;
+      }
+
+      .flag-box {
+        padding: 6px;
+      }
+
+      .flag-img {
+        max-height: min(22vh, 150px);
+      }
+
+      .country-name {
+        font-size: 24px;
+      }
+
+      .notice {
+        padding: 5px 7px;
+        font-size: 11px;
+      }
+
+      .start-screen {
+        grid-template-columns: 1fr;
+        align-content: center;
+      }
+
+      .start-screen p, .rule-list {
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .review-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+      }
+
+      .review-flag {
+        height: 42px;
+        padding: 4px;
+      }
+
+      .review-flag img {
+        max-height: 34px;
+      }
+
+      .review-body {
+        padding: 4px;
+      }
+
+      .review-body h3 {
+        font-size: 12px;
+        margin-bottom: 2px;
+      }
+
+      .answer-chip {
+        font-size: 10px;
+        padding: 2px 5px;
+        margin-bottom: 2px;
+      }
+
+      .review-body p {
+        -webkit-line-clamp: 1;
+        font-size: 9px;
+        margin-bottom: 3px;
+      }
+
+      .fraction-model {
+        height: 24px;
+        padding: 3px;
+        gap: 2px;
+      }
+
+      .fraction-piece {
+        font-size: 9px;
+      }
+
+      .winner {
+        padding: 6px;
+        margin-bottom: 5px;
+      }
+
+      .winner p {
+        font-size: 10px;
+        line-height: 1.25;
+      }
+
+      .summary {
+        padding: 6px;
+      }
+
+      .summary h2 {
+        margin-bottom: 4px;
+        font-size: 16px;
       }
     }
   </style>
