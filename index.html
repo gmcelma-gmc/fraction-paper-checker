@@ -286,10 +286,11 @@
       flex: 0 1 auto;
       align-self: center;
       padding: 0;
-      border: 0;
-      background: #24384a;
-      border-radius: var(--radius);
+      border: clamp(3px, .45vw, 5px) solid #18324a;
+      background: #ffffff;
+      border-radius: 6px;
       overflow: hidden;
+      box-shadow: 0 10px 24px rgba(24, 50, 74, .18);
     }
 
     .flag-img {
@@ -300,7 +301,7 @@
       object-fit: fill;
       border: 0;
       box-shadow: none;
-      background: transparent;
+      background: #ffffff;
     }
 
     .flag-emoji {
@@ -485,19 +486,19 @@
       height: clamp(50px, 10vh, 82px);
       display: grid;
       place-items: center;
-      padding: 0;
-      background: #24384a;
+      padding: 5px;
+      background: #f4f8fb;
       border-bottom: 1px solid var(--line);
     }
 
     .review-flag img {
-      width: 100%;
+      width: auto;
       height: 100%;
       max-width: 100%;
       max-height: none;
       object-fit: contain;
-      border: 0;
-      background: transparent;
+      border: 2px solid #18324a;
+      background: #ffffff;
     }
 
     .review-body {
@@ -752,7 +753,7 @@
 
       .review-flag {
         height: 42px;
-        padding: 0;
+        padding: 3px;
       }
 
       .review-flag img {
