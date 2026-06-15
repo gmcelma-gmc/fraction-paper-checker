@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>分數競技台</title>
+  <style>
+    :root {
+      --ink: #18324a;
+      --muted: #5a7185;
+      --line: #cddce8;
+      --paper: #fffdfa;
+      --blue: #2369a1;
+      --blue-soft: #eaf4ff;
+      --leaf: #2f8068;
+      --leaf-soft: #e9f7ef;
+      --sun: #f3b642;
+      --sun-soft: #fff5d7;
+      --coral: #d65a4a;
+      --coral-soft: #fff0ed;
+      --violet: #7356a6;
+      --shadow: 0 10px 24px rgba(31, 55, 76, .13);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(242, 248, 255, .97), rgba(237, 247, 240, .98)),
+        repeating-linear-gradient(90deg, rgba(24, 50, 74, .045) 0 1px, transparent 1px 72px);
+    }
+
+    button {
+      font: inherit;
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(33, 58, 80, .15);
+    }
+
+    .app {
+      width: min(1440px, calc(100% - 18px));
+      margin: 0 auto;
+      padding: 14px 0 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(255, 253, 250, .92);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 38px);
+      letter-spacing: 0;
+    }
+
+    header p,
+    .hint {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .header-actions,
+    .race-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 8px 12px;
+      color: var(--ink);
+      background: white;
+      border: 1px solid #b8cad9;
+      font-weight: 800;
+    }
+
+    .btn.sun {
+      color: #5d4210;
+      background: var(--sun);
+      border-color: #d19a28;
+    }
+
+    .btn.leaf {
+      color: white;
+      background: var(--leaf);
+      border-color: var(--leaf);
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: minmax(360px, 430px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .panel {
+      min-width: 0;
+      background: rgba(255, 253, 250, .94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-inner {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .player-zone {
+      display: grid;
+      gap: 8px;
+    }
+
+    .player-card {
+      min-height: 52px;
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 10px;
+      align-items: center;
+      color: var(--ink);
+      background: white;
+      border: 1px solid #b8cad9;
+      border-radius: var(--radius);
+      text-align: left;
+      user-select: none;
+      touch-action: none;
+      box-shadow: 0 4px 10px rgba(31, 55, 76, .08);
+    }
+
+    .player-card.used {
+      background: var(--leaf-soft);
+      border-color: #9ed0b5;
+    }
+
+    .fraction-name {
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .mini-track {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      border-radius: 6px;
+      background:
+        linear-gradient(90deg, rgba(24, 50, 74, .13) 0 1px, transparent 1px),
+        rgba(234, 244, 255, .72);
+      border: 1px solid rgba(24, 50, 74, .13);
+    }
+
+    .mini-bar {
+      height: 14px;
+      border-radius: 5px;
+      border: 2px solid currentColor;
+      background: color-mix(in srgb, currentColor 32%, white);
+    }
+
+    .question,
+    .teacher-box {
+      padding: 12px;
+      border-radius: var(--radius);
+      line-height: 1.55;
+    }
+
+    .question {
+      background: var(--sun-soft);
+      border: 1px solid #ead190;
+    }
+
+    .question strong,
+    .teacher-box strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #65470f;
+    }
+
+    .teacher-box {
+      background: white;
+      border: 1px solid #d7e4ee;
+    }
+
+    .teacher-box strong {
+      color: var(--blue);
+    }
+
+    .teacher-box ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    .teacher-box li {
+      margin: 3px 0;
+    }
+
+    .race-panel {
+      min-height: 650px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .race-head {
+      padding: 14px 14px 0;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .workspace {
+      position: relative;
+      min-height: 470px;
+      margin: 12px 14px;
+      overflow: hidden;
+      border: 1px solid #b8cad9;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, transparent 0 78px, rgba(214, 90, 74, .18) 78px 80px, transparent 80px),
+        repeating-linear-gradient(0deg, rgba(24, 50, 74, .055) 0 1px, transparent 1px 56px),
+        linear-gradient(180deg, #ffffff, #f7fbff);
+      touch-action: none;
+    }
+
+    .baseline {
+      position: absolute;
+      left: 80px;
+      top: 30px;
+      bottom: 24px;
+      width: 4px;
+      background: var(--coral);
+      border-radius: 999px;
+      z-index: 1;
+    }
+
+    .baseline-label {
+      position: absolute;
+      left: 24px;
+      top: 16px;
+      z-index: 2;
+      padding: 6px 9px;
+      color: #994235;
+      font-weight: 900;
+      background: rgba(255, 240, 237, .94);
+      border: 1px solid #f2c1b9;
+      border-radius: var(--radius);
+    }
+
+    .lane-label {
+      position: absolute;
+      left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    .piece {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 44px;
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(24, 50, 74, .2);
+      border-left-width: 5px;
+      border-radius: 7px;
+      color: #14304a;
+      font-weight: 900;
+      user-select: none;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 8px 16px rgba(31, 55, 76, .15);
+      z-index: 5;
+    }
+
+    .piece.dragging {
+      cursor: grabbing;
+      z-index: 30;
+      box-shadow: 0 14px 28px rgba(31, 55, 76, .24);
+    }
+
+    .piece.small {
+      font-size: 13px;
+    }
+
+    .piece .tag {
+      position: absolute;
+      right: 4px;
+      bottom: -21px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(24, 50, 74, .13);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .compare-note {
+      margin: 0 14px 14px;
+      padding: 10px 12px;
+      border: 1px solid #d7e4ee;
+      border-radius: var(--radius);
+      background: white;
+      color: var(--ink);
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .compare-note strong {
+      color: var(--leaf);
+    }
+
+    .floating {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    @media (max-width: 760px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .race-panel {
+        min-height: 590px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      header,
+      .race-head {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions,
+      .race-actions {
+        justify-content: start;
+      }
+
+      .workspace {
+        margin: 10px;
+      }
+
+      .compare-note {
+        margin: 0 10px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>分數競技台</h1>
+        <p>從選手區拖出單位分數，到競賽區對齊基準線，比一比哪一條比較長。</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="resetAll">全部歸位</button>
+        <button class="btn sun" id="teacherMode">教師提示</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="panel">
+        <div class="panel-inner">
+          <div>
+            <h2>選手區</h2>
+            <p class="hint">每位選手都是「一條一樣長的 1」平均分後的其中 1 份。拖到右邊比賽。</p>
+          </div>
+
+          <div class="player-zone" id="playerZone"></div>
+
+          <div class="question">
+            <strong>引導提問</strong>
+            都是拿 1 份，為什麼有的比較長？分母比較小，代表分成比較少份，每一份會怎麼樣？
+          </div>
+
+          <div class="teacher-box" id="teacherBox" hidden>
+            <strong>教師可用語句</strong>
+            <ul>
+              <li>「先選兩位選手上場，把左端對齊紅色基準線。」</li>
+              <li>「看右端誰伸得比較遠，誰的值就比較大。」</li>
+              <li>「1/2 和 1/3 都只有 1 份，但分的份數不同，所以每一份的大小不同。」</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel race-panel">
+        <div class="race-head">
+          <div>
+            <h2>競賽區</h2>
+            <p class="hint">拖到紅色基準線附近會自動對齊。可以上下排列，觀察哪位選手跑得最遠。</p>
+          </div>
+          <div class="race-actions">
+            <button class="btn leaf" id="demoBasic">示範 1/2、1/3</button>
+            <button class="btn" id="sortPieces">對齊基準線</button>
+            <button class="btn" id="clearPieces">清空競賽區</button>
+          </div>
+        </div>
+
+        <div class="workspace" id="workspace">
+          <div class="baseline"></div>
+          <div class="baseline-label">基準線</div>
+        </div>
+
+        <p class="compare-note" id="compareNote">請從選手區拖單位分數到競賽區，把左端對齊基準線，再觀察右端伸到哪裡。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      pieces: [],
+      pieceSeq: 0,
+      activePiece: null,
+      rosterDrag: null,
+      teacherVisible: false
+    };
+
+    const colors = [
+      ["#8fd0ff", "#2369a1"],
+      ["#9be2bd", "#2f8068"],
+      ["#ffd36e", "#9b6c15"],
+      ["#ffaaa0", "#b5483c"],
+      ["#c6b1ff", "#7356a6"],
+      ["#94d8d0", "#22746d"]
+    ];
+
+    const playerZone = document.querySelector("#playerZone");
+    const workspace = document.querySelector("#workspace");
+    const compareNote = document.querySelector("#compareNote");
+    const teacherBox = document.querySelector("#teacherBox");
+
+    function init() {
+      renderPlayerZone();
+      buildLaneLabels();
+
+      document.querySelector("#demoBasic").addEventListener("click", () => {
+        addPieceToWorkspace(2, 80, 76);
+        addPieceToWorkspace(3, 80, 132);
+        updatePlayerUsedState();
+        updateCompareNote();
+      });
+      document.querySelector("#sortPieces").addEventListener("click", alignPieces);
+      document.querySelector("#clearPieces").addEventListener("click", clearPieces);
+      document.querySelector("#resetAll").addEventListener("click", resetAll);
+      document.querySelector("#teacherMode").addEventListener("click", toggleTeacher);
+
+      window.addEventListener("resize", () => {
+        state.pieces.forEach((piece) => {
+          piece.el.style.width = `${pieceWidth(piece.denominator)}px`;
+        });
+      });
+    }
+
+    function renderPlayerZone() {
+      playerZone.innerHTML = "";
+      for (let d = 2; d <= 12; d += 1) {
+        const color = colors[(d - 2) % colors.length];
+        const card = document.createElement("button");
+        card.className = "player-card";
+        card.dataset.denominator = d;
+        card.style.color = color[1];
+        card.innerHTML = `
+          <span class="fraction-name">1/${d}</span>
+          <span class="mini-track">
+            <span class="mini-bar" style="width: calc(100% / ${d})"></span>
+          </span>
+        `;
+        card.addEventListener("pointerdown", onRosterPointerDown);
+        playerZone.appendChild(card);
+      }
+    }
+
+    function buildLaneLabels() {
+      for (let i = 0; i < 7; i += 1) {
+        const label = document.createElement("div");
+        label.className = "lane-label";
+        label.style.top = `${86 + i * 56}px`;
+        label.textContent = `第 ${i + 1} 道`;
+        workspace.appendChild(label);
+      }
+    }
+
+    function onRosterPointerDown(event) {
+      event.preventDefault();
+      const denominator = Number(event.currentTarget.dataset.denominator);
+      const existing = state.pieces.find((piece) => piece.denominator === denominator);
+      if (existing) {
+        pulsePiece(existing.el);
+        return;
+      }
+
+      const floating = createPieceElement(denominator);
+      floating.classList.add("floating", "dragging");
+      floating.style.width = `${pieceWidth(denominator)}px`;
+      document.body.appendChild(floating);
+
+      state.rosterDrag = {
+        denominator,
+        el: floating,
+        offsetX: floating.offsetWidth / 2,
+        offsetY: floating.offsetHeight / 2
+      };
+
+      window.addEventListener("pointermove", onRosterPointerMove);
+      window.addEventListener("pointerup", onRosterPointerUp);
+      window.addEventListener("pointercancel", onRosterPointerUp);
+      moveFloating(event);
+    }
+
+    function onRosterPointerMove(event) {
+      moveFloating(event);
+    }
+
+    function onRosterPointerUp(event) {
+      if (!state.rosterDrag) return;
+      const drag = state.rosterDrag;
+      const rect = workspace.getBoundingClientRect();
+      const droppedInWorkspace =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (droppedInWorkspace) {
+        const x = event.clientX - rect.left - drag.offsetX;
+        const y = event.clientY - rect.top - drag.offsetY;
+        addPieceToWorkspace(drag.denominator, x, y);
+      }
+
+      drag.el.remove();
+      state.rosterDrag = null;
+      window.removeEventListener("pointermove", onRosterPointerMove);
+      window.removeEventListener("pointerup", onRosterPointerUp);
+      window.removeEventListener("pointercancel", onRosterPointerUp);
+      updatePlayerUsedState();
+      updateCompareNote();
+    }
+
+    function moveFloating(event) {
+      if (!state.rosterDrag) return;
+      const drag = state.rosterDrag;
+      drag.el.style.left = `${event.clientX - drag.offsetX}px`;
+      drag.el.style.top = `${event.clientY - drag.offsetY}px`;
+    }
+
+    function addPieceToWorkspace(denominator, x, y) {
+      const existing = state.pieces.find((piece) => piece.denominator === denominator);
+      if (existing) {
+        existing.el.style.left = `${clampX(x, existing.el.offsetWidth)}px`;
+        existing.el.style.top = `${clampY(y, existing.el.offsetHeight)}px`;
+        snapPiece(existing.el);
+        pulsePiece(existing.el);
+        return existing.el;
+      }
+
+      const piece = createPieceElement(denominator);
+      const id = `piece-${state.pieceSeq += 1}`;
+      piece.dataset.id = id;
+      piece.style.width = `${pieceWidth(denominator)}px`;
+      piece.style.left = `${clampX(x, pieceWidth(denominator))}px`;
+      piece.style.top = `${clampY(y, 44)}px`;
+      piece.addEventListener("pointerdown", onWorkspacePointerDown);
+      workspace.appendChild(piece);
+      state.pieces.push({ id, denominator, el: piece });
+      snapPiece(piece);
+      return piece;
+    }
+
+    function createPieceElement(denominator) {
+      const color = colors[(denominator - 2) % colors.length];
+      const piece = document.createElement("div");
+      piece.className = `piece ${denominator >= 9 ? "small" : ""}`;
+      piece.dataset.denominator = denominator;
+      piece.style.background = color[0];
+      piece.style.borderColor = color[1];
+      piece.innerHTML = `1/${denominator}<span class="tag">1 份</span>`;
+      return piece;
+    }
+
+    function pieceWidth(denominator) {
+      const whole = Math.min(840, Math.max(480, workspace.clientWidth - 132));
+      return whole / denominator;
+    }
+
+    function onWorkspacePointerDown(event) {
+      beginWorkspaceDrag(event.currentTarget, event);
+    }
+
+    function beginWorkspaceDrag(piece, event) {
+      const rect = piece.getBoundingClientRect();
+      piece.setPointerCapture(event.pointerId);
+      state.activePiece = {
+        el: piece,
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top
+      };
+      piece.classList.add("dragging");
+      piece.addEventListener("pointermove", onWorkspacePointerMove);
+      piece.addEventListener("pointerup", onWorkspacePointerUp);
+      piece.addEventListener("pointercancel", onWorkspacePointerUp);
+      moveWorkspacePiece(event);
+    }
+
+    function onWorkspacePointerMove(event) {
+      moveWorkspacePiece(event);
+    }
+
+    function onWorkspacePointerUp(event) {
+      const piece = event.currentTarget;
+      piece.releasePointerCapture(event.pointerId);
+      piece.classList.remove("dragging");
+      piece.removeEventListener("pointermove", onWorkspacePointerMove);
+      piece.removeEventListener("pointerup", onWorkspacePointerUp);
+      piece.removeEventListener("pointercancel", onWorkspacePointerUp);
+      snapPiece(piece);
+      state.activePiece = null;
+      updateCompareNote();
+    }
+
+    function moveWorkspacePiece(event) {
+      if (!state.activePiece) return;
+      const piece = state.activePiece.el;
+      const rect = workspace.getBoundingClientRect();
+      const x = event.clientX - rect.left - state.activePiece.offsetX;
+      const y = event.clientY - rect.top - state.activePiece.offsetY;
+      piece.style.left = `${clampX(x, piece.offsetWidth)}px`;
+      piece.style.top = `${clampY(y, piece.offsetHeight)}px`;
+    }
+
+    function clampX(x, width) {
+      return Math.max(4, Math.min(workspace.clientWidth - width - 4, x));
+    }
+
+    function clampY(y, height) {
+      return Math.max(38, Math.min(workspace.clientHeight - height - 24, y));
+    }
+
+    function snapPiece(piece) {
+      const baselineX = 80;
+      const left = parseFloat(piece.style.left);
+      if (Math.abs(left - baselineX) <= 52) {
+        piece.style.left = `${baselineX}px`;
+      }
+
+      const top = parseFloat(piece.style.top);
+      const row = Math.max(0, Math.round((top - 76) / 56));
+      const snappedTop = 76 + row * 56;
+      if (Math.abs(top - snappedTop) <= 24) {
+        piece.style.top = `${snappedTop}px`;
+      }
+    }
+
+    function alignPieces() {
+      const ordered = [...state.pieces].sort((a, b) => {
+        return parseFloat(a.el.style.top) - parseFloat(b.el.style.top);
+      });
+      ordered.forEach((piece, index) => {
+        piece.el.style.left = "80px";
+        piece.el.style.top = `${76 + index * 56}px`;
+      });
+      updateCompareNote();
+    }
+
+    function clearPieces() {
+      state.pieces.forEach((piece) => piece.el.remove());
+      state.pieces = [];
+      updatePlayerUsedState();
+      compareNote.textContent = "競賽區已清空。請從選手區拖單位分數到競賽區，把左端對齊基準線比較。";
+    }
+
+    function resetAll() {
+      clearPieces();
+      teacherBox.hidden = true;
+      state.teacherVisible = false;
+      document.querySelector("#teacherMode").textContent = "教師提示";
+    }
+
+    function updatePlayerUsedState() {
+      const used = new Set(state.pieces.map((piece) => piece.denominator));
+      playerZone.querySelectorAll(".player-card").forEach((card) => {
+        card.classList.toggle("used", used.has(Number(card.dataset.denominator)));
+      });
+    }
+
+    function updateCompareNote() {
+      compareNote.textContent = "請把每位選手的左端對齊基準線，用右端伸出的長短來比較。";
+    }
+
+    function pulsePiece(piece) {
+      piece.animate([
+        { transform: "scale(1)" },
+        { transform: "scale(1.06)" },
+        { transform: "scale(1)" }
+      ], { duration: 320, easing: "ease-out" });
+    }
+
+    function toggleTeacher() {
+      state.teacherVisible = !state.teacherVisible;
+      teacherBox.hidden = !state.teacherVisible;
+      document.querySelector("#teacherMode").textContent = state.teacherVisible ? "收起提示" : "教師提示";
+    }
+
+    init();
+  </script>
+</body>
+</html>

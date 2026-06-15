@@ -1,16 +1,21 @@
-# 平分作品檢測互動網站
+# 單位分數互動遊戲
 
-這是一個給國小二年級學生使用的單位分數作品檢測網頁。
+這個 GitHub Pages 專案放置三個彼此獨立的單位分數網頁遊戲，不再互相覆蓋。
 
-學生可以上傳自己的色紙平分作品，選擇挑戰 `1/2`、`1/4` 或 `1/8`，網站會協助檢查是否符合「每一份一樣大」的平分概念，並給予適合低年級學生理解的回饋。
+## 遊戲入口
 
-## 課堂使用重點
+- 平分小偵探  
+  https://gmcelma-gmc.github.io/fraction-paper-checker/
 
-- 適合國小二年級「平分」與「單位分數」概念練習。
-- 重點不是分割線漂不漂亮，而是每一份是否一樣大。
-- 學生修正前，先確認是否真的平分；平分通過後，再檢查分數標示。
-- 網站為課堂形成性評量輔助工具，教師仍可依學生作品與口說說明進行專業判斷。
+- 環遊世界找分數  
+  https://gmcelma-gmc.github.io/fraction-paper-checker/world-fraction-flags.html
 
-## 線上網址
+- 分數競技台  
+  https://gmcelma-gmc.github.io/fraction-paper-checker/unit-fraction-bar-race.html
 
-https://gmcelma-gmc.github.io/fraction-paper-checker/
+## 維護原則
+
+- `index.html` 保留給「平分小偵探」。
+- `world-fraction-flags.html` 保留給「環遊世界找分數」。
+- `unit-fraction-bar-race.html` 保留給「分數競技台」。
+- 新增或修改任一遊戲時，請只更新該遊戲自己的 HTML 檔。
