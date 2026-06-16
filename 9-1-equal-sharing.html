@@ -1,0 +1,2276 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>9-1 一樣大才公平</title>
+  <style>
+    :root {
+      --ink: #24364a;
+      --muted: #66788b;
+      --line: #c9d9e8;
+      --paper: #fffefa;
+      --sky: #e9f6ff;
+      --blue: #2f6fa5;
+      --blue-soft: #eaf5ff;
+      --green: #37806b;
+      --green-soft: #eaf8f0;
+      --gold: #f3bd48;
+      --gold-soft: #fff5d7;
+      --rose: #d96155;
+      --rose-soft: #fff0ed;
+      --plum: #7060a8;
+      --shadow: 0 12px 28px rgba(36, 54, 74, .13);
+      --radius: 8px;
+      --pizza-bg:
+        radial-gradient(circle at 35% 35%, #d85b2e 0 2px, transparent 3px),
+        radial-gradient(circle at 62% 46%, #3f9b4e 0 3px, transparent 4px),
+        radial-gradient(circle at 48% 68%, #c68636 0 5px, transparent 6px),
+        radial-gradient(circle at 72% 28%, #e45739 0 3px, transparent 4px),
+        radial-gradient(circle at 28% 70%, #4d9f45 0 3px, transparent 4px),
+        radial-gradient(circle at 50% 50%, #ffe8a7, #e8a844 72%, #c77932 100%);
+      --piece-bg: linear-gradient(135deg, #ffd66a, #f5a95b);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 245, 215, .9), transparent 34rem),
+        linear-gradient(180deg, #f1f9ff 0%, #eef8f2 100%);
+      line-height: 1.55;
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: inherit;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(36, 54, 74, .16);
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .app {
+      width: min(1240px, calc(100% - 18px));
+      margin: 0 auto;
+      padding: 12px 0 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(255, 254, 250, .96);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .badge {
+      width: 74px;
+      height: 74px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #fff8de, #e2f5ff);
+      border: 2px solid #b9d9ee;
+      font-weight: 900;
+      color: var(--blue);
+      text-align: center;
+      line-height: 1.05;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 3.3vw, 38px);
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: clamp(15px, 2vw, 17px);
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(90px, 1fr));
+      gap: 6px;
+      padding: 5px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #f8fbff;
+    }
+
+    .mode-switch button {
+      min-height: 42px;
+      padding: 8px 10px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .mode-switch button.active {
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 6px 14px rgba(47, 111, 165, .24);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 320px;
+      gap: 12px;
+      align-items: start;
+    }
+
+    body.student-mode .layout {
+      grid-template-columns: 260px minmax(0, 1fr);
+    }
+
+    .panel {
+      background: rgba(255, 254, 250, .97);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .steps {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      position: sticky;
+      top: 10px;
+    }
+
+    .step-button {
+      width: 100%;
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px;
+      text-align: left;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .step-button.active {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .step-button.done .step-no {
+      background: var(--green);
+    }
+
+    .step-no {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .step-title {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .step-note {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .checkmark {
+      color: var(--green);
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .work {
+      min-height: 720px;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto minmax(420px, auto) auto auto;
+      gap: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .task {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 18px);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      min-height: 31px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: var(--green-soft);
+      border: 1px solid #b9dfd0;
+      color: #245f50;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .tag.ticket {
+      background: var(--gold-soft);
+      border-color: #ecd18c;
+      color: #6e5008;
+    }
+
+    .stage {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(248,252,255,.95)),
+        repeating-linear-gradient(0deg, rgba(36,54,74,.035) 0 1px, transparent 1px 36px);
+      overflow: hidden;
+    }
+
+    .stage-inner {
+      padding: clamp(12px, 2vw, 18px);
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .feedback {
+      min-height: 72px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 4px;
+      align-content: center;
+      border-radius: var(--radius);
+      border: 1px solid #ecd18c;
+      background: var(--gold-soft);
+    }
+
+    .feedback.good {
+      border-color: #b9dfd0;
+      background: var(--green-soft);
+    }
+
+    .feedback.no {
+      border-color: #efb8b0;
+      background: var(--rose-soft);
+    }
+
+    .feedback strong {
+      font-size: 18px;
+    }
+
+    .say-box {
+      padding: 12px;
+      border: 1px solid #b8d9ee;
+      border-radius: var(--radius);
+      background: var(--sky);
+      display: grid;
+      gap: 8px;
+    }
+
+    .sentence {
+      min-height: 44px;
+      padding: 9px 10px;
+      border: 1px solid #b8d9ee;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .primary, .secondary, .ghost {
+      min-height: 44px;
+      padding: 9px 13px;
+      font-weight: 900;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .secondary {
+      background: var(--green-soft);
+      border: 1px solid #b0d9c8;
+      color: #24604f;
+    }
+
+    .ghost {
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .tool-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .choice {
+      min-height: 190px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      place-items: center;
+      text-align: center;
+      border: 2px solid var(--line);
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .choice.selected {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .choice.correct {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .choice.wrong {
+      border-color: var(--rose);
+      background: var(--rose-soft);
+    }
+
+    svg {
+      max-width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .ticket-lab {
+      display: grid;
+      gap: 14px;
+    }
+
+    .paper-card {
+      min-height: 260px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .shape-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .shape-tab {
+      min-height: 54px;
+      padding: 8px;
+      background: #fff;
+      border: 2px solid var(--line);
+      font-weight: 900;
+    }
+
+    .shape-tab.active {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .cut-palette {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .cut-btn {
+      min-height: 54px;
+      padding: 8px;
+      background: #fff;
+      border: 2px solid var(--line);
+      font-weight: 900;
+    }
+
+    .cut-btn.active {
+      border-color: var(--plum);
+      background: #f2eeff;
+    }
+
+    .tool-board {
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      gap: 12px;
+      border: 2px solid #8c8c8c;
+      border-radius: 28px;
+      background: #e9eef1;
+      overflow: hidden;
+    }
+
+    .work-board {
+      position: relative;
+      min-height: 560px;
+      overflow: hidden;
+      background: #e9eef1;
+      touch-action: none;
+    }
+
+    .cut-prompt {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      z-index: 2;
+      width: calc(100% - 36px);
+      min-height: 84px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.72);
+      color: #2e2e2e;
+      font-weight: 900;
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.45;
+    }
+
+    .tool-panel {
+      min-height: 560px;
+      padding: 12px;
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: 12px;
+      border-left: 2px solid #8c8c8c;
+      background: #e3eaee;
+    }
+
+    .tool-title {
+      padding: 6px 10px;
+      text-align: center;
+      color: #fff;
+      background: #767676;
+      border: 4px solid #bcbcbc;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 0;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
+    }
+
+    .tool-preview {
+      min-height: 126px;
+      display: grid;
+      place-items: center;
+    }
+
+    .preview-shape {
+      position: relative;
+      width: 118px;
+      height: 88px;
+      border: 3px solid #29475f;
+      background: var(--tool-bg, var(--piece-bg));
+      overflow: hidden;
+    }
+
+    .preview-shape.circle {
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+    }
+
+    .preview-shape.square {
+      width: 106px;
+      height: 106px;
+    }
+
+    .preview-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 4px;
+      background: rgba(255,255,255,.95);
+      transform: translateY(-2px);
+    }
+
+    .preview-line.vertical {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: auto;
+      width: 4px;
+      height: auto;
+      transform: translateX(-2px);
+    }
+
+    .preview-line.vertical-off {
+      top: 0;
+      bottom: 0;
+      left: 36%;
+      right: auto;
+      width: 4px;
+      height: auto;
+      transform: translateX(-2px);
+    }
+
+    .preview-line.horizontal-off {
+      top: 58%;
+      transform: translateY(-2px);
+    }
+
+    .preview-line.diagonal {
+      top: 50%;
+      left: -12%;
+      right: -12%;
+      width: 130%;
+      transform: rotate(24deg);
+    }
+
+    .preview-line.corner-diagonal {
+      top: 50%;
+      left: 50%;
+      right: auto;
+      width: 148%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      transform-origin: center;
+    }
+
+    .preview-line.rect-diagonal {
+      top: 50%;
+      left: 50%;
+      right: auto;
+      width: 150%;
+      transform: translate(-50%, -50%) rotate(36.7deg);
+      transform-origin: center;
+    }
+
+    .tool-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .blue-tool,
+    .green-tool,
+    .side-tool {
+      min-height: 45px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 2px solid #69c6ff;
+      background: #82d2ff;
+      color: #102c44;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 4px 5px 0 #5c8fea;
+    }
+
+    .green-tool {
+      justify-self: center;
+      min-width: 132px;
+      border-color: #85d348;
+      background: #7ecb39;
+      color: #fff;
+      box-shadow: 5px 6px 0 #4f8423;
+      font-size: 24px;
+    }
+
+    .tool-tip {
+      align-self: end;
+      display: grid;
+      gap: 4px;
+    }
+
+    .speech {
+      padding: 10px;
+      border: 2px solid #222;
+      border-radius: 12px;
+      background: #fff;
+      color: #222;
+      font-weight: 800;
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .teacher {
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff8de;
+      border: 2px solid #d7c08c;
+      font-size: 34px;
+    }
+
+    .piece {
+      position: absolute;
+      border: 3px solid #29475f;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      user-select: none;
+      touch-action: none;
+      background: var(--tool-bg, var(--piece-bg));
+      color: var(--ink);
+      box-shadow: 0 4px 10px rgba(36, 54, 74, .18);
+      transform-origin: center center;
+    }
+
+    .compare-zone {
+      position: absolute;
+      left: 50%;
+      top: 170px;
+      width: min(410px, 54%);
+      height: 270px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      transform: translateX(-50%);
+      border: 5px dashed #8cc6dd;
+      border-radius: 22px;
+      background: rgba(255,255,255,.34);
+      color: #416074;
+      font-weight: 900;
+      z-index: 1;
+    }
+
+    .compare-zone strong {
+      display: block;
+      font-size: 34px;
+      color: #29475f;
+    }
+
+    .compare-zone span {
+      display: block;
+      margin-top: 6px;
+      font-size: 20px;
+    }
+
+    .compare-zone.ready {
+      border-color: #6dee55;
+      background: rgba(218,255,210,.42);
+    }
+
+    .whole-piece {
+      z-index: 3;
+      cursor: grab;
+    }
+
+    .whole-piece.ready {
+      border-color: #5be448;
+      box-shadow: 0 0 0 8px rgba(91, 228, 72, .24);
+    }
+
+    .piece.reference {
+      opacity: .35;
+      border: 6px dashed #66ef4c;
+      box-shadow: none;
+    }
+
+    .pizza-texture {
+      --tool-bg: var(--pizza-bg);
+      border-color: #d58a3c;
+    }
+
+    .paper-yellow {
+      --tool-bg: linear-gradient(135deg, #ffe17b, #f2b54c);
+    }
+
+    .paper-pink {
+      --tool-bg: linear-gradient(135deg, #ffd3df, #e681a2);
+    }
+
+    .paper-blue {
+      --tool-bg: linear-gradient(135deg, #cce9ff, #74b6df);
+    }
+
+    .piece.draggable {
+      cursor: grab;
+    }
+
+    .piece.draggable:active {
+      cursor: grabbing;
+    }
+
+    .piece-circle {
+      border-radius: 999px;
+    }
+
+    .circle-top {
+      border-radius: 999px 999px 0 0;
+      border-bottom-width: 4px;
+    }
+
+    .circle-bottom {
+      border-radius: 0 0 999px 999px;
+      border-top-width: 4px;
+    }
+
+    .circle-left {
+      border-radius: 999px 0 0 999px;
+      border-right-width: 4px;
+    }
+
+    .circle-right {
+      border-radius: 0 999px 999px 0;
+      border-left-width: 4px;
+    }
+
+    .circle-diag-large,
+    .circle-diag-small {
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .circle-diag-small {
+      clip-path: polygon(0 0, 100% 0, 100% 72%, 0 28%);
+    }
+
+    .circle-diag-large {
+      clip-path: polygon(0 28%, 100% 72%, 100% 100%, 0 100%);
+    }
+
+    .circle-diag-large::after,
+    .circle-diag-small::after {
+      content: "";
+      position: absolute;
+      left: -12%;
+      top: 50%;
+      width: 132%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.95);
+      transform: rotate(24deg);
+      pointer-events: none;
+    }
+
+    .diag-piece {
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+    }
+
+    .diag-piece-alt {
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    }
+
+    .piece-square,
+    .piece-rect {
+      border-radius: 8px;
+    }
+
+    .piece.flipped {
+      transform: scaleX(-1);
+    }
+
+    .piece-label {
+      transform: none;
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+    }
+
+    .piece.flipped .piece-label {
+      transform: scaleX(-1);
+    }
+
+    .rotation-handle {
+      position: absolute;
+      z-index: 6;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 3px solid #f2a13a;
+      background: #fff4b7;
+      color: #2b3748;
+      font-size: 19px;
+      font-weight: 900;
+      box-shadow: 0 5px 0 #d18326, 0 8px 14px rgba(36, 54, 74, .18);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .rotation-handle:active {
+      cursor: grabbing;
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #d18326, 0 6px 10px rgba(36, 54, 74, .16);
+    }
+
+    .overlay-result {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .quick-side {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      gap: 12px;
+      z-index: 4;
+    }
+
+    .side-tool {
+      min-width: 128px;
+      border-color: #b9e4e1;
+      background: #eefcfb;
+      color: #111;
+      box-shadow: 5px 7px 0 rgba(56, 137, 132, .32);
+    }
+
+    .resource-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 2px solid #b9e4e1;
+      border-radius: 18px;
+      background: #eefcfb;
+      color: #234457;
+      font-weight: 900;
+    }
+
+    .resource-strip a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 2px solid #69c6ff;
+      background: #82d2ff;
+      color: #102c44;
+      text-decoration: none;
+      box-shadow: 4px 5px 0 #5c8fea;
+      white-space: nowrap;
+    }
+
+    .detective-game {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 2px solid #b9e4e1;
+      border-radius: 18px;
+      background: #f4fffe;
+    }
+
+    .detective-center {
+      min-height: 420px;
+      place-items: center;
+      text-align: center;
+      padding: 32px;
+    }
+
+    .detective-game header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 900;
+      color: #234457;
+    }
+
+    .detective-center h3 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 52px);
+      color: #234457;
+    }
+
+    .detective-center p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.6;
+    }
+
+    .detective-center a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 72px;
+      padding: 12px 28px;
+      border-radius: 22px;
+      border: 3px solid #69c6ff;
+      background: #82d2ff;
+      color: #102c44;
+      text-decoration: none;
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 6px 8px 0 #5c8fea;
+    }
+
+    .repair-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .repair-tab {
+      min-height: 50px;
+      padding: 8px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .repair-tab.active {
+      border-color: var(--plum);
+      background: #f2eeff;
+    }
+
+    .split-shape {
+      position: relative;
+      width: min(560px, 100%);
+      height: 230px;
+      border: 4px solid #29475f;
+      background:
+        linear-gradient(rgba(41, 71, 95, .18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(41, 71, 95, .18) 1px, transparent 1px),
+        #fff;
+      background-size: 46px 46px;
+      border-radius: 8px;
+      touch-action: none;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .split-shape.square {
+      width: min(330px, 78vw);
+      height: min(330px, 78vw);
+    }
+
+    .split-shape::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(243, 189, 72, .42) var(--split, 50%), transparent var(--split, 50%));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .split-shape.horizontal::before {
+      background: linear-gradient(180deg, rgba(243, 189, 72, .42) var(--split, 50%), transparent var(--split, 50%));
+    }
+
+    .split-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--split, 50%);
+      width: 8px;
+      transform: translateX(-4px);
+      background: var(--rose);
+      cursor: ew-resize;
+      z-index: 3;
+    }
+
+    .split-line.horizontal {
+      top: var(--split, 50%);
+      bottom: auto;
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 8px;
+      transform: translateY(-4px);
+      cursor: ns-resize;
+    }
+
+    .split-line::after {
+      content: "拖拉";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--rose);
+      color: var(--rose);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .judge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .judge-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .judge-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .judge-actions button {
+      min-height: 42px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .judge-actions button.selected.yes {
+      background: var(--green-soft);
+      border-color: var(--green);
+    }
+
+    .judge-actions button.selected.no {
+      background: var(--rose-soft);
+      border-color: var(--rose);
+    }
+
+    .exit-card {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .progress {
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .quiz-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .answer {
+      min-height: 56px;
+      padding: 9px;
+      border: 2px solid var(--line);
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .answer.correct {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .answer.wrong {
+      border-color: var(--rose);
+      background: var(--rose-soft);
+    }
+
+    .guide {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      position: sticky;
+      top: 10px;
+    }
+
+    .guide.hidden {
+      display: none;
+    }
+
+    .guide h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .guide-section {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .guide-section b {
+      color: var(--blue);
+    }
+
+    .guide-section p, .guide-section ul {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .guide-section ul {
+      padding-left: 1.2em;
+    }
+
+    .guide-section li + li {
+      margin-top: 4px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1120px) {
+      .layout,
+      body.student-mode .layout {
+        grid-template-columns: 230px minmax(0, 1fr);
+      }
+
+      .guide {
+        grid-column: 2;
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .mode-switch {
+        width: 100%;
+      }
+
+      .layout,
+      body.student-mode .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .steps {
+        position: static;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .step-button {
+        grid-template-columns: 36px 1fr;
+      }
+
+      .checkmark {
+        display: none;
+      }
+
+      .guide {
+        grid-column: auto;
+      }
+
+      .tool-board,
+      .choice-grid,
+      .shape-tabs,
+      .cut-palette,
+      .judge-grid,
+      .answer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tool-panel {
+        border-left: 0;
+        border-top: 2px solid #8c8c8c;
+        min-height: 0;
+      }
+
+      .work {
+        min-height: 0;
+      }
+    }
+  </style>
+</head>
+<body class="student-mode">
+  <div class="app">
+    <header class="topbar">
+      <div class="badge">9-1<br>平分</div>
+      <div>
+        <h1>一樣大才公平</h1>
+        <p class="subtitle">先切一切，再疊合比一比。能判斷「每一份一樣大」，才拿到進入單位分數的入場券。</p>
+      </div>
+      <div class="mode-switch" aria-label="模式切換">
+        <button id="studentMode" class="active" type="button">學生版</button>
+        <button id="parentMode" type="button">家長版</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <nav class="steps panel" id="stepList" aria-label="9-1學習步驟"></nav>
+
+      <section class="work panel" aria-live="polite">
+        <div>
+          <h2 id="stepTitle"></h2>
+          <p class="task" id="stepTask"></p>
+        </div>
+        <div class="tags">
+          <span class="tag" id="conceptTag"></span>
+          <span class="tag ticket" id="ticketTag"></span>
+        </div>
+        <div class="stage">
+          <div class="stage-inner" id="stage"></div>
+        </div>
+        <div class="feedback" id="feedback">
+          <strong>開始挑戰</strong>
+          <span>先照畫面操作，再說出你的理由。</span>
+        </div>
+      </section>
+
+      <aside class="guide panel hidden" id="parentGuide">
+        <h3>家長陪學提示</h3>
+        <div class="guide-section">
+          <b>這一步在學</b>
+          <p id="guideConcept"></p>
+        </div>
+        <div class="guide-section">
+          <b>可以這樣問</b>
+          <ul id="guidePrompts"></ul>
+        </div>
+        <div class="guide-section">
+          <b>觀察孩子</b>
+          <p id="guideObserve"></p>
+        </div>
+        <div class="guide-section">
+          <b>常見檢測題型</b>
+          <p id="guideExam"></p>
+        </div>
+      </aside>
+    </main>
+
+    <div class="footer">9-1 對應教案活動：公平判斷、切割疊合、平分小偵探、平分小法官、修正挑戰、出場卷。</div>
+  </div>
+
+  <script>
+    const steps = [
+      {
+        id: "entry",
+        title: "入場券：切一切、疊疊看",
+        short: "拖拉疊合",
+        task: "先選切割線，再把黃色那份拖去和藍色那份疊合，看看是不是一樣大。",
+        concept: "每一份一樣大才叫平分",
+        ticket: "入場券",
+        guide: "孩子要透過「切割線」和「疊合比較」判斷是否平分。這一步不是背答案，而是建立公平與一樣大的判準。",
+        prompts: ["你選的切線讓兩邊一樣大嗎？", "拖去疊合後，有沒有多出來或不夠？", "如果不能疊合，還能說公平嗎？"],
+        observe: "孩子是否會用疊合結果說理由，而不是只說「看起來差不多」。",
+        exam: "檢測題常讓學生判斷哪個圖形是平分，關鍵是每份大小是否相同。",
+        sentences: ["能完全疊合，表示兩份一樣大。", "每份一樣大，才是平分。"]
+      },
+      {
+        id: "detective",
+        title: "平分小偵探",
+        short: "網頁遊戲",
+        task: "開啟平分小偵探，先用遊戲練習判斷哪些圖形真的有平分。",
+        concept: "看見每份一樣大的證據",
+        ticket: "能力學習",
+        guide: "這一步讓孩子先到教案原本的互動網頁練習，透過判斷題累積平分與不平分的辨識經驗。",
+        prompts: ["你為什麼覺得這一題有平分？", "有沒有只是切開，但每份不一樣大？", "你能找到每份一樣大的證據嗎？"],
+        observe: "孩子是否能用「每份一樣大」作為判斷理由，而不是只看有沒有線或切成幾份。",
+        exam: "連結到檢測題中的圖形判斷題：辨認平分與不平分。",
+        sentences: ["我能找出平分的圖形。"]
+      },
+      {
+        id: "judge",
+        title: "平分小法官",
+        short: "判斷平分",
+        task: "請幫每張色紙打分數：每份一樣大就是合格，不一樣大就退回重摺。",
+        concept: "用證據判斷平分",
+        ticket: "能力學習",
+        guide: "這一步承接教案中的色紙摺疊。孩子要看摺線後的每份是否一樣大，練習成為平分小法官。",
+        prompts: ["哪一張色紙可以合格？", "你看到哪裡不一樣大？", "如果要修正，摺線要往哪邊移？"],
+        observe: "孩子是否能說出合格或退回的理由，例如左右一樣寬、上下不一樣高。",
+        exam: "常見題型會混入切成同份數但不等大的圖，檢查學生是否只看份數。",
+        sentences: ["我判斷平分時，要看每一份是不是一樣大。", "不一樣大就不能叫平分。"]
+      },
+      {
+        id: "repair",
+        title: "修正挑戰：把不公平變公平",
+        short: "調整摺線",
+        task: "拖拉紅色摺線，讓左右兩邊變成一樣大。",
+        concept: "調整到正中間才公平",
+        ticket: "精熟練習",
+        guide: "孩子從判斷進到修正。能把不平分調整成平分，代表孩子不只會選答案，也知道平分的結構。",
+        prompts: ["紅線現在偏哪一邊？", "哪一邊比較大？", "要怎麼移，兩邊才一樣大？"],
+        observe: "孩子是否能主動把摺線移到正中間，並用左右一樣大說明。",
+        exam: "可連結到畫線、補線或選出正確切割方式的題型。",
+        sentences: ["摺線在中間，左右兩份才一樣大。", "我可以修正摺線，讓它變成平分。"]
+      },
+      {
+        id: "exit",
+        title: "出場卷：我會判斷平分",
+        short: "檢測題",
+        task: "完成8題小檢測。答題時要先想：有沒有平分？每份有沒有一樣大？",
+        concept: "把操作轉成檢測能力",
+        ticket: "出場卷",
+        guide: "出場卷只檢測9-1的核心能力：是否能判斷平分、說明公平、一樣大與疊合證據。",
+        prompts: ["這題要先看什麼？", "哪一份比較大？", "你可以用疊合的想法說理由嗎？"],
+        observe: "孩子是否能把前面的操作經驗轉成紙筆或線上題目的判斷。",
+        exam: "題型包含判斷平分圖、選出公平切法、判斷語句、找出不公平原因。",
+        sentences: ["我會先看每一份是不是一樣大。", "我可以用平分的規則完成檢測題。"]
+      }
+    ];
+
+    const judgeItems = [
+      { id: "a", correct: "yes", label: "左右一樣寬", svg: paperSvg("verticalCenter") },
+      { id: "b", correct: "no", label: "左邊比較小", svg: paperSvg("verticalOff") },
+      { id: "c", correct: "yes", label: "上下各一半", svg: paperSvg("horizontalCenter") },
+      { id: "d", correct: "no", label: "三份大小不同", svg: paperSvg("unequalThree") },
+      { id: "e", correct: "yes", label: "四格一樣大", svg: paperSvg("quarters") },
+      { id: "f", correct: "no", label: "有切線但不公平", svg: paperSvg("slant") }
+    ];
+
+    const exitQuestions = [
+      {
+        text: "哪一張色紙有平分？",
+        visual: () => `<div class="choice-grid">${answerButton("A", paperSvg("verticalOff"))}${answerButton("B", paperSvg("verticalCenter"))}${answerButton("C", paperSvg("unequalThree"))}</div>`,
+        answer: "B",
+        good: "左右兩份一樣大，所以有平分。",
+        wrong: "要看每一份大小是否相同，不是只看有沒有切線。"
+      },
+      {
+        text: "這樣分公平嗎？",
+        visual: () => `<div class="choice-grid">${answerButton("公平", paperSvg("verticalOff"))}${answerButton("不公平", paperSvg("verticalOff"))}</div>`,
+        answer: "不公平",
+        good: "左邊小、右邊大，所以不公平。",
+        wrong: "兩份大小不同，不能說公平。"
+      },
+      {
+        text: "哪一句話是平分的意思？",
+        visual: () => answerOptions(["分成很多份", "每一份一樣大", "只要有切開就好"]),
+        answer: "每一份一樣大",
+        good: "平分最重要的是每份一樣大。",
+        wrong: "平分不是只看份數，也不是只看有沒有切開。"
+      },
+      {
+        text: "如果兩片疊合後有一片多出來，表示什麼？",
+        visual: () => answerOptions(["兩片一樣大", "沒有平分", "一定很公平"]),
+        answer: "沒有平分",
+        good: "疊合後不能對齊，表示大小不同。",
+        wrong: "疊合是用來檢查大小是否相同。"
+      },
+      {
+        text: "哪一張可以給兩個人公平分享？",
+        visual: () => `<div class="choice-grid">${answerButton("A", paperSvg("horizontalCenter"))}${answerButton("B", paperSvg("slant"))}${answerButton("C", paperSvg("verticalOff"))}</div>`,
+        answer: "A",
+        good: "上下兩份一樣大，可以公平分享。",
+        wrong: "公平分享要讓每個人分到一樣大。"
+      },
+      {
+        text: "看到切成4份，就一定是平分嗎？",
+        visual: () => answerOptions(["一定是", "不一定，要看大小", "不用看大小"]),
+        answer: "不一定，要看大小",
+        good: "切成4份還要確認每一份一樣大。",
+        wrong: "份數一樣不代表每份大小一樣。"
+      },
+      {
+        text: "這張色紙退回重摺的原因是什麼？",
+        visual: () => `<div class="choice-grid">${answerButton("每份不一樣大", paperSvg("unequalThree"))}${answerButton("顏色太少", paperSvg("unequalThree"))}${answerButton("有三條線", paperSvg("unequalThree"))}</div>`,
+        answer: "每份不一樣大",
+        good: "退回的理由要說到每份大小不同。",
+        wrong: "平分判斷的重點是每份大小，不是顏色或線條數。"
+      },
+      {
+        text: "完成9-1後，進入分數前要先會什麼？",
+        visual: () => answerOptions(["判斷平分", "只會數線條", "只看顏色"]),
+        answer: "判斷平分",
+        good: "平分是學幾分之一的入場券。",
+        wrong: "學分數前，要先能判斷有沒有平分。"
+      }
+    ];
+
+    const state = {
+      mode: "student",
+      step: 0,
+      done: new Set(),
+      shape: "rect",
+      cut: "center",
+      entryCutDone: false,
+      wholePlaced: false,
+      wholePosition: { x: 0, y: 0 },
+      overlapDropped: false,
+      movedPiece: { x: 0, y: 0, flipped: false, rotation: 0 },
+      repairPercent: 35,
+      repairShape: "rect",
+      repairLine: "vertical",
+      judgeAnswers: {},
+      exitIndex: 0,
+      exitCorrect: new Set()
+    };
+
+    const els = {
+      studentMode: document.getElementById("studentMode"),
+      parentMode: document.getElementById("parentMode"),
+      stepList: document.getElementById("stepList"),
+      title: document.getElementById("stepTitle"),
+      task: document.getElementById("stepTask"),
+      conceptTag: document.getElementById("conceptTag"),
+      ticketTag: document.getElementById("ticketTag"),
+      stage: document.getElementById("stage"),
+      feedback: document.getElementById("feedback"),
+      guide: document.getElementById("parentGuide"),
+      guideConcept: document.getElementById("guideConcept"),
+      guidePrompts: document.getElementById("guidePrompts"),
+      guideObserve: document.getElementById("guideObserve"),
+      guideExam: document.getElementById("guideExam")
+    };
+
+    function paperSvg(type, w = 220, h = 145) {
+      const base = `<rect x="18" y="18" width="${w - 36}" height="${h - 36}" rx="8" fill="#fff" stroke="#29475f" stroke-width="5"/>`;
+      const line = (x1, y1, x2, y2, color = "#d96155") => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="5" stroke-linecap="round"/>`;
+      let inside = "";
+      if (type === "verticalCenter") inside = line(w / 2, 18, w / 2, h - 18);
+      if (type === "verticalOff") inside = line(w * .36, 18, w * .36, h - 18);
+      if (type === "horizontalCenter") inside = line(18, h / 2, w - 18, h / 2);
+      if (type === "unequalThree") inside = line(w * .34, 18, w * .34, h - 18) + line(w * .74, 18, w * .74, h - 18);
+      if (type === "quarters") inside = line(w / 2, 18, w / 2, h - 18) + line(18, h / 2, w - 18, h / 2);
+      if (type === "slant") inside = line(54, 18, w - 30, h - 18);
+      return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="色紙摺線圖">${base}${inside}</svg>`;
+    }
+
+    function answerButton(label, visual) {
+      return `<button class="answer" type="button" data-answer="${label}">${visual}<span>${label}</span></button>`;
+    }
+
+    function answerOptions(options) {
+      return `<div class="answer-grid">${options.map(option => `<button class="answer" type="button" data-answer="${option}">${option}</button>`).join("")}</div>`;
+    }
+
+    function setFeedback(kind, title, text) {
+      els.feedback.className = `feedback ${kind || ""}`.trim();
+      els.feedback.innerHTML = `<strong>${title}</strong><span>${text}</span>`;
+    }
+
+    function markDone(id = steps[state.step].id) {
+      state.done.add(id);
+      renderSteps();
+    }
+
+    function renderSteps() {
+      els.stepList.innerHTML = steps.map((step, index) => {
+        const active = index === state.step ? "active" : "";
+        const done = state.done.has(step.id) ? "done" : "";
+        const check = state.done.has(step.id) ? "✓" : "";
+        return `<button class="step-button ${active} ${done}" type="button" data-index="${index}">
+          <span class="step-no">${index + 1}</span>
+          <span><span class="step-title">${step.title}</span><span class="step-note">${step.short}</span></span>
+          <span class="checkmark">${check}</span>
+        </button>`;
+      }).join("");
+      [...els.stepList.querySelectorAll("button")].forEach(button => {
+        button.addEventListener("click", () => {
+          state.step = Number(button.dataset.index);
+          render();
+        });
+      });
+    }
+
+    function renderGuide(step) {
+      els.guide.classList.toggle("hidden", state.mode !== "parent");
+      els.guideConcept.textContent = step.guide;
+      els.guidePrompts.innerHTML = step.prompts.map(prompt => `<li>${prompt}</li>`).join("");
+      els.guideObserve.textContent = step.observe;
+      els.guideExam.textContent = step.exam;
+    }
+
+    function renderShell() {
+      const step = steps[state.step];
+      els.title.textContent = step.title;
+      els.task.textContent = step.task;
+      els.conceptTag.textContent = step.concept;
+      els.ticketTag.textContent = step.ticket;
+      renderGuide(step);
+    }
+
+    function renderEntry() {
+      state.entryCutDone = false;
+      state.wholePlaced = false;
+      state.wholePosition = { x: 0, y: 0 };
+      state.overlapDropped = false;
+      state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
+      els.stage.innerHTML = `<div class="ticket-lab">
+        <div class="shape-tabs">
+          <button class="shape-tab ${state.shape === "rect" ? "active" : ""}" type="button" data-shape="rect">長方形</button>
+          <button class="shape-tab ${state.shape === "square" ? "active" : ""}" type="button" data-shape="square">正方形</button>
+          <button class="shape-tab ${state.shape === "circle" ? "active" : ""}" type="button" data-shape="circle">圓形</button>
+        </div>
+        <div class="cut-palette">
+          <button class="cut-btn ${state.cut === "center" ? "active" : ""}" type="button" data-cut="center">對半切</button>
+          <button class="cut-btn ${state.cut === "off" ? "active" : ""}" type="button" data-cut="off">偏一邊切</button>
+          <button class="cut-btn ${state.cut === "horizontal" ? "active" : ""}" type="button" data-cut="horizontal">${state.shape === "circle" ? "再對半切" : "橫著切"}</button>
+          <button class="cut-btn ${state.cut === "diagonal" ? "active" : ""}" type="button" data-cut="diagonal">斜斜切</button>
+        </div>
+        <div class="paper-card">
+          <div class="tool-board">
+            <div class="work-board" id="cutStage"></div>
+            <div class="tool-panel">
+              <div class="tool-title">教學工具</div>
+              <div class="tool-preview" id="toolPreview"></div>
+              <div class="tool-nav">
+                <button class="blue-tool" type="button" id="prevCut">上一個</button>
+                <button class="blue-tool" type="button" id="nextCut">下一個</button>
+              </div>
+              <button class="green-tool" type="button" id="mergePiece">切割圖形</button>
+              <div class="tool-tip">
+                <div class="speech">一次只能拖曳一種平分的圖形。切割後，拖黃色片到虛線框，必要時可翻轉。</div>
+                <div class="teacher">👧</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tool-row">
+          <button class="primary" type="button" id="checkOverlap">疊合評分</button>
+          <button class="ghost" type="button" id="autoOverlap">幫我疊上去</button>
+          <button class="ghost" type="button" id="flipPiece">翻轉黃色片</button>
+        </div>
+      </div>`;
+      updateEntryVisual();
+      wireShapeButtons();
+      wireCutButtons();
+      document.getElementById("checkOverlap").addEventListener("click", checkOverlap);
+      document.getElementById("mergePiece").addEventListener("click", handleCutTool);
+      document.getElementById("prevCut").addEventListener("click", () => cycleCut(-1));
+      document.getElementById("nextCut").addEventListener("click", () => cycleCut(1));
+      document.getElementById("autoOverlap").addEventListener("click", () => {
+        if (!state.entryCutDone) {
+          setFeedback("no", "還沒切割", "請先把完整圖形拖進比較區，再按右邊的「切割圖形」。");
+          return;
+        }
+        state.movedPiece.x = 0;
+        state.movedPiece.y = 0;
+        state.movedPiece.rotation = 0;
+        placePieces(true);
+        state.overlapDropped = true;
+        setFeedback("", "已經疊上去", "請按「疊合評分」看看兩份是不是一樣大。");
+      });
+      document.getElementById("flipPiece").addEventListener("click", () => {
+        if (!state.entryCutDone) {
+          setFeedback("no", "還沒切割", "切割後才會出現可以翻轉的黃色片。");
+          return;
+        }
+        state.movedPiece.flipped = !state.movedPiece.flipped;
+        placePieces();
+        setFeedback("", state.movedPiece.flipped ? "已翻轉" : "翻回來了", "還可以拖「轉」圓鈕，轉到任何角度再疊合。");
+      });
+    }
+
+    function entryPieces() {
+      const shape = state.shape;
+      const cut = state.cut;
+      const equal = cut !== "off";
+      const base = {
+        rect: { w: 260, h: 145, cls: "piece-rect paper-yellow", preview: "paper-yellow", name: "長方形" },
+        square: { w: 170, h: 170, cls: "piece-square paper-pink", preview: "paper-pink", name: "正方形" },
+        circle: { w: 210, h: 210, cls: "piece-circle pizza-texture", preview: "pizza-texture", name: "圓形" }
+      }[shape];
+      if (shape === "circle") {
+        if (cut === "off") return { equal: false, base, line: "horizontal-off", a: { w: 210, h: 122, cls: "circle-top pizza-texture", label: "大片" }, b: { w: 210, h: 88, cls: "circle-bottom pizza-texture", label: "小片" } };
+        if (cut === "diagonal") return { equal: true, base, line: "diagonal", a: { w: 210, h: 210, cls: "circle-diag-large pizza-texture", label: "斜切半圓" }, b: { w: 210, h: 210, cls: "circle-diag-small pizza-texture", label: "斜切半圓" } };
+        if (cut === "horizontal") return { equal: true, base, line: "horizontal", a: { w: 210, h: 105, cls: "circle-top pizza-texture", label: "上半圓" }, b: { w: 210, h: 105, cls: "circle-bottom pizza-texture", label: "下半圓" } };
+        return { equal: true, base, line: "vertical", a: { w: 105, h: 210, cls: "circle-left pizza-texture", label: "左半圓" }, b: { w: 105, h: 210, cls: "circle-right pizza-texture", label: "右半圓" } };
+      }
+      if (cut === "off") return { equal: false, base, line: "vertical-off", a: { w: Math.round(base.w * .36), h: base.h, cls: base.cls, label: "小片" }, b: { w: Math.round(base.w * .64), h: base.h, cls: base.cls, label: "大片" } };
+      if (cut === "horizontal") return { equal, base, line: "horizontal", a: { w: base.w, h: Math.round(base.h / 2), cls: base.cls, label: "上半" }, b: { w: base.w, h: Math.round(base.h / 2), cls: base.cls, label: "下半" } };
+      if (cut === "diagonal") {
+        return { equal: true, base, line: "diagonal", a: { w: base.w, h: base.h, cls: `${base.cls} diag-piece`, label: "三角片" }, b: { w: base.w, h: base.h, cls: `${base.cls} diag-piece-alt`, label: "三角片" } };
+      }
+      return { equal, base, line: "vertical", a: { w: Math.round(base.w / 2), h: base.h, cls: base.cls, label: "左半" }, b: { w: Math.round(base.w / 2), h: base.h, cls: base.cls, label: "右半" } };
+    }
+
+    function updateEntryVisual() {
+      const stage = document.getElementById("cutStage");
+      const data = entryPieces();
+      if (!state.entryCutDone) {
+        stage.innerHTML = `<div class="cut-prompt">先把完整的${data.base.name}拖進比較區，再按右邊綠色的「切割圖形」。</div>
+          <div class="compare-zone ${state.wholePlaced ? "ready" : ""}" id="compareZone">
+            <div><strong>比較區</strong><span>把完整圖形放到這裡</span></div>
+          </div>
+          <div class="piece whole-piece draggable ${data.base.cls} ${state.wholePlaced ? "ready" : ""}" id="wholePiece">
+            <span class="piece-label">完整${data.base.name}</span>
+          </div>
+          <div class="overlay-result" id="overlayHint">${state.wholePlaced ? "可以按右邊切割圖形" : "請拖拉完整圖形"}</div>
+          <div class="quick-side">
+            <button class="side-tool" type="button" id="hideTopic">隱藏題目</button>
+            <button class="side-tool" type="button" id="resetEntry">重新布題</button>
+            <button class="side-tool" type="button" id="showHelp">使用說明</button>
+          </div>`;
+        updateToolPreview(data);
+        updateCutToolLabel();
+        placeWhole();
+        wireWholeDrag();
+        wireEntrySideTools();
+        return;
+      }
+      stage.innerHTML = `<div class="cut-prompt">${data.base.name}已經切成兩片，拖黃色片去疊藍色片，看看是不是一樣大。</div>
+        <div class="piece reference ${data.a.cls}" id="targetPiece"><span class="piece-label">藍色 ${data.a.label}</span></div>
+        <div class="piece draggable ${data.b.cls}" id="movePiece"><span class="piece-label">黃色 ${data.b.label}</span></div>
+        <button class="rotation-handle" type="button" id="rotateHandle" aria-label="拖曳旋轉黃色片">轉</button>
+        <div class="overlay-result" id="overlayHint">請拖拉黃色片</div>
+        <div class="quick-side">
+          <button class="side-tool" type="button" id="hideTopic">隱藏題目</button>
+          <button class="side-tool" type="button" id="resetEntry">重新布題</button>
+          <button class="side-tool" type="button" id="showHelp">使用說明</button>
+        </div>`;
+      updateToolPreview(data);
+      updateCutToolLabel();
+      placePieces(false);
+      wirePieceDrag();
+      wireRotationHandle();
+      wireEntrySideTools();
+    }
+
+    function wireEntrySideTools() {
+      document.getElementById("resetEntry").addEventListener("click", renderEntry);
+      document.getElementById("hideTopic").addEventListener("click", () => {
+        const prompt = document.querySelector(".cut-prompt");
+        prompt.style.visibility = prompt.style.visibility === "hidden" ? "visible" : "hidden";
+      });
+      document.getElementById("showHelp").addEventListener("click", () => setFeedback("", "使用說明", "先把完整圖形拖進比較區，按「切割圖形」後，再拖黃色片和藍色片疊合。"));
+    }
+
+    function updateCutToolLabel() {
+      const button = document.getElementById("mergePiece");
+      if (button) button.textContent = state.entryCutDone ? "合併圖形" : "切割圖形";
+    }
+
+    function updateToolPreview(data = entryPieces()) {
+      const preview = document.getElementById("toolPreview");
+      if (!preview) return;
+      const shapeClass = state.shape === "circle" ? "circle" : state.shape === "square" ? "square" : "rect";
+      const lineClass = data.line === "vertical" ? "vertical" :
+        data.line === "vertical-off" ? "vertical-off" :
+        data.line === "horizontal-off" ? "horizontal-off" :
+        data.line === "diagonal" && state.shape === "square" ? "corner-diagonal" :
+        data.line === "diagonal" && state.shape === "rect" ? "rect-diagonal" :
+        data.line === "diagonal" ? "diagonal" : "";
+      preview.innerHTML = `<div class="preview-shape ${shapeClass} ${data.base.preview}"><div class="preview-line ${lineClass}"></div></div>`;
+    }
+
+    function placeWhole() {
+      const data = entryPieces();
+      const whole = document.getElementById("wholePiece");
+      if (!whole) return;
+      const stage = document.getElementById("cutStage");
+      const boardWidth = stage ? stage.getBoundingClientRect().width : 780;
+      const boardHeight = stage ? stage.getBoundingClientRect().height : 560;
+      whole.style.width = `${data.base.w}px`;
+      whole.style.height = `${data.base.h}px`;
+      const startX = Math.max(24, Math.min(boardWidth - data.base.w - 24, state.wholePosition.x || 70));
+      const startY = Math.max(140, Math.min(boardHeight - data.base.h - 24, state.wholePosition.y || 410));
+      whole.style.left = `${startX}px`;
+      whole.style.top = `${startY}px`;
+      state.wholePosition.x = startX;
+      state.wholePosition.y = startY;
+    }
+
+    function snapWholeToZone() {
+      const area = document.getElementById("cutStage");
+      const whole = document.getElementById("wholePiece");
+      const zone = document.getElementById("compareZone");
+      if (!area || !whole || !zone) return;
+      const areaRect = area.getBoundingClientRect();
+      const zoneRect = zone.getBoundingClientRect();
+      state.wholePlaced = true;
+      state.wholePosition.x = zoneRect.left - areaRect.left + (zoneRect.width - whole.offsetWidth) / 2;
+      state.wholePosition.y = zoneRect.top - areaRect.top + (zoneRect.height - whole.offsetHeight) / 2;
+      placeWhole();
+      zone.classList.add("ready");
+      whole.classList.add("ready");
+      document.getElementById("overlayHint").textContent = "可以按右邊切割圖形";
+    }
+
+    function handleCutTool() {
+      if (state.entryCutDone) {
+        state.entryCutDone = false;
+        state.overlapDropped = false;
+        state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
+        updateEntryVisual();
+        setFeedback("", "合併回完整圖形", "可以再換切割線，或重新按切割圖形觀察。");
+        return;
+      }
+      if (!state.wholePlaced) {
+        setFeedback("no", "還沒放進比較區", "請先把完整圖形拖到中間的比較區，再按「切割圖形」。");
+        const hint = document.getElementById("overlayHint");
+        if (hint) hint.textContent = "先拖進比較區";
+        return;
+      }
+      state.entryCutDone = true;
+      state.overlapDropped = false;
+      state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
+      updateEntryVisual();
+      setFeedback("", "切好了", "現在把黃色這片拖去和藍色那片疊疊看。");
+    }
+
+    function placePieces(overlap = false) {
+      const data = entryPieces();
+      const target = document.getElementById("targetPiece");
+      const move = document.getElementById("movePiece");
+      if (!target || !move) return;
+      const stage = document.getElementById("cutStage");
+      const boardWidth = stage ? stage.getBoundingClientRect().width : 780;
+      const startX = Math.max(80, Math.round(boardWidth * .38 - data.a.w / 2));
+      const startY = 210;
+      target.style.width = `${data.a.w}px`;
+      target.style.height = `${data.a.h}px`;
+      target.style.left = `${startX}px`;
+      target.style.top = `${startY}px`;
+      move.style.width = `${data.b.w}px`;
+      move.style.height = `${data.b.h}px`;
+      const x = overlap ? 0 : (state.movedPiece.x || Math.min(310, Math.round(boardWidth * .28)));
+      const y = overlap ? 0 : (state.movedPiece.y || 0);
+      move.style.left = `${startX + x}px`;
+      move.style.top = `${startY + y}px`;
+      move.classList.toggle("flipped", state.movedPiece.flipped);
+      const flip = state.movedPiece.flipped ? "scaleX(-1)" : "scaleX(1)";
+      move.style.transform = `${flip} rotate(${state.movedPiece.rotation || 0}deg)`;
+      updateRotationUI();
+    }
+
+    function normalizeAngle(angle) {
+      return ((Math.round(angle) % 360) + 360) % 360;
+    }
+
+    function setRotation(angle) {
+      state.movedPiece.rotation = normalizeAngle(angle);
+      const move = document.getElementById("movePiece");
+      if (!move) return;
+      const flip = state.movedPiece.flipped ? "scaleX(-1)" : "scaleX(1)";
+      move.style.transform = `${flip} rotate(${state.movedPiece.rotation}deg)`;
+      updateRotationUI();
+    }
+
+    function updateRotationUI() {
+      const move = document.getElementById("movePiece");
+      const handle = document.getElementById("rotateHandle");
+      const angle = normalizeAngle(state.movedPiece.rotation || 0);
+      if (!move || !handle) return;
+      const left = parseFloat(move.style.left) || 0;
+      const top = parseFloat(move.style.top) || 0;
+      const radius = Math.max(move.offsetWidth, move.offsetHeight) / 2 + 34;
+      const rad = (angle - 90) * Math.PI / 180;
+      const centerX = left + move.offsetWidth / 2;
+      const centerY = top + move.offsetHeight / 2;
+      handle.style.left = `${centerX + Math.cos(rad) * radius - handle.offsetWidth / 2}px`;
+      handle.style.top = `${centerY + Math.sin(rad) * radius - handle.offsetHeight / 2}px`;
+    }
+
+    function wireRotationHandle() {
+      const area = document.getElementById("cutStage");
+      const move = document.getElementById("movePiece");
+      const handle = document.getElementById("rotateHandle");
+      if (!area || !move || !handle) return;
+      let rotating = false;
+      const getPoint = event => event.touches ? event.touches[0] : event;
+      const rotateFromPoint = event => {
+        if (!rotating) return;
+        const point = getPoint(event);
+        const areaRect = area.getBoundingClientRect();
+        const centerX = parseFloat(move.style.left) + move.offsetWidth / 2;
+        const centerY = parseFloat(move.style.top) + move.offsetHeight / 2;
+        const x = point.clientX - areaRect.left - centerX;
+        const y = point.clientY - areaRect.top - centerY;
+        setRotation(Math.atan2(y, x) * 180 / Math.PI + 90);
+      };
+      const stopRotate = () => {
+        rotating = false;
+        window.removeEventListener("pointermove", rotateFromPoint);
+        window.removeEventListener("pointerup", stopRotate);
+        window.removeEventListener("mousemove", rotateFromPoint);
+        window.removeEventListener("mouseup", stopRotate);
+        window.removeEventListener("touchmove", rotateFromPoint);
+        window.removeEventListener("touchend", stopRotate);
+        setFeedback("", "已旋轉黃色片", "可以繼續轉到任何角度，再拖去和藍色片疊合。");
+      };
+      const startRotate = event => {
+        event.preventDefault();
+        rotating = true;
+        window.addEventListener("pointermove", rotateFromPoint);
+        window.addEventListener("pointerup", stopRotate);
+        window.addEventListener("mousemove", rotateFromPoint);
+        window.addEventListener("mouseup", stopRotate);
+        window.addEventListener("touchmove", rotateFromPoint, { passive: false });
+        window.addEventListener("touchend", stopRotate);
+      };
+      handle.addEventListener("pointerdown", startRotate);
+      handle.addEventListener("mousedown", startRotate);
+      handle.addEventListener("touchstart", startRotate, { passive: false });
+    }
+
+    function cycleCut(direction) {
+      const cuts = ["center", "horizontal", "diagonal", "off"];
+      const current = cuts.indexOf(state.cut);
+      state.cut = cuts[(current + direction + cuts.length) % cuts.length];
+      state.entryCutDone = false;
+      state.wholePlaced = false;
+      state.wholePosition = { x: 0, y: 0 };
+      state.overlapDropped = false;
+      state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
+      renderEntry();
+      setFeedback("", "換一種切法", "請先把完整圖形拖進比較區，再按切割圖形。");
+    }
+
+    function wireShapeButtons() {
+      [...document.querySelectorAll(".shape-tab")].forEach(button => {
+        button.addEventListener("click", () => {
+          state.shape = button.dataset.shape;
+          state.entryCutDone = false;
+          state.wholePlaced = false;
+          state.wholePosition = { x: 0, y: 0 };
+          state.overlapDropped = false;
+          state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
+          renderEntry();
+          setFeedback("", `換成${button.textContent}`, "請選切法，再把完整圖形拖進比較區。");
+        });
+      });
+    }
+
+    function wireCutButtons() {
+      [...document.querySelectorAll(".cut-btn")].forEach(button => {
+        button.addEventListener("click", () => {
+          state.cut = button.dataset.cut;
+          state.entryCutDone = false;
+          state.wholePlaced = false;
+          state.wholePosition = { x: 0, y: 0 };
+          state.overlapDropped = false;
+          state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
+          updateEntryVisual();
+          [...document.querySelectorAll(".cut-btn")].forEach(btn => btn.classList.toggle("active", btn === button));
+          setFeedback("", "換一條切割線", "請先拖完整圖形到比較區，再按切割圖形。");
+        });
+      });
+    }
+
+    function wireWholeDrag() {
+      const area = document.getElementById("cutStage");
+      const whole = document.getElementById("wholePiece");
+      const zone = document.getElementById("compareZone");
+      if (!area || !whole || !zone) return;
+      let offsetX = 0;
+      let offsetY = 0;
+      let dragging = false;
+      const getPoint = event => event.touches ? event.touches[0] : event;
+      const onMove = event => {
+        if (!dragging) return;
+        const point = getPoint(event);
+        const rect = area.getBoundingClientRect();
+        let x = point.clientX - rect.left - offsetX;
+        let y = point.clientY - rect.top - offsetY;
+        x = Math.max(4, Math.min(rect.width - whole.offsetWidth - 4, x));
+        y = Math.max(4, Math.min(rect.height - whole.offsetHeight - 4, y));
+        whole.style.left = `${x}px`;
+        whole.style.top = `${y}px`;
+        state.wholePosition.x = x;
+        state.wholePosition.y = y;
+      };
+      const onUp = () => {
+        dragging = false;
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", onUp);
+        const zoneRect = zone.getBoundingClientRect();
+        const wholeRect = whole.getBoundingClientRect();
+        const centerX = wholeRect.left + wholeRect.width / 2;
+        const centerY = wholeRect.top + wholeRect.height / 2;
+        state.wholePlaced = centerX > zoneRect.left && centerX < zoneRect.right && centerY > zoneRect.top && centerY < zoneRect.bottom;
+        if (state.wholePlaced) snapWholeToZone();
+        zone.classList.toggle("ready", state.wholePlaced);
+        whole.classList.toggle("ready", state.wholePlaced);
+        document.getElementById("overlayHint").textContent = state.wholePlaced ? "可以按右邊切割圖形" : "還沒放進比較區";
+      };
+      const onDown = event => {
+        event.preventDefault();
+        if (dragging) return;
+        dragging = true;
+        const point = getPoint(event);
+        const rect = whole.getBoundingClientRect();
+        offsetX = point.clientX - rect.left;
+        offsetY = point.clientY - rect.top;
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+        window.addEventListener("touchmove", onMove, { passive: false });
+        window.addEventListener("touchend", onUp);
+      };
+      whole.addEventListener("pointerdown", onDown);
+      whole.addEventListener("mousedown", onDown);
+      whole.addEventListener("touchstart", onDown, { passive: false });
+      zone.addEventListener("click", snapWholeToZone);
+    }
+
+    function wirePieceDrag() {
+      const area = document.getElementById("cutStage");
+      const move = document.getElementById("movePiece");
+      if (!area || !move) return;
+      let offsetX = 0;
+      let offsetY = 0;
+      let dragging = false;
+      const getPoint = event => event.touches ? event.touches[0] : event;
+      const onMove = event => {
+        if (!dragging) return;
+        const point = getPoint(event);
+        const rect = area.getBoundingClientRect();
+        let x = point.clientX - rect.left - offsetX;
+        let y = point.clientY - rect.top - offsetY;
+        x = Math.max(4, Math.min(rect.width - move.offsetWidth - 4, x));
+        y = Math.max(4, Math.min(rect.height - move.offsetHeight - 4, y));
+        move.style.left = `${x}px`;
+        move.style.top = `${y}px`;
+        const target = document.getElementById("targetPiece");
+        const targetLeft = parseFloat(target.style.left);
+        const targetTop = parseFloat(target.style.top);
+        state.movedPiece.x = x - targetLeft;
+        state.movedPiece.y = y - targetTop;
+        updateRotationUI();
+      };
+      const onUp = () => {
+        dragging = false;
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", onUp);
+        const target = document.getElementById("targetPiece").getBoundingClientRect();
+        const current = move.getBoundingClientRect();
+        const targetCenterX = target.left + target.width / 2;
+        const targetCenterY = target.top + target.height / 2;
+        const currentCenterX = current.left + current.width / 2;
+        const currentCenterY = current.top + current.height / 2;
+        state.overlapDropped = Math.abs(targetCenterX - currentCenterX) < 42 && Math.abs(targetCenterY - currentCenterY) < 42;
+        document.getElementById("overlayHint").textContent = state.overlapDropped ? "已疊到藍色片附近" : "還沒疊準，可以再拖近一點";
+      };
+      const onDown = event => {
+        event.preventDefault();
+        if (dragging) return;
+        dragging = true;
+        const point = getPoint(event);
+        const rect = move.getBoundingClientRect();
+        offsetX = point.clientX - rect.left;
+        offsetY = point.clientY - rect.top;
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+        window.addEventListener("touchmove", onMove, { passive: false });
+        window.addEventListener("touchend", onUp);
+      };
+      move.addEventListener("pointerdown", onDown);
+      move.addEventListener("mousedown", onDown);
+      move.addEventListener("touchstart", onDown, { passive: false });
+    }
+
+    function checkOverlap() {
+      if (!state.entryCutDone) {
+        setFeedback("no", "還沒切割", "請先把完整圖形拖進比較區，按「切割圖形」後再疊合比較。");
+        return;
+      }
+      const data = entryPieces();
+      const same = data.equal && Math.abs(data.a.w - data.b.w) <= 8 && Math.abs(data.a.h - data.b.h) <= 8;
+      if (!state.overlapDropped) {
+        setFeedback("no", "還沒疊合", "請先拖拉黃色這份，放到藍色那份上面。");
+        return;
+      }
+      if (same) {
+        setFeedback("good", "入場券通過", "兩份可以疊合，一樣大，這就是平分。");
+        markDone("entry");
+      } else {
+        setFeedback("no", "還不能通過", "疊合後會多出來或不夠，表示兩份不一樣大。請換一條切割線。");
+      }
+    }
+
+    function renderDetective() {
+      els.stage.innerHTML = `<div class="ticket-lab">
+        <div class="detective-game detective-center">
+          <h3>平分小偵探</h3>
+          <p>開啟教案原本的互動網頁，練習找出真正「每份一樣大」的圖形。</p>
+          <a id="detectiveLink" href="https://gmcelma-gmc.github.io/fraction-paper-checker/" target="_blank" rel="noopener">開啟平分小偵探</a>
+        </div>
+      </div>`;
+      setFeedback("", "開啟遊戲", "完成平分小偵探後，回到這裡進入平分小法官。");
+      document.getElementById("detectiveLink").addEventListener("click", () => markDone("detective"));
+    }
+
+    function renderJudge() {
+      els.stage.innerHTML = `<div class="ticket-lab">
+        <div class="judge-grid">
+        ${judgeItems.map(item => `<div class="judge-card" data-id="${item.id}">
+          <div>${item.svg}</div>
+          <b>${item.label}</b>
+          <div class="judge-actions">
+            <button type="button" class="yes" data-answer="yes">合格</button>
+            <button type="button" class="no" data-answer="no">退回</button>
+          </div>
+        </div>`).join("")}
+        </div>
+        <div class="tool-row">
+          <button class="primary" type="button" id="checkJudge">小法官評分</button>
+          <button class="ghost" type="button" id="resetJudge">重新評分</button>
+        </div>
+      </div>`;
+      [...document.querySelectorAll(".judge-card")].forEach(card => {
+        [...card.querySelectorAll("button")].forEach(button => {
+          button.addEventListener("click", () => {
+            [...card.querySelectorAll("button")].forEach(btn => btn.classList.remove("selected"));
+            button.classList.add("selected");
+            state.judgeAnswers[card.dataset.id] = button.dataset.answer;
+          });
+        });
+      });
+      document.getElementById("resetJudge").addEventListener("click", () => {
+        state.judgeAnswers = {};
+        renderJudge();
+        setFeedback("", "重新評分", "請每一張都選合格或退回。");
+      });
+      document.getElementById("checkJudge").addEventListener("click", () => {
+        const answered = Object.keys(state.judgeAnswers).length;
+        if (answered < judgeItems.length) {
+          setFeedback("no", "還沒評完", `還有 ${judgeItems.length - answered} 張色紙沒有評分。`);
+          return;
+        }
+        const correct = judgeItems.filter(item => state.judgeAnswers[item.id] === item.correct).length;
+        if (correct >= 5) {
+          setFeedback("good", "小法官通過", `你答對 ${correct} 張。你能用每份一樣大來判斷平分。`);
+          markDone("judge");
+        } else {
+          setFeedback("no", "再當一次小法官", `你答對 ${correct} 張。請再看每一份大小是不是相同。`);
+        }
+      });
+    }
+
+    function renderRepair() {
+      state.repairPercent = 35;
+      const shapeName = state.repairShape === "square" ? "正方形" : "長方形";
+      const lineName = state.repairLine === "horizontal" ? "橫線" : "直線";
+      const directionText = state.repairLine === "horizontal" ? "上下兩邊" : "左右兩邊";
+      els.stage.innerHTML = `<div class="ticket-lab">
+        <div class="repair-tabs">
+          <button class="repair-tab ${state.repairShape === "rect" ? "active" : ""}" type="button" data-repair-shape="rect">長方形</button>
+          <button class="repair-tab ${state.repairShape === "square" ? "active" : ""}" type="button" data-repair-shape="square">正方形</button>
+        </div>
+        <div class="repair-tabs">
+          <button class="repair-tab ${state.repairLine === "vertical" ? "active" : ""}" type="button" data-repair-line="vertical">直線</button>
+          <button class="repair-tab ${state.repairLine === "horizontal" ? "active" : ""}" type="button" data-repair-line="horizontal">橫線</button>
+        </div>
+        <div class="paper-card">
+          <b>拖拉紅色${lineName}，讓${shapeName}${directionText}一樣大。可以用網格線幫忙對準。</b>
+          <div class="repair-shape split-shape ${state.repairShape === "square" ? "square" : "rect"} ${state.repairLine === "horizontal" ? "horizontal" : "vertical"}" id="repairShape" style="--split:${state.repairPercent}%">
+            <div class="split-line ${state.repairLine === "horizontal" ? "horizontal" : "vertical"}" id="repairLine" role="slider" aria-label="拖拉摺線" tabindex="0"></div>
+          </div>
+        </div>
+        <div class="tool-row">
+          <button class="primary" type="button" id="checkRepair">檢查平分</button>
+          <button class="ghost" type="button" id="centerRepair">放到正中間</button>
+        </div>
+      </div>`;
+      document.querySelectorAll("[data-repair-shape]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.repairShape = button.dataset.repairShape;
+          renderRepair();
+          setFeedback("", `換成${button.textContent}`, "請利用網格線，把紅線拖到正中間。");
+        });
+      });
+      document.querySelectorAll("[data-repair-line]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.repairLine = button.dataset.repairLine;
+          renderRepair();
+          setFeedback("", `換成${button.textContent}`, "請利用網格線，把紅線拖到正中間。");
+        });
+      });
+      wireRepairDrag();
+      document.getElementById("centerRepair").addEventListener("click", () => updateRepair(50));
+      document.getElementById("checkRepair").addEventListener("click", () => {
+        const ok = Math.abs(state.repairPercent - 50) <= 2;
+        if (ok) {
+          setFeedback("good", "修正成功", `紅線在${shapeName}中間，${directionText}一樣大。`);
+          markDone("repair");
+        } else {
+          setFeedback("no", "還沒有平分", "請參考網格線，把紅線移到正中間。");
+        }
+      });
+    }
+
+    function updateRepair(percent) {
+      state.repairPercent = Math.max(12, Math.min(88, Math.round(percent)));
+      document.getElementById("repairShape").style.setProperty("--split", `${state.repairPercent}%`);
+    }
+
+    function wireRepairDrag() {
+      const shape = document.getElementById("repairShape");
+      const getPoint = event => event.touches ? event.touches[0] : event;
+      const moveTo = clientX => {
+        const rect = shape.getBoundingClientRect();
+        updateRepair(((clientX - rect.left) / rect.width) * 100);
+      };
+      const moveToY = clientY => {
+        const rect = shape.getBoundingClientRect();
+        updateRepair(((clientY - rect.top) / rect.height) * 100);
+      };
+      const start = event => {
+        event.preventDefault();
+        const point = getPoint(event);
+        if (state.repairLine === "horizontal") moveToY(point.clientY);
+        else moveTo(point.clientX);
+        const onMove = e => {
+          e.preventDefault();
+          const current = getPoint(e);
+          if (state.repairLine === "horizontal") moveToY(current.clientY);
+          else moveTo(current.clientX);
+        };
+        const onUp = () => {
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("mousemove", onMove);
+          window.removeEventListener("mouseup", onUp);
+          window.removeEventListener("touchmove", onMove);
+          window.removeEventListener("touchend", onUp);
+        };
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+        window.addEventListener("touchmove", onMove, { passive: false });
+        window.addEventListener("touchend", onUp);
+      };
+      shape.addEventListener("pointerdown", start);
+      shape.addEventListener("mousedown", start);
+      shape.addEventListener("touchstart", start, { passive: false });
+    }
+
+    function renderExit() {
+      const q = exitQuestions[state.exitIndex];
+      els.stage.innerHTML = `<div class="exit-card">
+        <div class="progress">第 ${state.exitIndex + 1} 題 / ${exitQuestions.length} 題，已答對 ${state.exitCorrect.size} 題</div>
+        <h3 class="quiz-title">${q.text}</h3>
+        ${q.visual()}
+        <div class="tool-row">
+          <button class="ghost" type="button" id="prevExit"${state.exitIndex === 0 ? " disabled" : ""}>上一題</button>
+          <button class="secondary" type="button" id="nextExit">${state.exitIndex === exitQuestions.length - 1 ? "完成出場卷" : "下一題"}</button>
+        </div>
+      </div>`;
+      [...document.querySelectorAll(".answer")].forEach(button => {
+        button.addEventListener("click", () => {
+          [...document.querySelectorAll(".answer")].forEach(btn => btn.classList.remove("correct", "wrong"));
+          const ok = button.dataset.answer === q.answer;
+          button.classList.add(ok ? "correct" : "wrong");
+          if (ok) state.exitCorrect.add(state.exitIndex);
+          setFeedback(ok ? "good" : "no", ok ? "答對了" : "再想一次", ok ? q.good : q.wrong);
+        });
+      });
+      document.getElementById("prevExit").addEventListener("click", () => {
+        state.exitIndex = Math.max(0, state.exitIndex - 1);
+        renderExit();
+        setFeedback("", "回到上一題", "請用平分規則說理由。");
+      });
+      document.getElementById("nextExit").addEventListener("click", () => {
+        if (state.exitIndex < exitQuestions.length - 1) {
+          state.exitIndex += 1;
+          renderExit();
+          setFeedback("", "下一題", "先看每一份是不是一樣大。");
+          return;
+        }
+        if (state.exitCorrect.size >= 6) {
+          setFeedback("good", "9-1通過", `你答對 ${state.exitCorrect.size} 題，可以進入下一個活動。`);
+          markDone("exit");
+        } else {
+          setFeedback("no", "再練一次", `目前答對 ${state.exitCorrect.size} 題。請回前面的疊合和小法官再操作一次。`);
+        }
+      });
+    }
+
+    function renderStage() {
+      const id = steps[state.step].id;
+      if (id === "entry") renderEntry();
+      if (id === "detective") renderDetective();
+      if (id === "judge") renderJudge();
+      if (id === "repair") renderRepair();
+      if (id === "exit") renderExit();
+    }
+
+    function render() {
+      renderSteps();
+      renderShell();
+      setFeedback("", "開始操作", "先動手做，再用下面的數學句說明。");
+      renderStage();
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      document.body.classList.toggle("student-mode", mode === "student");
+      document.body.classList.toggle("parent-mode", mode === "parent");
+      els.studentMode.classList.toggle("active", mode === "student");
+      els.parentMode.classList.toggle("active", mode === "parent");
+      renderGuide(steps[state.step]);
+    }
+
+    els.studentMode.addEventListener("click", () => setMode("student"));
+    els.parentMode.addEventListener("click", () => setMode("parent"));
+    render();
+  </script>
+</body>
+</html>
