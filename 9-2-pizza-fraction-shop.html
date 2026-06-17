@@ -102,6 +102,10 @@
       align-items: start;
     }
 
+    .layout.guide-hidden {
+      grid-template-columns: 310px minmax(0, 1fr);
+    }
+
     .panel {
       border: 2px solid var(--line);
       border-radius: var(--radius);
@@ -1060,7 +1064,7 @@
 
     .order-grid {
       display: grid;
-      grid-template-columns: minmax(310px, 1fr) minmax(320px, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
       gap: 18px;
       align-items: start;
     }
@@ -1282,6 +1286,9 @@
       .layout {
         grid-template-columns: 250px minmax(0, 1fr);
       }
+      .layout.guide-hidden {
+        grid-template-columns: 250px minmax(0, 1fr);
+      }
       .guide {
         grid-column: 1 / -1;
         position: static;
@@ -1329,7 +1336,7 @@
       </div>
     </header>
 
-    <section class="layout">
+    <section class="layout guide-hidden" id="mainLayout">
       <nav class="steps panel" id="stepList" aria-label="9-2學習步驟"></nav>
 
       <section class="workspace panel">
@@ -1436,7 +1443,7 @@
     const state = {
       step: 0,
       done: new Set(),
-      showGuide: true,
+      showGuide: false,
       ticketStage: 0,
       ticketDoneStages: new Set(),
       writeQuestion: null,
@@ -1528,6 +1535,7 @@
     ];
 
     const els = {
+      layout: document.getElementById("mainLayout"),
       stepList: document.getElementById("stepList"),
       title: document.getElementById("stepTitle"),
       task: document.getElementById("stepTask"),
@@ -1674,6 +1682,7 @@
       els.guidePrompts.innerHTML = step.prompts.map(prompt => `<li>${formatFractions(prompt)}</li>`).join("");
       els.guideMisconception.innerHTML = formatFractions(step.misconception);
       els.guide.style.display = state.showGuide ? "block" : "none";
+      els.layout.classList.toggle("guide-hidden", !state.showGuide);
       els.studentMode.classList.toggle("active", !state.showGuide);
       els.parentMode.classList.toggle("active", state.showGuide);
     }
