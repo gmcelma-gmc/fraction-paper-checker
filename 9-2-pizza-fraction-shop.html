@@ -563,17 +563,21 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 150px;
+      min-width: min(210px, 100%);
+      max-width: 100%;
       min-height: 54px;
-      margin: 0 6px;
+      margin: 6px 0;
       padding: 6px 14px;
       border: 4px dashed #e09b2f;
       border-radius: 14px;
       background: #fff3b8;
       vertical-align: middle;
       color: #875209;
-      font-size: 24px;
+      font-size: clamp(20px, 2vw, 24px);
       font-weight: 900;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      text-align: center;
       box-shadow: inset 0 0 0 2px rgba(255,255,255,.8);
     }
 
@@ -582,6 +586,23 @@
       border-color: #5fbd82;
       background: #e8fff1;
       color: #14613c;
+    }
+
+    .sentence-drop .placed-chip,
+    .drop-zone .placed-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      max-width: 100%;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: transparent;
+      color: inherit;
+      font-size: inherit;
+      line-height: 1.18;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
     .sentence-line {
@@ -714,7 +735,7 @@
     }
 
     .ticket-answers {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
     .ticket-scene {
@@ -764,14 +785,19 @@
     }
 
     .ticket-answer-line {
-      min-height: 112px;
-      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 156px;
+      min-width: 0;
+      padding: 18px;
       border: 2px solid var(--line);
       border-radius: 16px;
       background: #fff;
-      font-size: 21px;
+      font-size: 24px;
       font-weight: 900;
-      line-height: 1.65;
+      line-height: 1.45;
+      overflow: visible;
     }
 
     .pass-animation {
@@ -903,15 +929,23 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 14px;
+      margin-bottom: 16px;
     }
 
     .chip {
-      padding: 14px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 138px;
+      min-height: 70px;
+      padding: 12px 14px;
       border: 3px solid #e09b2f;
       border-radius: 18px;
       background: #ffdf59;
-      font-size: 23px;
+      font-size: clamp(21px, 2.2vw, 28px);
       font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
       cursor: grab;
       user-select: none;
       box-shadow: 0 6px 0 #b9791e;
@@ -1712,12 +1746,13 @@
       let selectedChip = null;
       function placeChip(zone, chip) {
         if (!chip) return;
+        const answerHtml = `<span class="placed-chip">${formatFractions(chip.dataset.label || chip.textContent)}</span>`;
         zone.dataset.answer = chip.dataset.answer;
         zone.classList.add("filled");
         if (zone.classList.contains("sentence-drop")) {
-          zone.innerHTML = `<strong>${formatFractions(chip.dataset.label || chip.textContent)}</strong>`;
+          zone.innerHTML = answerHtml;
         } else {
-          zone.innerHTML = zone.textContent.split("：")[0] + `：<strong>${formatFractions(chip.dataset.label || chip.textContent)}</strong>`;
+          zone.innerHTML = zone.textContent.split("：")[0] + `：${answerHtml}`;
         }
         chip.style.display = "none";
         selectedChip = null;
