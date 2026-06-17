@@ -563,17 +563,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: min(210px, 100%);
+      min-width: min(132px, 100%);
       max-width: 100%;
-      min-height: 54px;
-      margin: 6px 0;
-      padding: 6px 14px;
-      border: 4px dashed #e09b2f;
+      min-height: 48px;
+      margin: 0 4px;
+      padding: 4px 8px;
+      border: 3px dashed #e09b2f;
       border-radius: 14px;
       background: #fff3b8;
       vertical-align: middle;
       color: #875209;
-      font-size: clamp(20px, 2vw, 24px);
+      font-size: clamp(17px, 1.65vw, 21px);
       font-weight: 900;
       line-height: 1.25;
       overflow-wrap: anywhere;
@@ -595,7 +595,7 @@
       justify-content: center;
       gap: 4px;
       max-width: 100%;
-      padding: 4px 8px;
+      padding: 2px 4px;
       border-radius: 12px;
       background: transparent;
       color: inherit;
@@ -603,6 +603,17 @@
       line-height: 1.18;
       white-space: normal;
       overflow-wrap: anywhere;
+    }
+
+    .sentence-drop .stack-frac {
+      min-width: 28px;
+      margin: 0 2px;
+      font-size: .86em;
+    }
+
+    .sentence-drop .stack-frac .line {
+      height: 3px;
+      margin: 3px 0;
     }
 
     .sentence-line {
@@ -735,7 +746,7 @@
     }
 
     .ticket-answers {
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .ticket-scene {
@@ -785,18 +796,15 @@
     }
 
     .ticket-answer-line {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-height: 156px;
+      min-height: 112px;
       min-width: 0;
-      padding: 18px;
+      padding: 12px;
       border: 2px solid var(--line);
       border-radius: 16px;
       background: #fff;
-      font-size: 24px;
+      font-size: clamp(18px, 1.8vw, 21px);
       font-weight: 900;
-      line-height: 1.45;
+      line-height: 1.55;
       overflow: visible;
     }
 
@@ -929,20 +937,19 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 14px;
-      margin-bottom: 16px;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 138px;
-      min-height: 70px;
-      padding: 12px 14px;
+      min-width: 118px;
+      min-height: 58px;
+      padding: 10px 12px;
       border: 3px solid #e09b2f;
       border-radius: 18px;
       background: #ffdf59;
-      font-size: clamp(21px, 2.2vw, 28px);
+      font-size: clamp(19px, 2vw, 24px);
       font-weight: 900;
       line-height: 1.2;
       text-align: center;
