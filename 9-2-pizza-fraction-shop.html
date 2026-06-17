@@ -1,0 +1,2075 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>9-2 披薩分數店</title>
+  <style>
+    :root {
+      --ink: #243043;
+      --muted: #65738a;
+      --line: #cbd8e8;
+      --paper: #fffdf7;
+      --cream: #fff4d6;
+      --sky: #dff2ff;
+      --blue: #3b82c4;
+      --mint: #dff7ea;
+      --green: #2f9e66;
+      --rose: #ffe4e6;
+      --red: #d94f45;
+      --gold: #f4b545;
+      --orange: #e98f2e;
+      --shadow: 0 14px 30px rgba(54, 72, 95, .14);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 9% 9%, rgba(255, 229, 150, .55), transparent 24%),
+        radial-gradient(circle at 88% 14%, rgba(186, 232, 255, .65), transparent 25%),
+        linear-gradient(180deg, #f9fcff 0%, #eef7f2 100%);
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 22px clamp(14px, 3vw, 34px) 150px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 74px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: clamp(20px, 2.1vw, 32px);
+      line-height: 1.45;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid #f3ce76;
+      background: #fff8dc;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+    }
+
+    .mode-switch button {
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: transparent;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .mode-switch button.active {
+      color: #1c4a38;
+      background: #bfeecf;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .88);
+      box-shadow: var(--shadow);
+    }
+
+    .steps {
+      position: sticky;
+      top: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .step-button {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      min-height: 92px;
+      padding: 14px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      text-align: left;
+    }
+
+    .step-button.active {
+      border-color: var(--blue);
+      background: #eaf5ff;
+    }
+
+    .step-no {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--blue);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .step-button.done .step-no {
+      background: var(--green);
+    }
+
+    .step-title {
+      display: block;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .step-note {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .check {
+      color: var(--green);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .workspace {
+      min-height: 720px;
+      overflow: hidden;
+    }
+
+    .task-head {
+      padding: clamp(18px, 2.4vw, 30px);
+      border-bottom: 2px solid var(--line);
+      background: linear-gradient(135deg, #fff7df, #e9f7ff);
+    }
+
+    .task-head h2 {
+      margin: 0;
+      font-size: clamp(30px, 3.6vw, 50px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .task-head p {
+      margin: 12px 0 0;
+      color: #52637a;
+      font-size: clamp(20px, 2vw, 28px);
+      line-height: 1.45;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 2px solid #b9d9c8;
+      color: #265d49;
+      background: #e8fff3;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .content {
+      padding: clamp(16px, 2vw, 28px);
+    }
+
+    .guide {
+      position: sticky;
+      top: 14px;
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+      padding: 18px;
+      background: #f9fdff;
+      scrollbar-gutter: stable;
+    }
+
+    .guide h2 {
+      margin: 0;
+      padding: 14px;
+      border-radius: 14px;
+      color: #fff;
+      background: #68727e;
+      text-align: center;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    .guide-section {
+      margin-top: 16px;
+      padding: 16px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .guide-section strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .guide-section p,
+    .guide-section li {
+      color: #3b4a5f;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .guide-section ul {
+      margin: 8px 0 0;
+      padding-left: 1.15em;
+    }
+
+    .tool-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .primary, .secondary, .choice, .big-action {
+      min-height: 54px;
+      padding: 12px 20px;
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: 900;
+      box-shadow: 0 6px 0 rgba(36, 48, 67, .18);
+    }
+
+    .primary {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .secondary {
+      background: #fff;
+      border: 2px solid var(--line);
+    }
+
+    .choice {
+      background: #fff7d5;
+      border: 2px solid #e6b759;
+    }
+
+    .choice.selected {
+      color: #184733;
+      background: #bceecb;
+      border-color: #35a56e;
+    }
+
+    .big-action {
+      color: #fff;
+      background: #89c64a;
+      font-size: 28px;
+      box-shadow: 8px 10px 0 #4e742d;
+    }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .feedback.good {
+      border-color: #6dc58a;
+      background: #ebfff2;
+      color: #14613c;
+    }
+
+    .feedback.try {
+      border-color: #f1b45c;
+      background: #fff7df;
+      color: #7a4b09;
+    }
+
+    .fraction-card {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(250px, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .mini-panel {
+      min-height: 210px;
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .mini-panel h3 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .pizza-stage {
+      display: grid;
+      place-items: center;
+      min-height: 330px;
+      border: 3px dashed #c5d6e8;
+      border-radius: 22px;
+      background: #f6fbff;
+    }
+
+    .model-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .model-card {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      min-height: 250px;
+      padding: 16px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdff;
+    }
+
+    .model-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .model-card strong {
+      font-size: 22px;
+    }
+
+    .split-pizza-demo {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+      min-height: 250px;
+      padding: 12px;
+      border: 3px dashed #c5d6e8;
+      border-radius: 22px;
+      background: #f6fbff;
+    }
+
+    .whole-pizza-demo,
+    .half-pizza-demo {
+      position: relative;
+      margin: 0 auto;
+      width: min(180px, 34vw);
+      aspect-ratio: 1;
+      border: 7px solid #c77f2f;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 64% 30%, #d85a41 0 4%, transparent 4.2%),
+        radial-gradient(circle at 34% 33%, #d85a41 0 3%, transparent 3.2%),
+        radial-gradient(circle at 45% 67%, #3f9b61 0 4%, transparent 4.2%),
+        radial-gradient(circle at 58% 60%, #bf7f35 0 5%, transparent 5.2%),
+        radial-gradient(circle, #ffe8a1 0%, #f3bc52 100%);
+      box-shadow: inset 0 0 0 4px rgba(120, 72, 23, .16), 0 12px 20px rgba(129, 84, 31, .16);
+    }
+
+    .whole-pizza-demo::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -5px;
+      bottom: -5px;
+      width: 7px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(40, 55, 74, .16);
+    }
+
+    .half-pizza-demo {
+      width: min(150px, 30vw);
+      border-radius: 0 999px 999px 0;
+      border-left: 8px solid #1f3148;
+      background:
+        radial-gradient(circle at 64% 30%, #d85a41 0 4.8%, transparent 5%),
+        radial-gradient(circle at 37% 63%, #3f9b61 0 4.5%, transparent 4.7%),
+        linear-gradient(90deg, #ffca05, #ffe066);
+      box-shadow: inset 0 0 0 4px rgba(120, 72, 23, .16), 0 14px 22px rgba(129, 84, 31, .2);
+    }
+
+    .demo-caption {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border: 3px solid #f0a33e;
+      border-radius: 999px;
+      background: #fff5c2;
+      font-size: 21px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .demo-arrow {
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      margin: 0 auto;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--orange);
+      font-size: 34px;
+      font-weight: 900;
+      box-shadow: 0 6px 0 rgba(119, 70, 18, .28);
+    }
+
+    .pizza {
+      --parts: 4;
+      --slice: 0;
+      --lineColor: rgba(255, 255, 255, .95);
+      position: relative;
+      width: min(300px, 62vw);
+      aspect-ratio: 1;
+      border: 7px solid #cf842f;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 62% 33%, #da5b42 0 3.2%, transparent 3.4%),
+        radial-gradient(circle at 36% 30%, #da5b42 0 2.4%, transparent 2.6%),
+        radial-gradient(circle at 56% 55%, #3f9b61 0 3.1%, transparent 3.3%),
+        radial-gradient(circle at 36% 67%, #3f9b61 0 3.2%, transparent 3.4%),
+        radial-gradient(circle at 48% 72%, #bf7f35 0 4.7%, transparent 4.9%),
+        repeating-conic-gradient(from -90deg, transparent 0 calc(360deg / var(--parts) - 1.6deg), var(--lineColor) calc(360deg / var(--parts) - 1.6deg) calc(360deg / var(--parts) + 1.6deg)),
+        conic-gradient(from -90deg, transparent 0 calc(var(--slice) * 360deg / var(--parts)), #ffd000 0 calc((var(--slice) + 1) * 360deg / var(--parts)), transparent 0 360deg),
+        radial-gradient(circle, #fde8a7 0%, #f6c15b 100%);
+      box-shadow: inset 0 0 0 3px rgba(106, 63, 19, .22), 0 16px 25px rgba(129, 84, 31, .16);
+    }
+
+    .cake-bar,
+    .ribbon-bar {
+      --parts: 4;
+      --slice: 0;
+      position: relative;
+      width: min(340px, 74vw);
+      height: 120px;
+      border: 6px solid #32485f;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--parts) - 2px), rgba(255,255,255,.95) calc(100% / var(--parts) - 2px) calc(100% / var(--parts) + 2px)),
+        linear-gradient(90deg, transparent 0 calc(var(--slice) * 100% / var(--parts)), #ffd000 0 calc((var(--slice) + 1) * 100% / var(--parts)), transparent 0 100%),
+        linear-gradient(180deg, #f5c5d5, #e69bb7);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.35), 0 12px 22px rgba(60, 75, 92, .14);
+    }
+
+    .cake-bar::before {
+      content: "";
+      position: absolute;
+      inset: 12px 0 auto 0;
+      height: 26px;
+      background: repeating-linear-gradient(90deg, #fff7fd 0 28px, #ffd6e6 28px 56px);
+      border-bottom: 4px solid rgba(105, 55, 80, .18);
+    }
+
+    .ribbon-bar {
+      height: 84px;
+      border-color: #497f92;
+      border-radius: 10px;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--parts) - 2px), rgba(255,255,255,.95) calc(100% / var(--parts) - 2px) calc(100% / var(--parts) + 2px)),
+        linear-gradient(90deg, transparent 0 calc(var(--slice) * 100% / var(--parts)), #ffd000 0 calc((var(--slice) + 1) * 100% / var(--parts)), transparent 0 100%),
+        linear-gradient(180deg, #bfe8f5, #73c7df);
+    }
+
+    .cake-bar.no-highlight {
+      background:
+        repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--parts) - 2px), rgba(255,255,255,.95) calc(100% / var(--parts) - 2px) calc(100% / var(--parts) + 2px)),
+        linear-gradient(180deg, #f5c5d5, #e69bb7);
+    }
+
+    .ribbon-bar.no-highlight {
+      background:
+        repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--parts) - 2px), rgba(255,255,255,.95) calc(100% / var(--parts) - 2px) calc(100% / var(--parts) + 2px)),
+        linear-gradient(180deg, #bfe8f5, #73c7df);
+    }
+
+    .unit-caption {
+      margin: 0;
+      color: #41536a;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .sentence-board {
+      display: grid;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .sentence-drop {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
+      min-height: 54px;
+      margin: 0 6px;
+      padding: 6px 14px;
+      border: 4px dashed #e09b2f;
+      border-radius: 14px;
+      background: #fff3b8;
+      vertical-align: middle;
+      color: #875209;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.8);
+    }
+
+    .sentence-drop.filled {
+      border-style: solid;
+      border-color: #5fbd82;
+      background: #e8fff1;
+      color: #14613c;
+    }
+
+    .sentence-line {
+      padding: 14px 16px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1.7;
+    }
+
+    .answer-bank-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 12px 16px;
+      border: 3px solid #f0b75c;
+      border-radius: 16px;
+      background: #fff8d9;
+      color: #7b4a08;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .pizza.small {
+      width: 132px;
+      border-width: 5px;
+    }
+
+    .pizza.tiny {
+      width: 74px;
+      border-width: 3px;
+    }
+
+    .pizza-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.9);
+      font-size: 22px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .pizza-svg-wrap {
+      position: relative;
+      width: min(230px, 44vw);
+      margin: 0 auto;
+      filter: drop-shadow(0 12px 18px rgba(129, 84, 31, .18));
+    }
+
+    .pizza-svg-wrap.small {
+      width: 120px;
+    }
+
+    .pizza-svg-wrap.tiny {
+      width: 70px;
+    }
+
+    .pizza-svg-wrap svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .pizza-svg-wrap .pizza-label {
+      left: 50%;
+      top: auto;
+      bottom: -8px;
+      transform: translateX(-50%);
+      border: 2px solid rgba(241, 171, 73, .55);
+      font-size: clamp(16px, 2vw, 22px);
+    }
+
+    .ticket-round-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ticket-round-tabs button {
+      min-height: 62px;
+      padding: 8px 12px;
+      border: 3px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 5px 0 rgba(36, 48, 67, .14);
+    }
+
+    .ticket-round-tabs button.active {
+      border-color: #e09b2f;
+      background: #fff1b7;
+      color: #754707;
+    }
+
+    .ticket-round-tabs button.stage-done {
+      border-color: #55b87d;
+      background: #e8fff1;
+      color: #17613e;
+    }
+
+    .ticket-round-tabs button.stage-done::after {
+      content: " ✓";
+      font-weight: 900;
+    }
+
+    .ticket-round-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .ticket-scenes,
+    .ticket-answers {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ticket-scenes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .ticket-answers {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .ticket-scene {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 210px;
+      padding: 12px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fbfdff;
+      text-align: center;
+    }
+
+    .ticket-scene .visual {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+    }
+
+    .ticket-scene .cake-bar {
+      width: 120px;
+      height: 58px;
+      border-width: 4px;
+      border-radius: 12px;
+    }
+
+    .ticket-scene .ribbon-bar {
+      width: 120px;
+      height: 48px;
+      border-width: 4px;
+    }
+
+    .ticket-scene h4 {
+      margin: 0 0 8px;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .ticket-scene p {
+      margin: 0;
+      color: #52637a;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .ticket-answer-line {
+      min-height: 112px;
+      padding: 14px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.65;
+    }
+
+    .pass-animation {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      padding: 14px;
+      border: 3px solid #7ccf93;
+      border-radius: 18px;
+      background: #effff3;
+      color: #14613c;
+      text-align: center;
+      animation: popPass .5s ease both;
+    }
+
+    .pass-face {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #ffd85a;
+      border: 5px solid #f0a33e;
+      font-size: 38px;
+      animation: bouncePass .85s ease-in-out infinite alternate;
+    }
+
+    .pass-stars {
+      font-size: 28px;
+      letter-spacing: 8px;
+      animation: sparklePass .9s ease-in-out infinite alternate;
+    }
+
+    @keyframes popPass {
+      from { transform: scale(.88); opacity: .25; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes bouncePass {
+      from { transform: translateY(0) rotate(-3deg); }
+      to { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    @keyframes sparklePass {
+      from { opacity: .45; transform: scale(.92); }
+      to { opacity: 1; transform: scale(1.08); }
+    }
+
+    .fraction-display {
+      display: inline-grid;
+      place-items: center;
+      min-width: 96px;
+      padding: 8px 14px;
+      border: 3px solid #1f3148;
+      border-radius: 14px;
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .fraction-display .top,
+    .fraction-display .bottom {
+      font-size: 46px;
+      line-height: 1;
+    }
+
+    .fraction-display .bar {
+      width: 74px;
+      height: 4px;
+      margin: 5px 0;
+      border-radius: 999px;
+      background: #1f3148;
+    }
+
+    .stack-frac {
+      display: inline-grid;
+      grid-template-rows: auto 4px auto;
+      place-items: center;
+      min-width: 44px;
+      margin: 0 4px;
+      vertical-align: middle;
+      color: #111;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .stack-frac .num,
+    .stack-frac .den {
+      font-size: 1.15em;
+      line-height: .95;
+    }
+
+    .stack-frac .line {
+      width: 100%;
+      height: 4px;
+      margin: 4px 0;
+      border-radius: 999px;
+      background: #243043;
+    }
+
+    .chip .stack-frac,
+    .choice .stack-frac,
+    .match-card .stack-frac {
+      min-width: 36px;
+    }
+
+    .drop-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .drop-zone {
+      min-height: 76px;
+      padding: 12px;
+      border: 3px dashed #aab8c8;
+      border-radius: 16px;
+      background: #f9fbff;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .drop-zone.filled {
+      border-style: solid;
+      background: #e9fff1;
+      border-color: #5fbd82;
+    }
+
+    .chip-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      padding: 14px 18px;
+      border: 3px solid #e09b2f;
+      border-radius: 18px;
+      background: #ffdf59;
+      font-size: 23px;
+      font-weight: 900;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 6px 0 #b9791e;
+    }
+
+    .chip.selected {
+      outline: 5px solid #45b36b;
+      background: #c9f6d7;
+      box-shadow: 0 6px 0 #4b8a5f;
+    }
+
+    .answer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 18px;
+    }
+
+    .fraction-input {
+      display: grid;
+      place-items: center;
+      width: 110px;
+      padding: 10px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .fraction-input input {
+      width: 70px;
+      border: 0;
+      outline: 0;
+      text-align: center;
+      font-size: 40px;
+      font-weight: 900;
+      background: transparent;
+    }
+
+    .fraction-input .bar {
+      width: 74px;
+      height: 4px;
+      margin: 2px 0;
+      border-radius: 999px;
+      background: #1f3148;
+    }
+
+    .match-area {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .match-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .match-card {
+      min-height: 110px;
+      padding: 12px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .match-card.dragging {
+      opacity: .6;
+    }
+
+    .match-card.correct {
+      border-color: #55b87d;
+      background: #edfff3;
+    }
+
+    .match-target {
+      min-height: 128px;
+      padding: 12px;
+      border: 3px dashed #abc0d3;
+      border-radius: 18px;
+      background: #f7fbff;
+      display: grid;
+      grid-template-columns: 106px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .match-target .label {
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .match-target.correct {
+      border-style: solid;
+      border-color: #55b87d;
+      background: #edfff3;
+    }
+
+    .order-grid {
+      display: grid;
+      grid-template-columns: minmax(310px, 1fr) minmax(320px, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .counter-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+      margin: 12px 0;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .counter-row input[type="range"] {
+      width: 100%;
+      accent-color: var(--orange);
+    }
+
+    .number-pill {
+      min-width: 70px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #fff1c6;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .pizza-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+      padding: 14px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .receipt {
+      padding: 18px;
+      border: 3px solid #35465a;
+      border-radius: 18px;
+      background: #fffefa;
+      font-size: 24px;
+      line-height: 1.6;
+      font-weight: 900;
+    }
+
+    .receipt span {
+      display: inline-block;
+      min-width: 52px;
+      padding: 0 8px;
+      border-bottom: 4px solid #e79c3c;
+      text-align: center;
+      color: #994f05;
+    }
+
+    .receipt-input {
+      width: 82px;
+      margin: 0 8px;
+      padding: 2px 8px;
+      border: 0;
+      border-bottom: 7px solid #e09b2f;
+      color: #8b4f10;
+      background: #fff8db;
+      text-align: center;
+      font-size: 42px;
+      font-weight: 900;
+      outline: 0;
+    }
+
+    .receipt-input:focus {
+      background: #fff0ae;
+      box-shadow: 0 0 0 4px rgba(224, 155, 47, .2);
+    }
+
+    .equation-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 3px solid #efc56f;
+      border-radius: 18px;
+      background: #fff7d2;
+      font-size: 26px;
+      font-weight: 900;
+      color: #273142;
+    }
+
+    .equation-row .receipt-input {
+      width: 76px;
+      font-size: 38px;
+    }
+
+    .method-progress {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 2px solid #bfe3dc;
+      border-radius: 16px;
+      background: #f0fffb;
+      color: #216455;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .secondary.method-done {
+      border-color: #6dc58a;
+      background: #ebfff2;
+      color: #14613c;
+    }
+
+    .exit-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .exit-question {
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .exit-question h3 {
+      margin: 0 0 12px;
+      font-size: 26px;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .completion-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(36, 48, 67, .32);
+      backdrop-filter: blur(4px);
+    }
+
+    .completion-overlay.show {
+      display: grid;
+    }
+
+    .completion-card {
+      width: min(620px, 92vw);
+      padding: 28px;
+      border: 5px solid #7ccf93;
+      border-radius: 28px;
+      background: #fffdf7;
+      box-shadow: 0 24px 60px rgba(34, 49, 68, .28);
+      text-align: center;
+      animation: popPass .35s ease-out both;
+    }
+
+    .completion-icon {
+      width: 126px;
+      height: 126px;
+      margin: 0 auto 16px;
+      border: 6px solid #e59f38;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 62% 35%, #d85a41 0 5%, transparent 5.5%),
+        radial-gradient(circle at 36% 32%, #d85a41 0 4%, transparent 4.5%),
+        radial-gradient(circle at 45% 68%, #3f9b61 0 5%, transparent 5.5%),
+        radial-gradient(circle, #ffe8a1 0%, #f3bc52 100%);
+      color: #15613e;
+      font-size: 58px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 5px rgba(255,255,255,.35), 0 12px 24px rgba(129, 84, 31, .18);
+      animation: bouncePass .55s ease-in-out infinite alternate;
+    }
+
+    .completion-stars {
+      color: #f0a431;
+      font-size: 30px;
+      font-weight: 900;
+      animation: sparklePass .55s ease-in-out infinite alternate;
+    }
+
+    .completion-card h2 {
+      margin: 8px 0 10px;
+      font-size: clamp(34px, 5vw, 52px);
+      line-height: 1.15;
+    }
+
+    .completion-card p {
+      margin: 0;
+      color: #44566f;
+      font-size: 24px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .completion-card button {
+      margin-top: 20px;
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 250px minmax(0, 1fr);
+      }
+      .guide {
+        grid-column: 1 / -1;
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .layout,
+      .fraction-card,
+      .match-area,
+      .order-grid {
+        grid-template-columns: 1fr;
+      }
+      .steps,
+      .guide {
+        position: static;
+        max-height: none;
+      }
+      .step-button {
+        min-height: 78px;
+      }
+      .pizza-stage {
+        min-height: 250px;
+      }
+      .pizza {
+        width: min(250px, 78vw);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <h1>9-2 披薩分數店</h1>
+        <p>先看懂「全部平分成幾份，拿其中一份」，再用披薩點餐任務說清楚分數。</p>
+      </div>
+      <div class="mode-switch" aria-label="顯示模式">
+        <button type="button" class="active" id="studentMode">學生版</button>
+        <button type="button" id="parentMode">家長提示</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <nav class="steps panel" id="stepList" aria-label="9-2學習步驟"></nav>
+
+      <section class="workspace panel">
+        <div class="task-head">
+          <h2 id="stepTitle"></h2>
+          <p id="stepTask"></p>
+          <div class="tags">
+            <span class="tag" id="conceptTag"></span>
+            <span class="tag" id="ticketTag"></span>
+          </div>
+        </div>
+        <div class="content" id="activity"></div>
+      </section>
+
+      <aside class="guide panel" id="guidePanel">
+        <h2>家長提示</h2>
+        <div class="guide-section">
+          <strong>正在建構</strong>
+          <p id="guideConcept"></p>
+        </div>
+        <div class="guide-section">
+          <strong>可以這樣問</strong>
+          <ul id="guidePrompts"></ul>
+        </div>
+        <div class="guide-section">
+          <strong>常見迷思</strong>
+          <p id="guideMisconception"></p>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer">9-2 對應教案活動：切披薩達人、認識二分之一與四分之一、披薩點餐大師、出場卷。</div>
+  </main>
+
+  <div class="completion-overlay" id="completionOverlay" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+    <div class="completion-card">
+      <div class="completion-stars">✦ ✦ ✦</div>
+      <div class="completion-icon">✓</div>
+      <h2 id="completionTitle">恭喜過關！</h2>
+      <p>你完成 9-2 披薩分數店的 5 個任務，能用圖、符號和生活情境說清楚幾分之一了。</p>
+      <button class="primary" type="button" id="closeCompletion">太棒了</button>
+    </div>
+  </div>
+
+  <script>
+    const steps = [
+      {
+        id: "ticket",
+        title: "入場券：單位說清楚",
+        short: "片、段、幾分之一",
+        task: "先完成圓形披薩兩種切法，再換長條形緞帶，拖拉正確的單位語言。",
+        concept: "單位量與分數",
+        ticket: "入場券",
+        guide: "孩子要先分清楚完整的單位量和切開後的一份。1片披薩是在數拿了幾片；1/2個披薩是在說這一片和完整1個披薩的關係。",
+        prompts: ["拿了幾片披薩？", "拿了幾個披薩？", "1段緞帶和1/4條緞帶說的是同一件事嗎？差在哪裡？"],
+        misconception: "孩子常把「1片」直接當成「1個」，或只會說一段卻說不出1/4條。請提醒他先說完整單位量，再說切開後的一份。"
+      },
+      {
+        id: "write",
+        title: "看圖寫分數",
+        short: "拿其中一份",
+        task: "看隨機出現的等分圖，寫出黃色這一份是幾分之一。",
+        concept: "圖像到符號",
+        ticket: "練習券",
+        guide: "這一步把圖像轉成分數符號。孩子要先數整個圖被平分成幾份，再確認黃色只有其中1份。",
+        prompts: ["整個披薩被平分成幾份？", "黃色有幾份？", "所以要寫成幾分之一？"],
+        misconception: "孩子可能只看黃色很大或很小就猜答案。請他回到「總共平分成幾份」來判斷分母。"
+      },
+      {
+        id: "match",
+        title: "分數圖對對碰",
+        short: "圖符配對",
+        task: "把分數卡拖到相同意思的圖旁邊，完成圖像、讀法、記法配對。",
+        concept: "多重表徵",
+        ticket: "配對券",
+        guide: "同一個分數可以用圖、讀法、符號表示。配對時不是比顏色，而是比「全部平分成幾份，拿其中1份」。",
+        prompts: ["這張圖總共幾等分？", "分數下面應該是幾？", "這張卡和圖說的是同一件事嗎？"],
+        misconception: "孩子容易把圖形大小不同誤認為不是同一分數。此處要強調：配對的是分數意義，不是實際圖片大小。"
+      },
+      {
+        id: "order",
+        title: "披薩點餐大師",
+        short: "素養任務",
+        task: "全班24人吃披薩，每人1片，每片一樣大，而且剛好分完。你要怎麼跟店員說？",
+        concept: "條件解題",
+        ticket: "任務券",
+        guide: "此任務把分數、乘法累加與生活情境連起來。孩子要檢查總片數是否24片，也要確認每個披薩都有平分。",
+        prompts: ["每個披薩切成幾等份？", "你點幾個披薩？一共有幾片？", "每人1片，會不會多或少？"],
+        misconception: "孩子可能只湊到24片，卻忘記每片要一樣大。請提醒：同一個披薩內必須平分；不同切法每片大小也會不同。"
+      },
+      {
+        id: "exit",
+        title: "出場券：我會說分數",
+        short: "檢核概念",
+        task: "完成5題小檢核，確認你能讀圖、寫分數，也能說清楚披薩點餐理由。",
+        concept: "形成性檢核",
+        ticket: "出場券",
+        guide: "出場券檢核9-2核心：平分前提、分母意義、分子1意義、1片與幾分之一的語言差異、24片任務條件。",
+        prompts: ["你怎麼知道？", "請用『平分成幾份，拿其中1份』說一次。", "這題有沒有剛好分完？"],
+        misconception: "若孩子錯在分母，先回圖像數等分；若錯在量詞，回到『片』和『個披薩的幾分之一』的差別。"
+      }
+    ];
+
+    const state = {
+      step: 0,
+      done: new Set(),
+      showGuide: true,
+      ticketStage: 0,
+      ticketDoneStages: new Set(),
+      writeQuestion: null,
+      writeDoneAnswers: new Set(),
+      matchPlaced: {},
+      orderParts: 4,
+      orderPizzas: 6,
+      orderDoneMethods: new Set(),
+      exitAnswers: {},
+      celebrated: false
+    };
+
+    const writeQuestions = [
+      { parts: 2, slice: 0, answer: "1/2", read: "二分之一" },
+      { parts: 3, slice: 1, answer: "1/3", read: "三分之一" },
+      { parts: 4, slice: 2, answer: "1/4", read: "四分之一" },
+      { parts: 6, slice: 3, answer: "1/6", read: "六分之一" },
+      { parts: 8, slice: 5, answer: "1/8", read: "八分之一" }
+    ];
+
+    const matchItems = [
+      { id: "half", parts: 2, text: "1/2 二分之一" },
+      { id: "third", parts: 3, text: "1/3 三分之一" },
+      { id: "quarter", parts: 4, text: "1/4 四分之一" },
+      { id: "sixth", parts: 6, text: "1/6 六分之一" }
+    ];
+
+    const ticketStages = [
+      {
+        title: "第一關：披薩對半切",
+        hint: "先完成圓形披薩：完整披薩、拿一片、和完整披薩比。",
+        items: [
+          { key: "halfWholePizza", model: "pizza", parts: 1, slice: -1, heading: "還沒有切開", note: "完整的單位量。", sentence: "完整的單位量是", answer: "1個披薩" },
+          { key: "halfPiecePizza", model: "pizza", parts: 2, slice: 0, heading: "切成兩等分", note: "黃色是其中一等分。", sentence: "拿了", answer: "1片披薩" },
+          { key: "halfFractionPizza", model: "pizza", parts: 2, slice: 0, heading: "和完整披薩比", note: "1片是整個披薩的一半。", sentence: "可以說拿了", answer: "1/2個披薩" }
+        ]
+      },
+      {
+        title: "第二關：披薩多等分",
+        hint: "再看圓形披薩另一種切法：切成很多等分，只拿其中一份。",
+        items: [
+          { key: "manyWholePizza", model: "pizza", parts: 1, slice: -1, heading: "還沒有切開", note: "完整的單位量仍是1個披薩。", sentence: "完整的單位量是", answer: "1個披薩" },
+          { key: "manyPiecePizza", model: "pizza", parts: 8, slice: 0, heading: "切成八等分", note: "黃色是其中一等分。", sentence: "拿了", answer: "1片披薩" },
+          { key: "manyFractionPizza", model: "pizza", parts: 8, slice: 0, heading: "和完整披薩比", note: "1片是整個披薩的八分之一。", sentence: "可以說拿了", answer: "1/8個披薩" }
+        ]
+      },
+      {
+        title: "第三關：換長條圖形",
+        hint: "圓形披薩完成後，再換長條形緞帶來說；蛋糕也可以用同樣方式說。",
+        items: [
+          { key: "barWholeRibbon", model: "ribbon", parts: 1, slice: -1, heading: "一條完整緞帶", note: "還沒有切開。", sentence: "完整的單位量是", answer: "1條緞帶" },
+          { key: "barPieceRibbon", model: "ribbon", parts: 4, slice: 0, heading: "緞帶切成四等分", note: "黃色是其中一等分。", sentence: "拿了", answer: "1段緞帶" },
+          { key: "barFractionRibbon", model: "ribbon", parts: 4, slice: 0, heading: "和完整緞帶比", note: "1段是整條緞帶的四分之一。", sentence: "可以說拿了", answer: "1/4條緞帶" }
+        ]
+      }
+    ];
+
+    const exitQuestions = [
+      {
+        id: "q1",
+        title: "1/4 下面的4表示什麼？",
+        options: ["全部平分成4份", "拿了4片", "有4個披薩"],
+        answer: "全部平分成4份"
+      },
+      {
+        id: "q2",
+        title: "1/2 上面的1表示什麼？",
+        options: ["拿其中1份", "切成1份", "有1個人吃"],
+        answer: "拿其中1份"
+      },
+      {
+        id: "q3",
+        title: "一個披薩平分成4份，黃色1份可以說成？",
+        options: ["1/4個披薩", "4個披薩", "1/2個披薩"],
+        answer: "1/4個披薩"
+      },
+      {
+        id: "q4",
+        title: "沒有每份一樣大，可以叫做1/4嗎？",
+        options: ["不可以，因為沒有平分", "可以，因為有切線", "可以，因為拿1片"],
+        answer: "不可以，因為沒有平分"
+      },
+      {
+        id: "q5",
+        title: "全班24人，每個披薩切4等份，要點幾個披薩才剛好？",
+        options: ["6個", "4個", "8個"],
+        answer: "6個"
+      }
+    ];
+
+    const els = {
+      stepList: document.getElementById("stepList"),
+      title: document.getElementById("stepTitle"),
+      task: document.getElementById("stepTask"),
+      conceptTag: document.getElementById("conceptTag"),
+      ticketTag: document.getElementById("ticketTag"),
+      activity: document.getElementById("activity"),
+      guide: document.getElementById("guidePanel"),
+      guideConcept: document.getElementById("guideConcept"),
+      guidePrompts: document.getElementById("guidePrompts"),
+      guideMisconception: document.getElementById("guideMisconception"),
+      studentMode: document.getElementById("studentMode"),
+      parentMode: document.getElementById("parentMode"),
+      completionOverlay: document.getElementById("completionOverlay"),
+      closeCompletion: document.getElementById("closeCompletion")
+    };
+
+    function polarPoint(cx, cy, r, deg) {
+      const rad = (deg - 90) * Math.PI / 180;
+      return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+    }
+
+    function sectorPath(cx, cy, r, startDeg, endDeg) {
+      const start = polarPoint(cx, cy, r, startDeg);
+      const end = polarPoint(cx, cy, r, endDeg);
+      const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+      return `M ${cx} ${cy} L ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)} Z`;
+    }
+
+    function pizzaMarkup(parts, slice = 0, label = "", size = "") {
+      const cx = 120;
+      const cy = 120;
+      const r = 100;
+      const count = Math.max(1, parts);
+      const step = 360 / count;
+      const highlight = slice >= 0 ? `<path d="${sectorPath(cx, cy, r, slice * step, (slice + 1) * step)}" fill="#ffd000" opacity=".8" stroke="none"></path>` : "";
+      const lines = count > 1 ? Array.from({ length: count }, (_, i) => {
+        const p = polarPoint(cx, cy, r, i * step);
+        return `<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(2)}" y2="${p.y.toFixed(2)}" stroke="#ffffff" stroke-width="5" stroke-linecap="round"></line>`;
+      }).join("") : "";
+      return `<div class="pizza-svg-wrap ${size}" aria-label="平分成${count}份的披薩">
+        <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
+          <defs>
+            <radialGradient id="pizzaBase${count}${slice}${size}" cx="50%" cy="45%" r="60%">
+              <stop offset="0%" stop-color="#fff7db"></stop>
+              <stop offset="100%" stop-color="#f2d28b"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="${cx}" cy="${cy}" r="${r + 6}" fill="#d28a36"></circle>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#pizzaBase${count}${slice}${size})" opacity=".2"></circle>
+          ${highlight}
+          <circle cx="78" cy="78" r="7" fill="#d35a40" opacity=".2"></circle>
+          <circle cx="148" cy="82" r="9" fill="#d35a40" opacity=".2"></circle>
+          <circle cx="86" cy="154" r="9" fill="#3e9c63" opacity=".2"></circle>
+          <circle cx="140" cy="166" r="12" fill="#bf7f35" opacity=".2"></circle>
+          ${lines}
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#bd7c31" stroke-width="5"></circle>
+        </svg>
+        ${label ? `<span class="pizza-label">${label}</span>` : ""}
+      </div>`;
+    }
+
+    function cakeMarkup(parts, slice = 0, label = "") {
+      const noHighlight = slice < 0 ? "no-highlight" : "";
+      return `<div class="cake-bar ${noHighlight}" style="--parts:${parts};--slice:${Math.max(0, slice)}" aria-label="平分成${parts}份的長條蛋糕">
+        ${label ? `<span class="pizza-label">${label}</span>` : ""}
+      </div>`;
+    }
+
+    function ribbonMarkup(parts, slice = 0, label = "") {
+      const noHighlight = slice < 0 ? "no-highlight" : "";
+      return `<div class="ribbon-bar ${noHighlight}" style="--parts:${parts};--slice:${Math.max(0, slice)}" aria-label="平分成${parts}段的緞帶">
+        ${label ? `<span class="pizza-label">${label}</span>` : ""}
+      </div>`;
+    }
+
+    function fractionMarkup(top, bottom) {
+      return `<span class="fraction-display"><span class="top">${top}</span><span class="bar"></span><span class="bottom">${bottom}</span></span>`;
+    }
+
+    function stackFraction(top, bottom) {
+      return `<span class="stack-frac" aria-label="${bottom}分之${top}"><span class="num">${top}</span><span class="line"></span><span class="den">${bottom}</span></span>`;
+    }
+
+    function formatFractions(text) {
+      return String(text).replace(/(\d+)\/(\d+)/g, (_, top, bottom) => stackFraction(top, bottom));
+    }
+
+    function markDone(id = steps[state.step].id) {
+      state.done.add(id);
+      renderSteps();
+      checkAllDone();
+    }
+
+    function checkAllDone() {
+      const allDone = steps.every(step => state.done.has(step.id));
+      if (!allDone || state.celebrated) return;
+      state.celebrated = true;
+      window.setTimeout(() => {
+        els.completionOverlay.classList.add("show");
+      }, 350);
+    }
+
+    function setFeedback(type, title, body) {
+      const box = document.getElementById("feedback");
+      if (!box) return;
+      box.className = `feedback ${type || ""}`;
+      box.innerHTML = `<strong>${title}</strong><br>${body}`;
+    }
+
+    function setTicketPassAnimation(title, body) {
+      const box = document.getElementById("feedback");
+      if (!box) return;
+      box.className = "feedback good";
+      box.innerHTML = `
+        <div class="pass-animation">
+          <div class="pass-stars">✦ ✦ ✦</div>
+          <div class="pass-face">♪</div>
+          <strong>${title}</strong>
+          <span>${body}</span>
+        </div>`;
+    }
+
+    function renderSteps() {
+      els.stepList.innerHTML = steps.map((step, index) => {
+        const active = index === state.step ? "active" : "";
+        const done = state.done.has(step.id) ? "done" : "";
+        const check = state.done.has(step.id) ? "✓" : "";
+        return `<button class="step-button ${active} ${done}" type="button" data-index="${index}">
+          <span class="step-no">${index + 1}</span>
+          <span><span class="step-title">${step.title}</span><span class="step-note">${step.short}</span></span>
+          <span class="check">${check}</span>
+        </button>`;
+      }).join("");
+      [...els.stepList.querySelectorAll("button")].forEach(button => {
+        button.addEventListener("click", () => {
+          state.step = Number(button.dataset.index);
+          render();
+        });
+      });
+    }
+
+    function renderGuide(step) {
+      els.guideConcept.innerHTML = formatFractions(step.guide);
+      els.guidePrompts.innerHTML = step.prompts.map(prompt => `<li>${formatFractions(prompt)}</li>`).join("");
+      els.guideMisconception.innerHTML = formatFractions(step.misconception);
+      els.guide.style.display = state.showGuide ? "block" : "none";
+      els.studentMode.classList.toggle("active", !state.showGuide);
+      els.parentMode.classList.toggle("active", state.showGuide);
+    }
+
+    function render() {
+      const step = steps[state.step];
+      els.title.textContent = step.title;
+      els.task.textContent = step.task;
+      els.conceptTag.textContent = step.concept;
+      els.ticketTag.textContent = step.ticket;
+      renderGuide(step);
+      renderSteps();
+      if (step.id === "ticket") renderTicket();
+      if (step.id === "write") renderWrite();
+      if (step.id === "match") renderMatch();
+      if (step.id === "order") renderOrder();
+      if (step.id === "exit") renderExit();
+    }
+
+    function renderTicket() {
+      const stage = ticketStages[state.ticketStage];
+      const tabButtons = ticketStages.map((item, index) => `
+        <button type="button" class="${index === state.ticketStage ? "active" : ""} ${state.ticketDoneStages.has(index) ? "stage-done" : ""}" data-ticket-stage="${index}">
+          ${item.title}
+        </button>`).join("");
+      const scenes = stage.items.map(item => `
+        <div class="ticket-scene">
+          <div class="visual">${ticketVisual(item)}</div>
+          <div>
+            <h4>${item.heading}</h4>
+            <p>${item.note}</p>
+          </div>
+        </div>`).join("");
+      const lines = stage.items.map(item => `
+        <div class="ticket-answer-line">
+          ${item.sentence} <span class="sentence-drop" data-slot="${item.key}">放答案</span>。
+        </div>`).join("");
+      const chips = stage.items.map(item => `<span class="chip" draggable="true" data-answer="${item.key}" data-label="${item.answer}">${formatFractions(item.answer)}</span>`).join("");
+      els.activity.innerHTML = `
+        <div>
+          <div class="ticket-round-tabs">${tabButtons}</div>
+          <div class="answer-bank-title">${stage.hint}</div>
+          <div class="ticket-round-layout">
+          <section class="mini-panel">
+            <h3>看圖</h3>
+            <div class="ticket-scenes">${scenes}</div>
+          </section>
+          <section class="mini-panel">
+            <h3>拖答案卡</h3>
+            <div class="chip-bank">${chips}</div>
+            <div class="ticket-answers">${lines}</div>
+            <div class="tool-row">
+              <button class="primary" type="button" id="checkTicket">檢查這一關</button>
+              <button class="secondary" type="button" id="resetTicket">重來</button>
+            </div>
+            <div id="feedback" class="feedback">可以拖拉答案卡，也可以先點答案卡，再點黃色空格。</div>
+          </section>
+          </div>
+        </div>`;
+      document.querySelectorAll("[data-ticket-stage]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.ticketStage = Number(button.dataset.ticketStage);
+          renderTicket();
+        });
+      });
+      enableTicketDrag();
+    }
+
+    function ticketVisual(item) {
+      if (item.model === "pizza") return pizzaMarkup(item.parts, item.slice, "", "small");
+      if (item.model === "cake") return cakeMarkup(item.parts, item.slice, "");
+      return ribbonMarkup(item.parts, item.slice, "");
+    }
+
+    function enableTicketDrag() {
+      let dragging = null;
+      let selectedChip = null;
+      function placeChip(zone, chip) {
+        if (!chip) return;
+        zone.dataset.answer = chip.dataset.answer;
+        zone.classList.add("filled");
+        if (zone.classList.contains("sentence-drop")) {
+          zone.innerHTML = `<strong>${formatFractions(chip.dataset.label || chip.textContent)}</strong>`;
+        } else {
+          zone.innerHTML = zone.textContent.split("：")[0] + `：<strong>${formatFractions(chip.dataset.label || chip.textContent)}</strong>`;
+        }
+        chip.style.display = "none";
+        selectedChip = null;
+        document.querySelectorAll(".chip").forEach(item => item.classList.remove("selected"));
+      }
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("dragstart", event => {
+          dragging = chip;
+          event.dataTransfer.setData("text/plain", chip.dataset.answer);
+        });
+        chip.addEventListener("click", () => {
+          selectedChip = chip;
+          document.querySelectorAll(".chip").forEach(item => item.classList.remove("selected"));
+          chip.classList.add("selected");
+          setFeedback("", "已選好答案卡", `現在點句子裡的黃色空格，把「${formatFractions(chip.dataset.label || chip.textContent)}」放進去。`);
+        });
+      });
+      document.querySelectorAll(".drop-zone, .sentence-drop").forEach(zone => {
+        zone.addEventListener("dragover", event => event.preventDefault());
+        zone.addEventListener("drop", event => {
+          event.preventDefault();
+          const answer = event.dataTransfer.getData("text/plain");
+          const chip = dragging || document.querySelector(`.chip[data-answer="${answer}"]`);
+          placeChip(zone, chip);
+        });
+        zone.addEventListener("click", () => {
+          if (!selectedChip) {
+            setFeedback("try", "先選答案卡", "請先點上方黃色答案卡，再點這個黃色空格。");
+            return;
+          }
+          placeChip(zone, selectedChip);
+        });
+      });
+      document.getElementById("checkTicket").addEventListener("click", () => {
+        const zones = [...document.querySelectorAll(".drop-zone, .sentence-drop")];
+        const allFilled = zones.every(zone => zone.dataset.answer);
+        const ok = allFilled && zones.every(zone => zone.dataset.slot === zone.dataset.answer);
+        if (ok) {
+          state.ticketDoneStages.add(state.ticketStage);
+          renderSteps();
+          if (state.ticketStage < ticketStages.length - 1) {
+            setTicketPassAnimation("這一關通過", "做得好，馬上進入下一關。");
+            window.setTimeout(() => {
+              state.ticketStage += 1;
+              renderTicket();
+            }, 1200);
+          } else {
+            if (state.ticketDoneStages.size === ticketStages.length) {
+              markDone("ticket");
+              setTicketPassAnimation("入場券通過", "你分得清楚完整單位量、切開後的一份，以及和完整量的分數關係。");
+            }
+          }
+        } else if (!allFilled) {
+          setFeedback("try", "還沒作答完", "右邊每一個黃色空格都要填好，才能檢查這一關。");
+        } else {
+          setFeedback("try", "再想一下", "先找完整的單位量，再判斷是在問「幾片、幾段」，還是在問「幾分之一個、幾分之一條」。");
+        }
+      });
+      document.getElementById("resetTicket").addEventListener("click", renderTicket);
+    }
+
+    function pickWriteQuestion() {
+      const current = state.writeQuestion;
+      const remaining = writeQuestions.filter(question => !state.writeDoneAnswers.has(question.answer));
+      const pool = remaining.length ? remaining : writeQuestions;
+      let next = pool[Math.floor(Math.random() * pool.length)];
+      if (current && pool.length > 1) {
+        while (next.parts === current.parts) next = pool[Math.floor(Math.random() * pool.length)];
+      }
+      state.writeQuestion = next;
+      return next;
+    }
+
+    function renderWrite() {
+      const q = state.writeQuestion || pickWriteQuestion();
+      const writeDoneCount = state.writeDoneAnswers.size;
+      els.activity.innerHTML = `
+        <section class="mini-panel">
+          <h3>黃色這一份是幾分之一？</h3>
+          <div class="answer-bank-title">完成進度：${writeDoneCount} / ${writeQuestions.length} 題</div>
+          <div class="pizza-stage">${pizzaMarkup(q.parts, q.slice, "黃色1份")}</div>
+          <div class="answer-row">
+            <span style="font-size:28px;font-weight:900;">我寫：</span>
+            <div class="fraction-input">
+              <input id="numInput" inputmode="numeric" value="1" aria-label="分子">
+              <span class="bar"></span>
+              <input id="denInput" inputmode="numeric" aria-label="分母" placeholder="?">
+            </div>
+            <button class="primary" type="button" id="checkWrite">檢查</button>
+            <button class="secondary" type="button" id="newWrite">換一題</button>
+          </div>
+          <div id="feedback" class="feedback">先數整個披薩平分成幾份，再寫在下面。</div>
+        </section>`;
+      document.getElementById("checkWrite").addEventListener("click", () => {
+        const top = document.getElementById("numInput").value.trim();
+        const bottom = document.getElementById("denInput").value.trim();
+        if (top === "1" && Number(bottom) === q.parts) {
+          state.writeDoneAnswers.add(q.answer);
+          if (state.writeDoneAnswers.size === writeQuestions.length) {
+            markDone("write");
+            setFeedback("good", "全部完成", `這題也答對了。你已經完成全部${writeQuestions.length}題看圖寫分數。`);
+          } else {
+            setFeedback("good", "答對了", `這個披薩平分成${q.parts}份，黃色是其中1份，所以是${formatFractions(q.answer)}，讀作${q.read}。馬上換下一題。`);
+            window.setTimeout(() => {
+              pickWriteQuestion();
+              renderWrite();
+            }, 900);
+          }
+        } else {
+          setFeedback("try", "再數一次", `黃色是1份沒錯，下面要寫「整個披薩平分成幾份」。`);
+        }
+      });
+      document.getElementById("newWrite").addEventListener("click", () => {
+        pickWriteQuestion();
+        renderWrite();
+      });
+    }
+
+    function renderMatch() {
+      const shuffled = [...matchItems].sort(() => Math.random() - .5);
+      els.activity.innerHTML = `
+        <div class="match-area">
+          <section class="mini-panel">
+            <h3>分數卡</h3>
+            <div class="match-list" id="cardList">
+              ${shuffled.map(item => `<div class="match-card" draggable="true" data-id="${item.id}">${formatFractions(item.text)}</div>`).join("")}
+            </div>
+          </section>
+          <section class="mini-panel">
+            <h3>配到正確圖旁邊</h3>
+            <div class="match-list">
+              ${matchItems.map(item => `
+                <div class="match-target" data-id="${item.id}">
+                  ${pizzaMarkup(item.parts, 0, "", "small")}
+                  <div><span class="label">拖分數卡到這裡</span><div class="placed"></div></div>
+                </div>`).join("")}
+            </div>
+          </section>
+        </div>
+        <div class="tool-row">
+          <button class="primary" type="button" id="checkMatch">檢查配對</button>
+          <button class="secondary" type="button" id="resetMatch">重新配對</button>
+        </div>
+        <div id="feedback" class="feedback">看圖數一數總共平分成幾份，再找相同的分數卡。</div>`;
+      state.matchPlaced = {};
+      enableMatchDrag();
+    }
+
+    function enableMatchDrag() {
+      let dragging = null;
+      document.querySelectorAll(".match-card").forEach(card => {
+        card.addEventListener("dragstart", event => {
+          dragging = card;
+          card.classList.add("dragging");
+          event.dataTransfer.setData("text/plain", card.dataset.id);
+        });
+        card.addEventListener("dragend", () => card.classList.remove("dragging"));
+      });
+      document.querySelectorAll(".match-target").forEach(target => {
+        target.addEventListener("dragover", event => event.preventDefault());
+        target.addEventListener("drop", event => {
+          event.preventDefault();
+          const id = event.dataTransfer.getData("text/plain");
+          const card = dragging || document.querySelector(`.match-card[data-id="${id}"]`);
+          if (!card) return;
+          const previous = target.querySelector(".match-card");
+          if (previous) document.getElementById("cardList").appendChild(previous);
+          target.querySelector(".placed").appendChild(card);
+          state.matchPlaced[target.dataset.id] = id;
+        });
+      });
+      document.getElementById("checkMatch").addEventListener("click", () => {
+        const targets = [...document.querySelectorAll(".match-target")];
+        const ok = targets.every(target => target.dataset.id === state.matchPlaced[target.dataset.id]);
+        targets.forEach(target => target.classList.toggle("correct", target.dataset.id === state.matchPlaced[target.dataset.id]));
+        if (ok) {
+          markDone("match");
+          setFeedback("good", "全部配對成功", "你能把圖、讀法和分數符號連起來了。");
+        } else {
+          setFeedback("try", "還有卡片要調整", "請先數每個圖總共幾等分，再找分母相同的卡。");
+        }
+      });
+      document.getElementById("resetMatch").addEventListener("click", renderMatch);
+    }
+
+    const orderMethods = [
+      { id: "quickFour", label: "方法一", parts: 4, pizzas: 6 },
+      { id: "quickSix", label: "方法二", parts: 6, pizzas: 4 },
+      { id: "quickEight", label: "方法三", parts: 8, pizzas: 3 }
+    ];
+
+    function orderMethodKey(pizzas, parts) {
+      return `${pizzas}x${parts}`;
+    }
+
+    function renderOrder() {
+      const total = state.orderParts * state.orderPizzas;
+      const ok = total === 24;
+      const doneCount = state.orderDoneMethods.size;
+      els.activity.innerHTML = `
+        <div class="order-grid">
+          <section class="mini-panel">
+            <h3>調整你的披薩訂單</h3>
+            <div class="counter-row">
+              <label for="partsRange">每個披薩切成幾等份</label>
+              <input id="partsRange" type="range" min="2" max="12" step="1" value="${state.orderParts}">
+              <span class="number-pill">${state.orderParts}</span>
+            </div>
+            <div class="counter-row">
+              <label for="pizzasRange">要點幾個披薩</label>
+              <input id="pizzasRange" type="range" min="1" max="12" step="1" value="${state.orderPizzas}">
+              <span class="number-pill">${state.orderPizzas}</span>
+            </div>
+            <div class="pizza-grid" id="orderPizzas">
+              ${Array.from({ length: state.orderPizzas }, () => pizzaMarkup(state.orderParts, 0, "", "tiny")).join("")}
+            </div>
+          </section>
+          <section class="mini-panel">
+            <h3>點餐單</h3>
+            <div class="receipt">
+              我要 <input class="receipt-input" id="receiptPizzas" inputmode="numeric" aria-label="要點幾個披薩"> 個披薩，<br>
+              每個披薩平分成 <input class="receipt-input" id="receiptParts" inputmode="numeric" aria-label="每個披薩平分成幾份"> 份，<br>
+              一共有 <input class="receipt-input" id="receiptTotal" inputmode="numeric" aria-label="一共有幾片"> 片。<br>
+              全班24人，每人1片。
+              <div class="equation-row" aria-label="數學算式">
+                算式：
+                <input class="receipt-input" id="receiptFactorA" inputmode="numeric" aria-label="每個披薩的片數">
+                ×
+                <input class="receipt-input" id="receiptFactorB" inputmode="numeric" aria-label="披薩個數">
+                =
+                <input class="receipt-input" id="receiptProduct" inputmode="numeric" aria-label="算式答案">
+              </div>
+            </div>
+            <div class="method-progress">已完成 ${doneCount} / 3 種方法。每一種方法都要填點餐單和算式。</div>
+            <div class="tool-row">
+              <button class="big-action" type="button" id="submitOrder">送出訂單</button>
+              ${orderMethods.map(method => {
+                const methodDone = state.orderDoneMethods.has(orderMethodKey(method.pizzas, method.parts));
+                return `<button class="secondary ${methodDone ? "method-done" : ""}" type="button" id="${method.id}">${methodDone ? "✓ " : ""}${method.label}</button>`;
+              }).join("")}
+            </div>
+            <div id="feedback" class="feedback ${ok ? "good" : ""}">
+              ${ok ? "左邊模型剛好24片，請自己填好點餐單和算式再送出。" : "左邊模型目前是" + total + "片，先調整到剛好24片，再填點餐單和算式。"}
+            </div>
+          </section>
+        </div>`;
+      document.getElementById("partsRange").addEventListener("input", event => {
+        state.orderParts = Number(event.target.value);
+        renderOrder();
+      });
+      document.getElementById("pizzasRange").addEventListener("input", event => {
+        state.orderPizzas = Number(event.target.value);
+        renderOrder();
+      });
+      orderMethods.forEach(method => {
+        document.getElementById(method.id).addEventListener("click", () => {
+          state.orderParts = method.parts;
+          state.orderPizzas = method.pizzas;
+          renderOrder();
+        });
+      });
+      document.getElementById("submitOrder").addEventListener("click", () => {
+        const totalNow = state.orderParts * state.orderPizzas;
+        const writtenPizzas = Number(document.getElementById("receiptPizzas").value);
+        const writtenParts = Number(document.getElementById("receiptParts").value);
+        const writtenTotal = Number(document.getElementById("receiptTotal").value);
+        const factorA = Number(document.getElementById("receiptFactorA").value);
+        const factorB = Number(document.getElementById("receiptFactorB").value);
+        const product = Number(document.getElementById("receiptProduct").value);
+        const writtenMatchesModel = writtenPizzas === state.orderPizzas && writtenParts === state.orderParts && writtenTotal === totalNow;
+        const equationMatchesModel = factorA === state.orderParts && factorB === state.orderPizzas && product === totalNow;
+        if (totalNow === 24 && writtenMatchesModel && equationMatchesModel) {
+          const key = orderMethodKey(state.orderPizzas, state.orderParts);
+          state.orderDoneMethods.add(key);
+          if (state.orderDoneMethods.size >= 3) {
+            markDone("order");
+            renderOrder();
+            setFeedback("good", "三種方法都成功", `你找到了3種剛好24片的方法，也能寫出 ${state.orderParts} × ${state.orderPizzas} = 24。點餐大師過關！`);
+          } else {
+            renderOrder();
+            setFeedback("good", "完成一種方法", `這一種成功了：${state.orderParts} × ${state.orderPizzas} = 24。已完成 ${state.orderDoneMethods.size} / 3 種方法，請換另一個方法繼續。`);
+          }
+        } else if (totalNow === 24 && !writtenMatchesModel) {
+          setFeedback("try", "點餐單還要修正", `左邊模型是${state.orderPizzas}個披薩，每個${state.orderParts}等份，共${totalNow}片。請把右邊點餐單填成一樣。`);
+        } else if (totalNow === 24 && !equationMatchesModel) {
+          setFeedback("try", "算式還要修正", `算式請寫成「每個披薩的片數 × 披薩個數 = 總片數」，這一題是 ${state.orderParts} × ${state.orderPizzas} = 24。`);
+        } else {
+          setFeedback("try", "還不能送出", `現在共有${totalNow}片，不是24片。請讓「每個披薩的片數 × 披薩個數 = 24」。`);
+        }
+      });
+    }
+
+    function renderExit() {
+      els.activity.innerHTML = `
+        <section class="exit-list">
+          ${exitQuestions.map((q, index) => `
+            <div class="exit-question" data-id="${q.id}">
+              <h3>${index + 1}. ${formatFractions(q.title)}</h3>
+              <div class="option-grid">
+                ${q.options.map(option => `<button type="button" class="choice" data-q="${q.id}" data-option="${option}">${formatFractions(option)}</button>`).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </section>
+        <div class="tool-row">
+          <button class="primary" type="button" id="checkExit">完成出場券</button>
+          <button class="secondary" type="button" id="resetExit">重新作答</button>
+        </div>
+        <div id="feedback" class="feedback">每題選一個答案，完成後按檢查。</div>`;
+      document.querySelectorAll(".choice[data-q]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.exitAnswers[button.dataset.q] = button.dataset.option;
+          document.querySelectorAll(`.choice[data-q="${button.dataset.q}"]`).forEach(btn => btn.classList.remove("selected"));
+          button.classList.add("selected");
+        });
+      });
+      document.getElementById("checkExit").addEventListener("click", () => {
+        const score = exitQuestions.reduce((sum, q) => sum + (state.exitAnswers[q.id] === q.answer ? 1 : 0), 0);
+        if (score === exitQuestions.length) {
+          markDone("exit");
+          setFeedback("good", "出場券通過", "你能說出分數的結構，也能完成披薩點餐任務。");
+        } else {
+          setFeedback("try", `答對${score}題`, "請回到錯題想一想：分母看平分成幾份，分子1看拿其中1份。");
+        }
+      });
+      document.getElementById("resetExit").addEventListener("click", () => {
+        state.exitAnswers = {};
+        renderExit();
+      });
+    }
+
+    els.studentMode.addEventListener("click", () => {
+      state.showGuide = false;
+      render();
+    });
+
+    els.parentMode.addEventListener("click", () => {
+      state.showGuide = true;
+      render();
+    });
+
+    els.closeCompletion.addEventListener("click", () => {
+      els.completionOverlay.classList.remove("show");
+    });
+
+    els.completionOverlay.addEventListener("click", event => {
+      if (event.target === els.completionOverlay) {
+        els.completionOverlay.classList.remove("show");
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
