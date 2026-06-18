@@ -1,0 +1,1534 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>9-3 分數對抗賽</title>
+  <style>
+    :root {
+      --ink: #243043;
+      --muted: #65738a;
+      --line: #cbd8e8;
+      --paper: #fffdf7;
+      --cream: #fff4d6;
+      --blue: #3b82c4;
+      --blue-soft: #eaf5ff;
+      --green: #2f9e66;
+      --mint: #e8fff3;
+      --gold: #f4b545;
+      --orange: #e98f2e;
+      --red: #d94f45;
+      --shadow: 0 14px 30px rgba(54, 72, 95, .14);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 8% 10%, rgba(255, 229, 150, .54), transparent 24%),
+        radial-gradient(circle at 88% 14%, rgba(186, 232, 255, .65), transparent 25%),
+        linear-gradient(180deg, #f9fcff 0%, #eef7f2 100%);
+    }
+
+    button, input { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 22px clamp(14px, 3vw, 34px) 150px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 74px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: clamp(20px, 2.1vw, 32px);
+      line-height: 1.45;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid #f3ce76;
+      background: #fff8dc;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+    }
+
+    .mode-switch button {
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: transparent;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .mode-switch button.active {
+      color: #1c4a38;
+      background: #bfeecf;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .layout.guide-hidden {
+      grid-template-columns: 310px minmax(0, 1fr);
+    }
+
+    .panel {
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .88);
+      box-shadow: var(--shadow);
+    }
+
+    .steps {
+      position: sticky;
+      top: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .step-button {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      min-height: 92px;
+      padding: 14px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      text-align: left;
+    }
+
+    .step-button.active {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .step-no {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--blue);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .step-button.done .step-no { background: var(--green); }
+
+    .step-title {
+      display: block;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .step-note {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .check {
+      color: var(--green);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .workspace {
+      min-height: 720px;
+      overflow: hidden;
+    }
+
+    .task-head {
+      padding: clamp(18px, 2.4vw, 30px);
+      border-bottom: 2px solid var(--line);
+      background: linear-gradient(135deg, #fff7df, #e9f7ff);
+    }
+
+    .task-head h2 {
+      margin: 0;
+      font-size: clamp(30px, 3.6vw, 50px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .task-head p {
+      margin: 12px 0 0;
+      color: #52637a;
+      font-size: clamp(20px, 2vw, 28px);
+      line-height: 1.45;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 2px solid #b9d9c8;
+      color: #265d49;
+      background: #e8fff3;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .content {
+      padding: clamp(16px, 2vw, 28px);
+    }
+
+    .guide {
+      position: sticky;
+      top: 14px;
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+      padding: 18px;
+      background: #f9fdff;
+      scrollbar-gutter: stable;
+    }
+
+    .guide h2 {
+      margin: 0;
+      padding: 14px;
+      border-radius: 14px;
+      color: #fff;
+      background: #68727e;
+      text-align: center;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    .guide-section {
+      margin-top: 16px;
+      padding: 16px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .guide-section strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .guide-section p,
+    .guide-section li {
+      color: #3b4a5f;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .guide-section ul {
+      margin: 8px 0 0;
+      padding-left: 1.15em;
+    }
+
+    .mini-panel {
+      min-height: 210px;
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .mini-panel h3 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .tool-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .primary, .secondary, .choice, .big-action {
+      min-height: 54px;
+      padding: 12px 20px;
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: 900;
+      box-shadow: 0 6px 0 rgba(36, 48, 67, .14);
+    }
+
+    .primary, .big-action {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .secondary {
+      background: #fff;
+      border: 2px solid var(--line);
+    }
+
+    .choice {
+      background: #fff;
+      border: 2px solid var(--line);
+    }
+
+    .choice.selected {
+      border-color: #e09b2f;
+      background: #fff1b7;
+      color: #754707;
+    }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #f8fbff;
+      color: #3a4a5f;
+      font-size: 22px;
+      line-height: 1.55;
+      font-weight: 800;
+    }
+
+    .feedback.good {
+      border-color: #6dc58a;
+      background: #ebfff2;
+      color: #14613c;
+    }
+
+    .feedback.try {
+      border-color: #f1b45c;
+      background: #fff7df;
+      color: #7a4b09;
+    }
+
+    .answer-bank-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0 12px;
+      padding: 12px 16px;
+      border: 3px solid #f0b75c;
+      border-radius: 16px;
+      background: #fff8d9;
+      color: #7b4a08;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .bar-stage {
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      padding: 22px;
+      border: 3px dashed #b7c9dc;
+      border-radius: 20px;
+      background: #f9fcff;
+    }
+
+    .fraction-bar {
+      width: min(680px, 100%);
+      height: 82px;
+      display: grid;
+      grid-template-columns: repeat(var(--parts), 1fr);
+      border: 5px solid #29405b;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fffdf7;
+      box-shadow: 0 12px 24px rgba(36, 48, 67, .12);
+    }
+
+    .bar-piece {
+      border-right: 3px solid rgba(36, 48, 67, .18);
+      background: #fff9dd;
+    }
+
+    .bar-piece:last-child { border-right: 0; }
+
+    .bar-piece.active {
+      background: linear-gradient(180deg, #ffdf55, #f6b53f);
+    }
+
+    .bar-label {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #fff;
+      color: #27415b;
+      font-size: 22px;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    .fraction-input {
+      display: inline-grid;
+      place-items: center;
+      width: 110px;
+      padding: 10px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .fraction-input input {
+      width: 74px;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      text-align: center;
+      font-size: 40px;
+      font-weight: 900;
+      background: transparent;
+    }
+
+    .fraction-input .bar {
+      width: 74px;
+      height: 5px;
+      border-radius: 999px;
+      background: #243043;
+    }
+
+    .fraction-read {
+      display: inline-grid;
+      place-items: center;
+      min-width: 82px;
+      vertical-align: middle;
+      color: #111;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .fraction-read .num,
+    .fraction-read .den {
+      font-size: 1.15em;
+      line-height: .95;
+    }
+
+    .fraction-read .line {
+      width: 100%;
+      height: 4px;
+      margin: 4px 0;
+      border-radius: 999px;
+      background: #243043;
+    }
+
+    .race-note-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .race-note {
+      padding: 16px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .race-launch {
+      display: grid;
+      place-items: center;
+      gap: 18px;
+      min-height: 300px;
+      margin: 18px 0;
+      padding: 28px;
+      border: 4px dashed #b9d3c6;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #fbfff8, #eef9f2);
+      text-align: center;
+    }
+
+    .race-launch .big-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 96px;
+      min-width: min(620px, 92%);
+      padding: 20px 32px;
+      border: 0;
+      border-radius: 24px;
+      background: #4b856f;
+      color: #fff;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1.15;
+      text-decoration: none;
+      box-shadow: 0 12px 0 #2f5d4c, 0 18px 30px rgba(50, 88, 73, .2);
+    }
+
+    .race-launch p {
+      max-width: 760px;
+      margin: 0;
+      color: #4b5e75;
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .observe-table {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .observe-row {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.1fr) minmax(360px, 1.4fr);
+      gap: 14px;
+      align-items: stretch;
+      padding: 14px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .observe-prompt {
+      display: grid;
+      gap: 10px;
+      align-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .observe-mini-bars {
+      display: grid;
+      gap: 8px;
+    }
+
+    .observe-mini-bar {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      align-items: center;
+      gap: 10px;
+      color: #34495f;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .observe-mini-bar .track {
+      display: grid;
+      grid-template-columns: repeat(var(--parts), minmax(0, 1fr));
+      height: 38px;
+      border: 3px solid #30435c;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff9d8;
+    }
+
+    .observe-mini-bar .piece {
+      height: 100%;
+      background: #fff9d8;
+      border-left: 2px solid rgba(91, 69, 29, .22);
+    }
+
+    .observe-mini-bar .piece:first-child {
+      border-left: 0;
+    }
+
+    .observe-mini-bar .piece.active {
+      background: linear-gradient(180deg, #ffe17a, #f0be45);
+      border-right: 3px solid rgba(91, 69, 29, .35);
+    }
+
+    .observe-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-content: center;
+    }
+
+    .observe-choice {
+      min-height: 74px;
+      padding: 10px 12px;
+      border: 3px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      color: #243043;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.25;
+      box-shadow: 0 7px 0 rgba(130, 148, 166, .25);
+    }
+
+    .observe-choice.active {
+      border-color: #e09b2f;
+      background: #fff3b8;
+      color: #7a4a09;
+      transform: translateY(3px);
+      box-shadow: 0 4px 0 rgba(150, 100, 28, .3);
+    }
+
+    .question-board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .question-card {
+      min-height: 128px;
+      padding: 16px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .question-card.active {
+      border-color: #e09b2f;
+      background: #fff8d9;
+      color: #754707;
+    }
+
+    .sentence-box {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border: 3px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 900;
+      line-height: 1.75;
+    }
+
+    .sentence-drop {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 132px;
+      min-height: 54px;
+      padding: 5px 12px;
+      border: 4px dashed #e09b2f;
+      border-radius: 14px;
+      background: #fff3b8;
+      color: #875209;
+      vertical-align: middle;
+    }
+
+    .sentence-drop.filled {
+      border-style: solid;
+      border-color: #5fbd82;
+      background: #e8fff1;
+      color: #14613c;
+    }
+
+    .chip-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      min-height: 58px;
+      padding: 10px 16px;
+      border: 3px solid #e09b2f;
+      border-radius: 18px;
+      background: #ffdf59;
+      font-size: 24px;
+      font-weight: 900;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 6px 0 #b9791e;
+    }
+
+    .chip.selected {
+      outline: 5px solid #45b36b;
+      background: #c9f6d7;
+      box-shadow: 0 6px 0 #4b8a5f;
+    }
+
+    .compare-card {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .compare-bars {
+      display: grid;
+      gap: 18px;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 14px;
+      align-items: center;
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .mini-bar {
+      width: 100%;
+      height: 54px;
+      display: grid;
+      grid-template-columns: repeat(var(--parts), 1fr);
+      border: 4px solid #29405b;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fffdf7;
+    }
+
+    .mini-bar span {
+      border-right: 2px solid rgba(36, 48, 67, .18);
+      background: #fff9dd;
+    }
+
+    .mini-bar span:last-child { border-right: 0; }
+
+    .mini-bar span:first-child {
+      background: linear-gradient(180deg, #ffdf55, #f6b53f);
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .exit-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .exit-question {
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .exit-question h3 {
+      margin: 0 0 12px;
+      font-size: 26px;
+    }
+
+    .completion-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(36, 48, 67, .32);
+      backdrop-filter: blur(4px);
+    }
+
+    .completion-overlay.show { display: grid; }
+
+    .completion-card {
+      width: min(620px, 92vw);
+      padding: 28px;
+      border: 5px solid #7ccf93;
+      border-radius: 28px;
+      background: #fffdf7;
+      box-shadow: 0 24px 60px rgba(34, 49, 68, .28);
+      text-align: center;
+      animation: popPass .35s ease-out both;
+    }
+
+    .completion-icon {
+      width: 126px;
+      height: 126px;
+      margin: 0 auto 16px;
+      border: 6px solid #e59f38;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #ffe8a1, #f3bc52);
+      color: #15613e;
+      font-size: 58px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 5px rgba(255,255,255,.35), 0 12px 24px rgba(129, 84, 31, .18);
+      animation: bouncePass .55s ease-in-out infinite alternate;
+    }
+
+    .completion-stars {
+      color: #f0a431;
+      font-size: 30px;
+      font-weight: 900;
+      animation: sparklePass .55s ease-in-out infinite alternate;
+    }
+
+    .completion-card h2 {
+      margin: 8px 0 10px;
+      font-size: clamp(34px, 5vw, 52px);
+      line-height: 1.15;
+    }
+
+    .completion-card p {
+      margin: 0;
+      color: #44566f;
+      font-size: 24px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    @keyframes popPass {
+      from { transform: scale(.88); opacity: .25; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes bouncePass {
+      from { transform: translateY(0) rotate(-3deg); }
+      to { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    @keyframes sparklePass {
+      from { opacity: .45; transform: scale(.92); }
+      to { opacity: 1; transform: scale(1.08); }
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+    }
+
+    @media (max-width: 1180px) {
+      .layout,
+      .layout.guide-hidden {
+        grid-template-columns: 250px minmax(0, 1fr);
+      }
+      .guide {
+        grid-column: 1 / -1;
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .layout,
+      .layout.guide-hidden,
+      .question-board,
+      .race-note-grid,
+      .observe-row,
+      .observe-options {
+        grid-template-columns: 1fr;
+      }
+      .steps,
+      .guide {
+        position: static;
+        max-height: none;
+      }
+      .step-button {
+        min-height: 78px;
+      }
+      .compare-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <h1>9-3 分數對抗賽</h1>
+        <p>先看懂長條圖的幾分之一，再用競技台發現：整條一樣長時，分母越大，每一份越小。</p>
+      </div>
+      <div class="mode-switch" aria-label="顯示模式">
+        <button type="button" class="active" id="studentMode">學生版</button>
+        <button type="button" id="parentMode">家長提示</button>
+      </div>
+    </header>
+
+    <section class="layout guide-hidden" id="mainLayout">
+      <nav class="steps panel" id="stepList" aria-label="9-3學習步驟"></nav>
+
+      <section class="workspace panel">
+        <div class="task-head">
+          <h2 id="stepTitle"></h2>
+          <p id="stepTask"></p>
+          <div class="tags">
+            <span class="tag" id="conceptTag"></span>
+            <span class="tag" id="ticketTag"></span>
+          </div>
+        </div>
+        <div class="content" id="activity"></div>
+      </section>
+
+      <aside class="guide panel" id="guidePanel">
+        <h2>家長提示</h2>
+        <div class="guide-section">
+          <strong>正在建構</strong>
+          <p id="guideConcept"></p>
+        </div>
+        <div class="guide-section">
+          <strong>可以這樣問</strong>
+          <ul id="guidePrompts"></ul>
+        </div>
+        <div class="guide-section">
+          <strong>常見迷思</strong>
+          <p id="guideMisconception"></p>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer">9-3 對應教案活動四：分數對抗賽，透過長條圖與分數競技台比較單位分數大小。</div>
+  </main>
+
+  <div class="completion-overlay" id="completionOverlay" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+    <div class="completion-card">
+      <div class="completion-stars">✦ ✦ ✦</div>
+      <div class="completion-icon">✓</div>
+      <h2 id="completionTitle">恭喜過關！</h2>
+      <p>你完成 9-3 分數對抗賽，能說出整條一樣長時，分母越大，每一份越小。</p>
+      <button class="primary" type="button" id="closeCompletion">太棒了</button>
+    </div>
+  </div>
+
+  <script>
+    const steps = [
+      {
+        id: "ticket",
+        title: "入場券：看長條寫分數",
+        short: "分母12以內",
+        task: "看長條圖，先確認全部平分成幾段，再寫出黃色這一段的分數。",
+        concept: "圖像到分數",
+        ticket: "入場券",
+        guide: "孩子要先看完整長條被平分成幾段，再確認黃色只有其中1段。這一步先確定孩子會看懂單位分數，才進入大小比較。",
+        prompts: ["整條長條被平分成幾段？", "黃色有幾段？", "所以黃色這一段是幾分之一條？"],
+        misconception: "孩子可能只看黃色的長短，卻沒有數全部平分成幾段。請提醒：分母看全部被平分成幾份。"
+      },
+      {
+        id: "race",
+        title: "分數競技台：找關鍵",
+        short: "拖拉比較",
+        task: "打開分數競技台，拖拉不同單位分數長條，對齊左端後觀察哪一段比較長。",
+        concept: "操作觀察",
+        ticket: "探索券",
+        guide: "這一步對應教案活動四，讓孩子用一樣長的整條長條來觀察 1/2、1/3、1/8 等每一份的長短。",
+        prompts: ["平分越多段，每一段會變怎樣？", "比較時要讓哪裡對齊？", "你覺得要看分子還是分母？"],
+        misconception: "孩子常以為數字越大就越大。此處要聚焦：比較的是每一份，不是分母數字本身。"
+      },
+      {
+        id: "sentence",
+        title: "競技台觀察紀錄",
+        short: "越多越小",
+        task: "先勾選你在競技台看到的結果，再把答案卡放進句子，整理出分數大小比較的關鍵說法。",
+        concept: "數學語言",
+        ticket: "發現券",
+        guide: "教師提問句型：平分越多段，每一段會變怎樣？要看哪裡？引導孩子說出整條一樣長時，分母越大，每一份越小。",
+        prompts: ["平分成12段和3段，哪一段比較小？", "比較單位分數大小時，要看哪個數？", "請完整說：分母越大，每一份越……"],
+        misconception: "孩子可能背成口訣但不連結圖像。請他回到長條圖指給你看：哪一段比較長？為什麼？"
+      },
+      {
+        id: "compare",
+        title: "分數對抗賽：誰比較大",
+        short: "選大的",
+        task: "看兩條同樣長的長條，選出比較大的單位分數，並用規則檢查答案。",
+        concept: "大小比較",
+        ticket: "任務券",
+        guide: "孩子要比較一樣長的整條中的單位分數。分子都是1時，分母小代表平分段數少，每一份比較大。",
+        prompts: ["這兩條一樣長嗎？", "哪一個分母比較小？", "分母小，表示每一份比較大還是比較小？"],
+        misconception: "孩子可能把 1/9 誤認為比 1/4 大，因為9比4大。請回到長條圖：切成9段，每一段其實更短。"
+      },
+      {
+        id: "exit",
+        title: "出場券：我會比較",
+        short: "檢核概念",
+        task: "完成出場券，檢查你是否能用圖和句子說明單位分數大小。",
+        concept: "形成性檢核",
+        ticket: "出場券",
+        guide: "出場券檢核三件事：會看長條圖分數、知道比較時要先確認整條一樣長、能說出分母越大每一份越小。",
+        prompts: ["這兩條是不是一樣長？", "分母代表什麼？", "請用『平分越多段，每一段越小』說明。"],
+        misconception: "若孩子錯在比較大小，先不要急著講口訣，回到長條圖對齊左端，看每一份的長短。"
+      }
+    ];
+
+    const ticketQuestions = [2, 3, 4, 5, 6, 8, 10, 12];
+    const comparePairs = [
+      [2, 4], [3, 6], [4, 8], [5, 10], [6, 12], [3, 8], [4, 7], [5, 9]
+    ];
+    const sentenceAnswers = {
+      smaller: "小",
+      denominator: "分母",
+      moreSmaller: "小"
+    };
+    const observationItems = [
+      {
+        id: "half-quarter",
+        prompt: "對齊左端後，哪一段比較長？",
+        bars: [2, 4],
+        options: ["1/2 比較長", "1/4 比較長", "一樣長"],
+        answer: "1/2 比較長"
+      },
+      {
+        id: "quarter-eighth",
+        prompt: "對齊左端後，哪一段比較長？",
+        bars: [4, 8],
+        options: ["1/4 比較長", "1/8 比較長", "一樣長"],
+        answer: "1/4 比較長"
+      },
+      {
+        id: "more-parts",
+        prompt: "整條一樣長時，平分越多段，每一段會怎樣？",
+        bars: [],
+        options: ["越小", "越大", "一樣大"],
+        answer: "越小"
+      },
+      {
+        id: "look-at",
+        prompt: "分子都是1時，比較單位分數大小主要看哪裡？",
+        bars: [],
+        options: ["分母", "分子", "顏色"],
+        answer: "分母"
+      }
+    ];
+    const exitQuestions = [
+      {
+        id: "q1",
+        title: "同一條緞帶，1/3 和 1/8 哪一份比較大？",
+        options: ["1/3", "1/8", "一樣大"],
+        answer: "1/3"
+      },
+      {
+        id: "q2",
+        title: "平分越多段，每一段會怎樣？",
+        options: ["越小", "越大", "不一定"],
+        answer: "越小"
+      },
+      {
+        id: "q3",
+        title: "比較單位分數大小，要先確認什麼？",
+        options: ["整條一樣長", "顏色一樣", "分母數字最大"],
+        answer: "整條一樣長"
+      },
+      {
+        id: "q4",
+        title: "分子都是1時，分母越大，每一份越……",
+        options: ["小", "大", "多"],
+        answer: "小"
+      },
+      {
+        id: "q5",
+        title: "1/12 比 1/6 小，是因為……",
+        options: ["一樣長的整條切更多段", "12比6大所以比較大", "黃色比較亮"],
+        answer: "一樣長的整條切更多段"
+      }
+    ];
+
+    const state = {
+      step: 0,
+      done: new Set(),
+      showGuide: false,
+      ticketQuestion: null,
+      ticketDone: new Set(),
+      raceChecks: new Set(),
+      observationReady: false,
+      observationAnswers: {},
+      sentencePlaced: {},
+      compareIndex: 0,
+      comparePair: null,
+      compareDone: new Set(),
+      exitAnswers: {},
+      celebrated: false
+    };
+
+    const els = {
+      layout: document.getElementById("mainLayout"),
+      stepList: document.getElementById("stepList"),
+      title: document.getElementById("stepTitle"),
+      task: document.getElementById("stepTask"),
+      conceptTag: document.getElementById("conceptTag"),
+      ticketTag: document.getElementById("ticketTag"),
+      activity: document.getElementById("activity"),
+      guide: document.getElementById("guidePanel"),
+      guideConcept: document.getElementById("guideConcept"),
+      guidePrompts: document.getElementById("guidePrompts"),
+      guideMisconception: document.getElementById("guideMisconception"),
+      studentMode: document.getElementById("studentMode"),
+      parentMode: document.getElementById("parentMode"),
+      completionOverlay: document.getElementById("completionOverlay"),
+      closeCompletion: document.getElementById("closeCompletion")
+    };
+
+    function stackFraction(top, bottom) {
+      return `<span class="fraction-read" aria-label="${bottom}分之${top}"><span class="num">${top}</span><span class="line"></span><span class="den">${bottom}</span></span>`;
+    }
+
+    function formatFractions(text) {
+      return String(text).replace(/(\d+)\/(\d+)/g, (_, top, bottom) => stackFraction(top, bottom));
+    }
+
+    function unitBar(parts, activeIndex = 0, className = "fraction-bar") {
+      return `<div class="${className}" style="--parts:${parts}">
+        ${Array.from({ length: parts }, (_, index) => `<span class="bar-piece ${index === activeIndex ? "active" : ""}"></span>`).join("")}
+      </div>`;
+    }
+
+    function miniUnitBar(parts) {
+      return `<div class="mini-bar" style="--parts:${parts}">${Array.from({ length: parts }, () => "<span></span>").join("")}</div>`;
+    }
+
+    function observeMiniBars(partsList) {
+      if (!partsList.length) return `<div class="feedback">想一想剛剛競技台裡，長條都對齊左端時的結果。</div>`;
+      return `<div class="observe-mini-bars">
+        ${partsList.map(parts => `
+          <div class="observe-mini-bar">
+            <span>${formatFractions("1/" + parts)}</span>
+            <span class="track" style="--parts:${parts}">
+              ${Array.from({ length: parts }, (_, index) => `<span class="piece ${index === 0 ? "active" : ""}"></span>`).join("")}
+            </span>
+          </div>
+        `).join("")}
+      </div>`;
+    }
+
+    function markDone(id = steps[state.step].id) {
+      state.done.add(id);
+      renderSteps();
+      checkAllDone();
+    }
+
+    function checkAllDone() {
+      const allDone = steps.every(step => state.done.has(step.id));
+      if (!allDone || state.celebrated) return;
+      state.celebrated = true;
+      window.setTimeout(() => {
+        els.completionOverlay.classList.add("show");
+      }, 350);
+    }
+
+    function setFeedback(type, title, body) {
+      const box = document.getElementById("feedback");
+      if (!box) return;
+      box.className = `feedback ${type || ""}`;
+      box.innerHTML = `<strong>${title}</strong><br>${body}`;
+    }
+
+    function renderSteps() {
+      els.stepList.innerHTML = steps.map((step, index) => {
+        const active = index === state.step ? "active" : "";
+        const done = state.done.has(step.id) ? "done" : "";
+        const check = state.done.has(step.id) ? "✓" : "";
+        return `<button class="step-button ${active} ${done}" type="button" data-index="${index}">
+          <span class="step-no">${index + 1}</span>
+          <span><span class="step-title">${step.title}</span><span class="step-note">${step.short}</span></span>
+          <span class="check">${check}</span>
+        </button>`;
+      }).join("");
+      document.querySelectorAll(".step-button").forEach(button => {
+        button.addEventListener("click", () => {
+          state.step = Number(button.dataset.index);
+          render();
+        });
+      });
+    }
+
+    function renderGuide(step) {
+      els.guideConcept.innerHTML = formatFractions(step.guide);
+      els.guidePrompts.innerHTML = step.prompts.map(prompt => `<li>${formatFractions(prompt)}</li>`).join("");
+      els.guideMisconception.innerHTML = formatFractions(step.misconception);
+      els.guide.style.display = state.showGuide ? "block" : "none";
+      els.layout.classList.toggle("guide-hidden", !state.showGuide);
+      els.studentMode.classList.toggle("active", !state.showGuide);
+      els.parentMode.classList.toggle("active", state.showGuide);
+    }
+
+    function pickTicketQuestion() {
+      const remaining = ticketQuestions.filter(parts => !state.ticketDone.has(parts));
+      const pool = remaining.length ? remaining : ticketQuestions;
+      state.ticketQuestion = pool[Math.floor(Math.random() * pool.length)];
+      return state.ticketQuestion;
+    }
+
+    function renderTicket() {
+      const parts = state.ticketQuestion || pickTicketQuestion();
+      els.activity.innerHTML = `
+        <section class="mini-panel">
+          <h3>黃色這一段是幾分之一？</h3>
+          <div class="answer-bank-title">完成進度：${state.ticketDone.size} / 5 題。分母都在12以內。</div>
+          <div class="bar-stage">
+            ${unitBar(parts, 0)}
+            <div class="bar-label">整條長條平分成 ${parts} 段，黃色是其中 1 段。</div>
+          </div>
+          <div class="tool-row">
+            <span style="font-size:28px;font-weight:900;">我寫：</span>
+            <div class="fraction-input">
+              <input id="numInput" inputmode="numeric" aria-label="分子">
+              <span class="bar"></span>
+              <input id="denInput" inputmode="numeric" aria-label="分母">
+            </div>
+            <button class="primary" type="button" id="checkTicket">檢查</button>
+            <button class="secondary" type="button" id="newTicket">換一題</button>
+          </div>
+          <div id="feedback" class="feedback">先數全部平分成幾段，再寫分母。</div>
+        </section>`;
+      document.getElementById("checkTicket").addEventListener("click", () => {
+        const top = document.getElementById("numInput").value.trim();
+        const bottom = document.getElementById("denInput").value.trim();
+        if (top === "1" && Number(bottom) === parts) {
+          state.ticketDone.add(parts);
+          if (state.ticketDone.size >= 5) {
+            markDone("ticket");
+            setFeedback("good", "入場券通過", "你能看長條圖寫出正確的單位分數，可以進入分數競技台。");
+          } else {
+            setFeedback("good", "答對了", `黃色是 ${formatFractions("1/" + parts)} 條。馬上換下一題。`);
+            window.setTimeout(() => {
+              pickTicketQuestion();
+              renderTicket();
+            }, 850);
+          }
+        } else {
+          setFeedback("try", "再數一次", `黃色只有1段，分母要寫整條長條平分成幾段。`);
+        }
+      });
+      document.getElementById("newTicket").addEventListener("click", () => {
+        pickTicketQuestion();
+        renderTicket();
+      });
+    }
+
+    function renderRace() {
+      els.activity.innerHTML = `
+        <section class="mini-panel">
+          <h3>分數競技台</h3>
+          <div class="answer-bank-title">教師提問：平分越多段，每一段會變怎樣？要看哪裡？</div>
+          <div class="race-note-grid">
+            <div class="race-note">把分數長條拖到競賽區</div>
+            <div class="race-note">左端對齊基準線</div>
+            <div class="race-note">比較哪一段比較長</div>
+          </div>
+          <div class="race-launch">
+            <a class="big-action" href="https://gmcelma-gmc.github.io/fraction-paper-checker/unit-fraction-bar-race.html" target="_blank" rel="noopener">開啟分數競技台</a>
+            <p>會開啟新頁面。請在競技台拖拉 1/2、1/4、1/8 等分數長條，對齊左端後觀察哪一段比較長。</p>
+          </div>
+          <div class="tool-row">
+            <button class="primary" type="button" id="checkRace">我完成操作</button>
+          </div>
+          <div id="feedback" class="feedback">完成競技台操作後，回到這一頁按「我完成操作」。</div>
+        </section>`;
+      document.getElementById("checkRace").addEventListener("click", () => {
+        markDone("race");
+        setFeedback("good", "競技台操作完成", "很好，下一關把你剛剛看到的結果勾選下來，再整理成一句數學規則。");
+      });
+    }
+
+    function renderSentence() {
+      const chips = [
+        { key: "smaller", label: "小" },
+        { key: "denominator", label: "分母" },
+        { key: "bigger", label: "大" },
+        { key: "numerator", label: "分子" }
+      ];
+      els.activity.innerHTML = `
+        <section class="mini-panel">
+          <h3>競技台觀察紀錄</h3>
+          <div class="answer-bank-title">先依照競技台的觀察選出結果，再整理成比較大小的關鍵句。</div>
+          <div class="observe-table">
+            ${observationItems.map(item => `
+              <div class="observe-row">
+                <div class="observe-prompt">
+                  <div>${item.prompt}</div>
+                  ${observeMiniBars(item.bars)}
+                </div>
+                <div class="observe-options">
+                  ${item.options.map(option => `<button type="button" class="observe-choice ${state.observationAnswers[item.id] === option ? "active" : ""}" data-observe="${item.id}" data-value="${option}">${formatFractions(option)}</button>`).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+          <div class="tool-row">
+            <button class="primary" type="button" id="checkObservation">完成觀察</button>
+          </div>
+          ${state.observationReady ? `
+            <div class="answer-bank-title">比較大小的關鍵句：把答案卡放到句子裡，說出分數對抗賽的發現。</div>
+            <div class="chip-bank">
+              ${chips.map(chip => `<span class="chip" draggable="true" data-answer="${chip.key}" data-label="${chip.label}">${chip.label}</span>`).join("")}
+            </div>
+            <div class="sentence-box">
+              <div>整條一樣長，平分越多段，每一段會變 <span class="sentence-drop" data-slot="smaller">放答案</span>。</div>
+              <div>比較單位分數大小，要看 <span class="sentence-drop" data-slot="denominator">放答案</span>。</div>
+              <div>分母越大，每一份越 <span class="sentence-drop" data-slot="moreSmaller">放答案</span>。</div>
+            </div>
+            <div class="tool-row">
+              <button class="primary" type="button" id="checkSentence">檢查歸納句</button>
+              <button class="secondary" type="button" id="resetSentence">重來</button>
+            </div>
+          ` : ""}
+          <div id="feedback" class="feedback">${state.observationReady ? "可以拖拉答案卡，也可以先點答案卡，再點黃色空格。" : "請先在上方觀察紀錄表選出結果。想不確定時，可以回到第2關操作競技台再看一次。"}</div>
+        </section>`;
+      document.querySelectorAll("[data-observe]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.observationAnswers[button.dataset.observe] = button.dataset.value;
+          state.observationReady = false;
+          renderSentence();
+        });
+      });
+      document.getElementById("checkObservation").addEventListener("click", () => {
+        const allAnswered = observationItems.every(item => state.observationAnswers[item.id]);
+        const allCorrect = observationItems.every(item => state.observationAnswers[item.id] === item.answer);
+        if (allAnswered && allCorrect) {
+          state.observationReady = true;
+          renderSentence();
+          setFeedback("good", "觀察完成", "很好，你已經抓到：整條一樣長時，分母越大，每一份越小。現在整理成一句數學規則。");
+        } else if (!allAnswered) {
+          setFeedback("try", "還沒選完", "每一列觀察紀錄都要先選一個結果。");
+        } else {
+          setFeedback("try", "再回競技台看一次", "把長條左端對齊後再比較：切比較少段的那一份比較長；切越多段，每一段越短。");
+        }
+      });
+      if (state.observationReady) enableSentenceDrag();
+    }
+
+    function enableSentenceDrag() {
+      let dragging = null;
+      let selectedChip = null;
+      function placeChip(zone, chip) {
+        if (!chip) return;
+        zone.dataset.answer = chip.dataset.answer;
+        zone.classList.add("filled");
+        zone.textContent = chip.dataset.label || chip.textContent;
+        selectedChip = null;
+        document.querySelectorAll(".chip").forEach(item => item.classList.remove("selected"));
+      }
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("dragstart", event => {
+          dragging = chip;
+          event.dataTransfer.setData("text/plain", chip.dataset.answer);
+        });
+        chip.addEventListener("click", () => {
+          selectedChip = chip;
+          document.querySelectorAll(".chip").forEach(item => item.classList.remove("selected"));
+          chip.classList.add("selected");
+          setFeedback("", "已選好答案卡", `現在點句子裡的黃色空格，把「${chip.dataset.label}」放進去。`);
+        });
+      });
+      document.querySelectorAll(".sentence-drop").forEach(zone => {
+        zone.addEventListener("dragover", event => event.preventDefault());
+        zone.addEventListener("drop", event => {
+          event.preventDefault();
+          const answer = event.dataTransfer.getData("text/plain");
+          const chip = dragging || document.querySelector(`.chip[data-answer="${answer}"]`);
+          placeChip(zone, chip);
+        });
+        zone.addEventListener("click", () => {
+          if (!selectedChip) {
+            setFeedback("try", "先選答案卡", "請先點上方答案卡，再點黃色空格。");
+            return;
+          }
+          placeChip(zone, selectedChip);
+        });
+      });
+      document.getElementById("checkSentence").addEventListener("click", () => {
+        const zones = [...document.querySelectorAll(".sentence-drop")];
+        const allFilled = zones.every(zone => zone.dataset.answer);
+        const ok = allFilled && zones.every(zone => sentenceAnswers[zone.dataset.slot] && zone.textContent === sentenceAnswers[zone.dataset.slot]);
+        if (ok) {
+          markDone("sentence");
+          setFeedback("good", "關鍵句完成", "整條一樣長時，平分越多段，每一段越小；分母越大，每一份越小。");
+        } else if (!allFilled) {
+          setFeedback("try", "還沒放完", "每一個黃色空格都要放答案。");
+        } else {
+          setFeedback("try", "再想一下", "回到分數競技台想一想：平分越多段，每一段會變大還是變小？");
+        }
+      });
+      document.getElementById("resetSentence").addEventListener("click", () => {
+        state.sentencePlaced = {};
+        renderSentence();
+      });
+    }
+
+    function shuffledComparePair(index = state.compareIndex) {
+      const base = comparePairs[index % comparePairs.length];
+      return Math.random() < 0.5 ? [base[1], base[0]] : [...base];
+    }
+
+    function advanceComparePair() {
+      state.compareIndex += 1;
+      state.comparePair = shuffledComparePair();
+    }
+
+    function currentComparePair() {
+      if (!state.comparePair) state.comparePair = shuffledComparePair();
+      return state.comparePair;
+    }
+
+    function renderCompare() {
+      const [a, b] = currentComparePair();
+      const answer = Math.min(a, b);
+      els.activity.innerHTML = `
+        <section class="compare-card">
+          <h3>誰比較大？</h3>
+          <div class="answer-bank-title">完成進度：${state.compareDone.size} / 4 題。分子都是1，請找每一份比較長的。</div>
+          <div class="compare-bars">
+            <div class="compare-row"><span>${formatFractions("1/" + a)}</span>${miniUnitBar(a)}</div>
+            <div class="compare-row"><span>${formatFractions("1/" + b)}</span>${miniUnitBar(b)}</div>
+          </div>
+          <div class="option-grid">
+            <button class="choice" type="button" data-answer="${a}">${formatFractions("1/" + a)} 比較大</button>
+            <button class="choice" type="button" data-answer="${b}">${formatFractions("1/" + b)} 比較大</button>
+          </div>
+          <div class="tool-row">
+            <button class="secondary" type="button" id="newCompare">換一題</button>
+          </div>
+          <div id="feedback" class="feedback">先看哪個分母比較小，分母小表示切比較少段，每一份比較大。</div>
+        </section>`;
+      document.querySelectorAll(".choice[data-answer]").forEach(button => {
+        button.addEventListener("click", () => {
+          const picked = Number(button.dataset.answer);
+          if (picked === answer) {
+            state.compareDone.add([a, b].sort((left, right) => left - right).join("-"));
+            if (state.compareDone.size >= 4) {
+              markDone("compare");
+              setFeedback("good", "分數對抗賽通過", `${formatFractions("1/" + answer)} 比較大，因為分母 ${answer} 比較小，每一份比較大。`);
+            } else {
+              setFeedback("good", "答對了", `${formatFractions("1/" + answer)} 比較大。下一題馬上來。`);
+              window.setTimeout(() => {
+                advanceComparePair();
+                renderCompare();
+              }, 850);
+            }
+          } else {
+            setFeedback("try", "再比一次", `分子都是1時，分母越大，每一份越小。請找分母比較小的那一個。`);
+          }
+        });
+      });
+      document.getElementById("newCompare").addEventListener("click", () => {
+        advanceComparePair();
+        renderCompare();
+      });
+    }
+
+    function renderExit() {
+      els.activity.innerHTML = `
+        <section class="exit-list">
+          ${exitQuestions.map((q, index) => `
+            <div class="exit-question" data-id="${q.id}">
+              <h3>${index + 1}. ${formatFractions(q.title)}</h3>
+              <div class="option-grid">
+                ${q.options.map(option => `<button type="button" class="choice" data-q="${q.id}" data-option="${option}">${formatFractions(option)}</button>`).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </section>
+        <div class="tool-row">
+          <button class="primary" type="button" id="checkExit">完成出場券</button>
+          <button class="secondary" type="button" id="resetExit">重新作答</button>
+        </div>
+        <div id="feedback" class="feedback">每題選一個答案，完成後按檢查。</div>`;
+      document.querySelectorAll(".choice[data-q]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.exitAnswers[button.dataset.q] = button.dataset.option;
+          document.querySelectorAll(`.choice[data-q="${button.dataset.q}"]`).forEach(btn => btn.classList.remove("selected"));
+          button.classList.add("selected");
+        });
+      });
+      document.getElementById("checkExit").addEventListener("click", () => {
+        const score = exitQuestions.reduce((sum, q) => sum + (state.exitAnswers[q.id] === q.answer ? 1 : 0), 0);
+        if (score === exitQuestions.length) {
+          markDone("exit");
+          setFeedback("good", "出場券通過", "你能用長條圖和關鍵句比較單位分數大小。");
+        } else {
+          setFeedback("try", `答對${score}題`, "請回到錯題想一想：整條一樣長時，分母越大，每一份越小。");
+        }
+      });
+      document.getElementById("resetExit").addEventListener("click", () => {
+        state.exitAnswers = {};
+        renderExit();
+      });
+    }
+
+    function render() {
+      const step = steps[state.step];
+      els.title.textContent = step.title;
+      els.task.textContent = step.task;
+      els.conceptTag.textContent = step.concept;
+      els.ticketTag.textContent = step.ticket;
+      renderGuide(step);
+      renderSteps();
+      if (step.id === "ticket") renderTicket();
+      if (step.id === "race") renderRace();
+      if (step.id === "sentence") renderSentence();
+      if (step.id === "compare") renderCompare();
+      if (step.id === "exit") renderExit();
+    }
+
+    els.studentMode.addEventListener("click", () => {
+      state.showGuide = false;
+      render();
+    });
+
+    els.parentMode.addEventListener("click", () => {
+      state.showGuide = true;
+      render();
+    });
+
+    els.closeCompletion.addEventListener("click", () => {
+      els.completionOverlay.classList.remove("show");
+    });
+
+    els.completionOverlay.addEventListener("click", event => {
+      if (event.target === els.completionOverlay) {
+        els.completionOverlay.classList.remove("show");
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -13,6 +13,9 @@
 - 9-2 披薩分數店自學網頁  
   https://gmcelma-gmc.github.io/fraction-paper-checker/9-2-pizza-fraction-shop.html
 
+- 9-3 分數對抗賽自學網頁  
+  https://gmcelma-gmc.github.io/fraction-paper-checker/9-3-unit-fraction-race.html
+
 - 環遊世界找分數  
   https://gmcelma-gmc.github.io/fraction-paper-checker/world-fraction-flags.html
 
@@ -24,6 +27,7 @@
 - `index.html` 保留給「平分小偵探」。
 - `9-1-equal-sharing.html` 保留給「9-1 一樣大平分自學網頁」。
 - `9-2-pizza-fraction-shop.html` 保留給「9-2 披薩分數店自學網頁」。
+- `9-3-unit-fraction-race.html` 保留給「9-3 分數對抗賽自學網頁」。
 - `world-fraction-flags.html` 保留給「環遊世界找分數」。
 - `unit-fraction-bar-race.html` 保留給「分數競技台」。
 - 新增或修改任一遊戲時，請只更新該遊戲自己的 HTML 檔。
