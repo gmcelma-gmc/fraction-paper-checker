@@ -7,6 +7,9 @@
 - 平分小偵探  
   https://gmcelma-gmc.github.io/fraction-paper-checker/
 
+- 單位分數自學島（三關整合首頁）  
+  https://gmcelma-gmc.github.io/fraction-paper-checker/unit-fraction-learning-island.html
+
 - 9-1 一樣大平分自學網頁  
   https://gmcelma-gmc.github.io/fraction-paper-checker/9-1-equal-sharing.html
 
@@ -25,6 +28,7 @@
 ## 維護原則
 
 - `index.html` 保留給「平分小偵探」。
+- `unit-fraction-learning-island.html` 保留給「單位分數自學島」三關整合首頁。
 - `9-1-equal-sharing.html` 保留給「9-1 一樣大平分自學網頁」。
 - `9-2-pizza-fraction-shop.html` 保留給「9-2 披薩分數店自學網頁」。
 - `9-3-unit-fraction-race.html` 保留給「9-3 分數對抗賽自學網頁」。

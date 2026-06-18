@@ -72,6 +72,28 @@
       line-height: 1.45;
     }
 
+    .lesson-art {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+      color: #7a4b08;
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .lesson-art svg {
+      width: 106px;
+      height: 76px;
+      filter: drop-shadow(0 8px 12px rgba(54, 72, 95, .16));
+      animation: floatCute 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatCute {
+      from { transform: translateY(0) rotate(-1deg); }
+      to { transform: translateY(-8px) rotate(2deg); }
+    }
+
     .mode-switch {
       display: flex;
       gap: 8px;
@@ -1329,6 +1351,19 @@
       <div>
         <h1>9-2 披薩分數店</h1>
         <p>先看懂「全部平分成幾份，拿其中一份」，再用披薩點餐任務說清楚分數。</p>
+        <div class="lesson-art" aria-hidden="true">
+          <svg viewBox="0 0 150 100">
+            <circle cx="58" cy="50" r="36" fill="#ffd873" stroke="#c9822e" stroke-width="6"/>
+            <path d="M58 14v72M22 50h72" stroke="#fffdf7" stroke-width="5"/>
+            <path d="M58 50L94 50A36 36 0 0 0 58 14Z" fill="#ffeaa5"/>
+            <circle cx="42" cy="38" r="4" fill="#d85743"/>
+            <circle cx="73" cy="63" r="5" fill="#478c57"/>
+            <circle cx="70" cy="34" r="4" fill="#d85743"/>
+            <path d="M112 28c12 10 12 32 0 44" fill="none" stroke="#3b82c4" stroke-width="7" stroke-linecap="round"/>
+            <path d="M104 36l11-10 1 15" fill="none" stroke="#3b82c4" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>披薩店開張</span>
+        </div>
       </div>
       <div class="mode-switch" aria-label="顯示模式">
         <button type="button" class="active" id="studentMode">學生版</button>
@@ -1633,9 +1668,20 @@
       const allDone = steps.every(step => state.done.has(step.id));
       if (!allDone || state.celebrated) return;
       state.celebrated = true;
+      localStorage.setItem("unitFraction.lesson.9-2", "done");
       window.setTimeout(() => {
         els.completionOverlay.classList.add("show");
       }, 350);
+      window.setTimeout(returnHome, 4600);
+    }
+
+    function hubUrl() {
+      const url = new URL(window.location.href);
+      return url.searchParams.get("hub") || "unit-fraction-learning-island.html";
+    }
+
+    function returnHome() {
+      window.location.href = hubUrl();
     }
 
     function setFeedback(type, title, body) {
@@ -2111,12 +2157,12 @@
     });
 
     els.closeCompletion.addEventListener("click", () => {
-      els.completionOverlay.classList.remove("show");
+      returnHome();
     });
 
     els.completionOverlay.addEventListener("click", event => {
       if (event.target === els.completionOverlay) {
-        els.completionOverlay.classList.remove("show");
+        returnHome();
       }
     });
 
