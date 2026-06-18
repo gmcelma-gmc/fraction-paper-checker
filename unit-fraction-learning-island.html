@@ -25,9 +25,10 @@
       color: var(--ink);
       font-family: "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
       background:
-        radial-gradient(circle at 10% 8%, rgba(255, 225, 122, .55), transparent 24rem),
-        radial-gradient(circle at 88% 12%, rgba(160, 224, 255, .58), transparent 25rem),
-        linear-gradient(180deg, #f9fcff 0%, #edf8f2 100%);
+        radial-gradient(circle at 13% 10%, rgba(255, 222, 98, .72), transparent 19rem),
+        radial-gradient(circle at 86% 16%, rgba(143, 217, 255, .72), transparent 24rem),
+        radial-gradient(circle at 58% 2%, rgba(255, 169, 158, .32), transparent 17rem),
+        linear-gradient(180deg, #fffdf4 0%, #eef9ff 52%, #ecfff3 100%);
     }
 
     a { color: inherit; }
@@ -39,33 +40,98 @@
     }
 
     .cover {
+      position: relative;
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
-      gap: 22px;
+      grid-template-columns: minmax(0, .92fr) minmax(320px, 1.08fr);
+      gap: 8px 28px;
       align-items: center;
-      min-height: min(620px, 78vh);
-      padding: clamp(24px, 5vw, 54px);
-      border: 4px solid var(--line);
-      border-radius: 28px;
-      background: rgba(255, 253, 247, .86);
-      box-shadow: var(--shadow);
+      min-height: min(660px, 82vh);
+      padding: clamp(22px, 4.2vw, 48px);
+      border: 5px solid #f0c86c;
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,251,230,.78)),
+        radial-gradient(circle at 18% 22%, rgba(255,221,110,.42), transparent 18rem);
+      box-shadow: 0 20px 42px rgba(124, 114, 63, .18);
       overflow: hidden;
+    }
+
+    .cover::before,
+    .cover::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      box-shadow:
+        52px 6px 0 rgba(255, 255, 255, .68),
+        104px -2px 0 rgba(255, 255, 255, .6);
+      pointer-events: none;
+    }
+
+    .cover::before {
+      width: 82px;
+      height: 34px;
+      left: 34px;
+      top: 30px;
+    }
+
+    .cover::after {
+      width: 70px;
+      height: 30px;
+      right: 138px;
+      top: 78px;
+    }
+
+    .cover-title {
+      position: relative;
+      z-index: 1;
+      grid-column: 1 / -1;
+      text-align: center;
+    }
+
+    .cover-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 8px 18px;
+      border: 3px solid #8ed0b0;
+      border-radius: 999px;
+      background: #f1fff6;
+      color: #2f604e;
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 900;
+      box-shadow: 0 8px 0 rgba(47, 96, 78, .12);
     }
 
     .cover h1 {
       margin: 0;
-      font-size: clamp(46px, 7vw, 86px);
-      line-height: 1.04;
+      font-size: clamp(40px, 7vw, 82px);
+      line-height: 1;
       letter-spacing: 0;
+      white-space: nowrap;
+      color: #243043;
+      text-shadow:
+        0 5px 0 #ffe69c,
+        0 10px 22px rgba(95, 72, 31, .12);
     }
 
     .cover p {
-      max-width: 760px;
-      margin: 18px 0 0;
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      margin: 14px 0 0;
       color: var(--muted);
-      font-size: clamp(22px, 2.5vw, 34px);
+      font-size: clamp(22px, 2.25vw, 32px);
       line-height: 1.55;
       font-weight: 800;
+    }
+
+    .cover-copy {
+      position: relative;
+      z-index: 1;
+      align-self: start;
+      padding: 18px 4px 10px;
     }
 
     .cover-badges {
@@ -79,21 +145,24 @@
       padding: 10px 16px;
       border: 3px solid #b9d3c6;
       border-radius: 999px;
-      background: #f0fff6;
+      background: #fffef0;
       color: #2f604e;
       font-size: 22px;
       font-weight: 900;
+      box-shadow: 0 7px 0 rgba(47, 96, 78, .12);
     }
 
     .island-art {
+      position: relative;
+      z-index: 1;
       display: grid;
       place-items: center;
     }
 
     .island-art svg {
-      width: min(420px, 90vw);
-      filter: drop-shadow(0 18px 24px rgba(54, 72, 95, .16));
-      animation: floatIsland 2.8s ease-in-out infinite alternate;
+      width: min(560px, 94vw);
+      filter: drop-shadow(0 20px 26px rgba(54, 72, 95, .18));
+      animation: floatIsland 3s ease-in-out infinite alternate;
     }
 
     @keyframes floatIsland {
@@ -223,32 +292,64 @@
       .cover {
         min-height: auto;
       }
+
+      .cover h1 {
+        font-size: clamp(24px, 7vw, 58px);
+      }
     }
   </style>
 </head>
 <body>
   <main class="island">
     <section class="cover">
-      <div>
+      <div class="cover-title">
+        <div class="cover-kicker">三關闖關任務</div>
         <h1>單位分數自學島</h1>
-        <p>跟著三個任務，從「一樣大才公平」出發，認識幾分之一，最後用長條圖比較單位分數大小。</p>
+      </div>
+      <div class="cover-copy">
+        <p>一起搭上分數小船，先找公平平分，再開披薩分數店，最後挑戰分數對抗賽。</p>
         <div class="cover-badges">
-          <span>先操作</span>
-          <span>再觀察</span>
-          <span>會說理由</span>
+          <span>動手玩</span>
+          <span>看圖想</span>
+          <span>說理由</span>
         </div>
       </div>
       <div class="island-art" aria-hidden="true">
-        <svg viewBox="0 0 420 310">
-          <path d="M56 214c70-82 238-82 308 0 12 15 4 42-17 46-78 17-196 17-274 0-21-4-29-31-17-46Z" fill="#bfe9c9" stroke="#2f604e" stroke-width="8"/>
-          <circle cx="130" cy="112" r="54" fill="#ffd873" stroke="#c9822e" stroke-width="8"/>
-          <path d="M130 58v108M76 112h108" stroke="#fffdf7" stroke-width="7"/>
-          <rect x="214" y="70" width="126" height="38" rx="18" fill="#fff8d8" stroke="#28445f" stroke-width="7"/>
-          <rect x="214" y="70" width="63" height="38" rx="18" fill="#f3c451"/>
-          <rect x="214" y="132" width="126" height="38" rx="18" fill="#fff8d8" stroke="#28445f" stroke-width="7"/>
-          <rect x="214" y="132" width="32" height="38" rx="18" fill="#8ed0b0"/>
-          <path d="M122 232c52 18 126 18 178 0" fill="none" stroke="#f0b84a" stroke-width="12" stroke-linecap="round"/>
-          <path d="M320 42l13 27 30 4-22 21 5 30-26-14-26 14 5-30-22-21 30-4Z" fill="#f4b545" stroke="#9a6722" stroke-width="6"/>
+        <svg viewBox="0 0 560 380">
+          <path d="M82 296c86 54 312 54 396 0" fill="none" stroke="#a5dcff" stroke-width="42" stroke-linecap="round"/>
+          <path d="M54 255c84-112 366-112 452 0 18 23 8 63-22 70-102 23-306 23-408 0-30-7-40-47-22-70Z" fill="#c9f2cc" stroke="#2f604e" stroke-width="9"/>
+          <path d="M108 276c88 26 252 30 344 0" fill="none" stroke="#ffe06f" stroke-width="18" stroke-linecap="round"/>
+          <path d="M113 252c48-31 98-46 151-45M317 208c48 2 92 17 130 44" fill="none" stroke="#f9b84a" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 18"/>
+
+          <g transform="translate(58 68)">
+            <circle cx="86" cy="86" r="66" fill="#ffd873" stroke="#c9822e" stroke-width="9"/>
+            <path d="M86 20v132M20 86h132" stroke="#fffdf7" stroke-width="8"/>
+            <circle cx="68" cy="64" r="7" fill="#d85743"/>
+            <circle cx="104" cy="108" r="8" fill="#478c57"/>
+            <circle cx="112" cy="58" r="6" fill="#c9822e"/>
+            <path d="M62 89c18 14 35 14 52 0" fill="none" stroke="#7b4a20" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="62" cy="78" r="5" fill="#243043"/>
+            <circle cx="112" cy="78" r="5" fill="#243043"/>
+          </g>
+
+          <g transform="translate(268 74)">
+            <rect x="0" y="12" width="166" height="44" rx="22" fill="#fff8d8" stroke="#28445f" stroke-width="8"/>
+            <rect x="0" y="12" width="83" height="44" rx="22" fill="#f4ca58"/>
+            <rect x="18" y="92" width="166" height="44" rx="22" fill="#fff8d8" stroke="#28445f" stroke-width="8"/>
+            <rect x="18" y="92" width="42" height="44" rx="22" fill="#9bd6b8"/>
+            <path d="M178 0l16 33 36 5-26 25 6 36-32-17-32 17 6-36-26-25 36-5Z" fill="#f4b545" stroke="#9a6722" stroke-width="7"/>
+          </g>
+
+          <g transform="translate(220 205)">
+            <path d="M0 42c40-28 78-28 118 0-35 28-82 28-118 0Z" fill="#8ed0b0" stroke="#2f604e" stroke-width="7"/>
+            <path d="M55 18c26 0 48 13 63 24-38 21-78 20-118 0 14-11 32-24 55-24Z" fill="#fff5cb" stroke="#2f604e" stroke-width="7"/>
+            <circle cx="54" cy="43" r="9" fill="#3b82c4"/>
+            <path d="M142 38c28-12 56 5 62 32-31 10-56-1-62-32Z" fill="#f07d70" stroke="#9e5048" stroke-width="6"/>
+          </g>
+
+          <g transform="translate(82 38)">
+            <path d="M0 16c24-22 54-22 78 0M396 34c24-22 54-22 78 0" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+          </g>
         </svg>
       </div>
     </section>
