@@ -25,10 +25,10 @@
       color: var(--ink);
       font-family: "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
       background:
-        radial-gradient(circle at 13% 10%, rgba(255, 222, 98, .72), transparent 19rem),
-        radial-gradient(circle at 86% 16%, rgba(143, 217, 255, .72), transparent 24rem),
-        radial-gradient(circle at 58% 2%, rgba(255, 169, 158, .32), transparent 17rem),
-        linear-gradient(180deg, #fffdf4 0%, #eef9ff 52%, #ecfff3 100%);
+        radial-gradient(circle at 12% 12%, rgba(255, 230, 95, .72), transparent 16rem),
+        radial-gradient(circle at 86% 18%, rgba(255, 137, 166, .38), transparent 19rem),
+        radial-gradient(circle at 53% 2%, rgba(124, 213, 255, .78), transparent 25rem),
+        linear-gradient(180deg, #dff6ff 0%, #fff7d6 50%, #e9ffe9 100%);
     }
 
     a { color: inherit; }
@@ -42,17 +42,18 @@
     .cover {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(0, .92fr) minmax(320px, 1.08fr);
-      gap: 8px 28px;
+      grid-template-columns: minmax(0, .72fr) minmax(360px, 1.28fr);
+      gap: 4px 24px;
       align-items: center;
-      min-height: min(660px, 82vh);
-      padding: clamp(22px, 4.2vw, 48px);
-      border: 5px solid #f0c86c;
-      border-radius: 34px;
+      min-height: min(700px, 86vh);
+      padding: clamp(20px, 3.8vw, 44px);
+      border: 7px solid #ffffff;
+      border-radius: 38px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,251,230,.78)),
-        radial-gradient(circle at 18% 22%, rgba(255,221,110,.42), transparent 18rem);
-      box-shadow: 0 20px 42px rgba(124, 114, 63, .18);
+        linear-gradient(180deg, rgba(198, 237, 255, .92) 0%, rgba(255, 251, 222, .92) 62%, rgba(202, 244, 201, .96) 100%);
+      box-shadow:
+        0 0 0 7px #f5c751,
+        0 22px 44px rgba(60, 75, 103, .2);
       overflow: hidden;
     }
 
@@ -82,9 +83,23 @@
       top: 78px;
     }
 
+    .cover-ground {
+      position: absolute;
+      left: -6%;
+      right: -6%;
+      bottom: -14%;
+      height: 42%;
+      border-radius: 50% 50% 0 0;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.5), transparent 10rem),
+        linear-gradient(180deg, #8ee2a7 0%, #5ec28a 100%);
+      border-top: 7px solid #2f604e;
+      z-index: 0;
+    }
+
     .cover-title {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       grid-column: 1 / -1;
       text-align: center;
     }
@@ -95,33 +110,34 @@
       gap: 10px;
       margin-bottom: 10px;
       padding: 8px 18px;
-      border: 3px solid #8ed0b0;
+      border: 4px solid #ffffff;
       border-radius: 999px;
-      background: #f1fff6;
-      color: #2f604e;
+      background: #ff7f8f;
+      color: #ffffff;
       font-size: clamp(18px, 2vw, 26px);
       font-weight: 900;
-      box-shadow: 0 8px 0 rgba(47, 96, 78, .12);
+      box-shadow: 0 8px 0 #b94b58;
     }
 
     .cover h1 {
       margin: 0;
-      font-size: clamp(40px, 7vw, 82px);
+      font-size: clamp(40px, 6.6vw, 78px);
       line-height: 1;
       letter-spacing: 0;
       white-space: nowrap;
-      color: #243043;
+      color: #22304a;
       text-shadow:
-        0 5px 0 #ffe69c,
-        0 10px 22px rgba(95, 72, 31, .12);
+        0 6px 0 #ffe56d,
+        0 10px 0 #ff9fb0,
+        0 18px 26px rgba(49, 60, 86, .18);
     }
 
     .cover p {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       max-width: 650px;
       margin: 14px 0 0;
-      color: var(--muted);
+      color: #35506a;
       font-size: clamp(22px, 2.25vw, 32px);
       line-height: 1.55;
       font-weight: 800;
@@ -129,9 +145,13 @@
 
     .cover-copy {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       align-self: start;
-      padding: 18px 4px 10px;
+      padding: 20px;
+      border: 5px solid #ffffff;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, .72);
+      box-shadow: 0 12px 0 rgba(72, 126, 98, .13);
     }
 
     .cover-badges {
@@ -143,26 +163,26 @@
 
     .cover-badges span {
       padding: 10px 16px;
-      border: 3px solid #b9d3c6;
+      border: 4px solid #ffffff;
       border-radius: 999px;
-      background: #fffef0;
-      color: #2f604e;
+      background: #ffdf5c;
+      color: #5c3b00;
       font-size: 22px;
       font-weight: 900;
-      box-shadow: 0 7px 0 rgba(47, 96, 78, .12);
+      box-shadow: 0 7px 0 #d7952c;
     }
 
     .island-art {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       display: grid;
       place-items: center;
     }
 
     .island-art svg {
-      width: min(560px, 94vw);
-      filter: drop-shadow(0 20px 26px rgba(54, 72, 95, .18));
-      animation: floatIsland 3s ease-in-out infinite alternate;
+      width: min(650px, 96vw);
+      filter: drop-shadow(0 22px 24px rgba(54, 72, 95, .2));
+      animation: floatIsland 2.6s ease-in-out infinite alternate;
     }
 
     @keyframes floatIsland {
@@ -174,7 +194,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
-      margin-top: 22px;
+      margin-top: 28px;
     }
 
     .mission {
@@ -183,10 +203,12 @@
       gap: 14px;
       min-height: 380px;
       padding: 22px;
-      border: 4px solid var(--line);
+      border: 5px solid #ffffff;
       border-radius: 24px;
-      background: #fff;
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, #ffffff 0%, #fff9de 100%);
+      box-shadow:
+        0 0 0 4px var(--line),
+        0 16px 0 rgba(67, 94, 121, .14);
       text-decoration: none;
       overflow: hidden;
       transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
@@ -194,8 +216,9 @@
 
     .mission:hover {
       transform: translateY(-4px);
-      border-color: #7ccf93;
-      box-shadow: 0 20px 42px rgba(54, 72, 95, .18);
+      box-shadow:
+        0 0 0 4px #7ccf93,
+        0 20px 0 rgba(67, 94, 121, .12);
     }
 
     .mission-no {
@@ -284,7 +307,7 @@
       cursor: pointer;
     }
 
-    @media (max-width: 900px) {
+      @media (max-width: 900px) {
       .cover,
       .missions {
         grid-template-columns: 1fr;
@@ -296,12 +319,17 @@
       .cover h1 {
         font-size: clamp(24px, 7vw, 58px);
       }
+
+      .cover-copy {
+        padding: 16px;
+      }
     }
   </style>
 </head>
 <body>
   <main class="island">
     <section class="cover">
+      <div class="cover-ground" aria-hidden="true"></div>
       <div class="cover-title">
         <div class="cover-kicker">三關闖關任務</div>
         <h1>單位分數自學島</h1>
@@ -315,40 +343,76 @@
         </div>
       </div>
       <div class="island-art" aria-hidden="true">
-        <svg viewBox="0 0 560 380">
-          <path d="M82 296c86 54 312 54 396 0" fill="none" stroke="#a5dcff" stroke-width="42" stroke-linecap="round"/>
-          <path d="M54 255c84-112 366-112 452 0 18 23 8 63-22 70-102 23-306 23-408 0-30-7-40-47-22-70Z" fill="#c9f2cc" stroke="#2f604e" stroke-width="9"/>
-          <path d="M108 276c88 26 252 30 344 0" fill="none" stroke="#ffe06f" stroke-width="18" stroke-linecap="round"/>
-          <path d="M113 252c48-31 98-46 151-45M317 208c48 2 92 17 130 44" fill="none" stroke="#f9b84a" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 18"/>
+        <svg viewBox="0 0 660 430">
+          <defs>
+            <linearGradient id="tent" x1="0" x2="0" y1="0" y2="1">
+              <stop stop-color="#ff8ca0"/>
+              <stop offset="1" stop-color="#ff5f78"/>
+            </linearGradient>
+            <linearGradient id="gold" x1="0" x2="0" y1="0" y2="1">
+              <stop stop-color="#ffe98a"/>
+              <stop offset="1" stop-color="#f5b840"/>
+            </linearGradient>
+          </defs>
 
-          <g transform="translate(58 68)">
-            <circle cx="86" cy="86" r="66" fill="#ffd873" stroke="#c9822e" stroke-width="9"/>
-            <path d="M86 20v132M20 86h132" stroke="#fffdf7" stroke-width="8"/>
-            <circle cx="68" cy="64" r="7" fill="#d85743"/>
-            <circle cx="104" cy="108" r="8" fill="#478c57"/>
-            <circle cx="112" cy="58" r="6" fill="#c9822e"/>
-            <path d="M62 89c18 14 35 14 52 0" fill="none" stroke="#7b4a20" stroke-width="6" stroke-linecap="round"/>
-            <circle cx="62" cy="78" r="5" fill="#243043"/>
-            <circle cx="112" cy="78" r="5" fill="#243043"/>
+          <path d="M56 332c118 54 438 54 548 0" fill="none" stroke="#9de0ff" stroke-width="44" stroke-linecap="round"/>
+          <path d="M70 292c96-86 408-86 506 0 20 18 12 52-18 60-118 30-352 30-470 0-30-8-38-42-18-60Z" fill="#8ee2a7" stroke="#2f604e" stroke-width="9"/>
+          <path d="M128 318c92 32 292 32 402 0" fill="none" stroke="#ffe66e" stroke-width="20" stroke-linecap="round"/>
+
+          <g transform="translate(238 56)">
+            <path d="M20 106h226L198 20H68Z" fill="url(#tent)" stroke="#243043" stroke-width="8" stroke-linejoin="round"/>
+            <path d="M68 20l28 86M132 20v86M198 20l-28 86" stroke="#fff7d6" stroke-width="10" stroke-linecap="round"/>
+            <rect x="42" y="106" width="184" height="78" rx="18" fill="#fff7d6" stroke="#243043" stroke-width="8"/>
+            <path d="M74 184v-52h116v52" fill="#8ed0b0" stroke="#243043" stroke-width="8" stroke-linejoin="round"/>
+            <text x="134" y="156" text-anchor="middle" font-size="30" font-weight="900" fill="#243043">分數樂園</text>
+            <path d="M36 58h196" stroke="#ffe66e" stroke-width="12" stroke-linecap="round" stroke-dasharray="1 22"/>
           </g>
 
-          <g transform="translate(268 74)">
-            <rect x="0" y="12" width="166" height="44" rx="22" fill="#fff8d8" stroke="#28445f" stroke-width="8"/>
-            <rect x="0" y="12" width="83" height="44" rx="22" fill="#f4ca58"/>
-            <rect x="18" y="92" width="166" height="44" rx="22" fill="#fff8d8" stroke="#28445f" stroke-width="8"/>
-            <rect x="18" y="92" width="42" height="44" rx="22" fill="#9bd6b8"/>
-            <path d="M178 0l16 33 36 5-26 25 6 36-32-17-32 17 6-36-26-25 36-5Z" fill="#f4b545" stroke="#9a6722" stroke-width="7"/>
+          <g transform="translate(35 82)">
+            <circle cx="102" cy="102" r="84" fill="#ffd873" stroke="#c9822e" stroke-width="10"/>
+            <path d="M102 18v168M18 102h168M42 42l120 120M162 42L42 162" stroke="#fffdf7" stroke-width="7"/>
+            <circle cx="102" cy="102" r="16" fill="#fff7d6" stroke="#c9822e" stroke-width="6"/>
+            <circle cx="101" cy="18" r="13" fill="#ff7f8f" stroke="#243043" stroke-width="5"/>
+            <circle cx="186" cy="103" r="13" fill="#8ed0b0" stroke="#243043" stroke-width="5"/>
+            <circle cx="101" cy="186" r="13" fill="#7db7ff" stroke="#243043" stroke-width="5"/>
+            <circle cx="18" cy="103" r="13" fill="#ffdf5c" stroke="#243043" stroke-width="5"/>
+            <path d="M74 116c18 18 42 18 60 0" fill="none" stroke="#7b4a20" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="72" cy="91" r="6" fill="#243043"/>
+            <circle cx="132" cy="91" r="6" fill="#243043"/>
+            <text x="102" y="236" text-anchor="middle" font-size="26" font-weight="900" fill="#243043">披薩轉轉輪</text>
           </g>
 
-          <g transform="translate(220 205)">
-            <path d="M0 42c40-28 78-28 118 0-35 28-82 28-118 0Z" fill="#8ed0b0" stroke="#2f604e" stroke-width="7"/>
-            <path d="M55 18c26 0 48 13 63 24-38 21-78 20-118 0 14-11 32-24 55-24Z" fill="#fff5cb" stroke="#2f604e" stroke-width="7"/>
-            <circle cx="54" cy="43" r="9" fill="#3b82c4"/>
-            <path d="M142 38c28-12 56 5 62 32-31 10-56-1-62-32Z" fill="#f07d70" stroke="#9e5048" stroke-width="6"/>
+          <g transform="translate(425 84)">
+            <path d="M74 0l18 38 42 6-30 29 7 41-37-20-37 20 7-41-30-29 42-6Z" fill="url(#gold)" stroke="#9a6722" stroke-width="7"/>
+            <rect x="10" y="126" width="176" height="42" rx="21" fill="#fff8d8" stroke="#28445f" stroke-width="8"/>
+            <rect x="10" y="126" width="88" height="42" rx="21" fill="#ffdf5c"/>
+            <rect x="28" y="190" width="176" height="42" rx="21" fill="#fff8d8" stroke="#28445f" stroke-width="8"/>
+            <rect x="28" y="190" width="44" height="42" rx="21" fill="#8ed0b0"/>
+            <text x="106" y="276" text-anchor="middle" font-size="26" font-weight="900" fill="#243043">長條雲霄車</text>
           </g>
 
-          <g transform="translate(82 38)">
-            <path d="M0 16c24-22 54-22 78 0M396 34c24-22 54-22 78 0" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+          <path d="M172 290c58-52 136-52 196 0 40 34 94 32 132-4" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+          <path d="M172 290c58-52 136-52 196 0 40 34 94 32 132-4" fill="none" stroke="#ff9fb0" stroke-width="9" stroke-linecap="round" stroke-dasharray="2 22"/>
+
+          <g transform="translate(174 265)">
+            <circle cx="0" cy="0" r="23" fill="#ffdf5c" stroke="#243043" stroke-width="6"/>
+            <text x="0" y="9" text-anchor="middle" font-size="26" font-weight="900" fill="#243043">1</text>
+          </g>
+          <g transform="translate(332 258)">
+            <circle cx="0" cy="0" r="23" fill="#7db7ff" stroke="#243043" stroke-width="6"/>
+            <text x="0" y="9" text-anchor="middle" font-size="26" font-weight="900" fill="#243043">2</text>
+          </g>
+          <g transform="translate(500 258)">
+            <circle cx="0" cy="0" r="23" fill="#ff7f8f" stroke="#243043" stroke-width="6"/>
+            <text x="0" y="9" text-anchor="middle" font-size="26" font-weight="900" fill="#243043">3</text>
+          </g>
+
+          <g transform="translate(276 310)">
+            <path d="M0 32c42-34 84-34 126 0-40 34-86 34-126 0Z" fill="#fff7d6" stroke="#2f604e" stroke-width="7"/>
+            <circle cx="62" cy="32" r="12" fill="#3b82c4"/>
+          </g>
+          <g transform="translate(104 30)">
+            <path d="M0 18c28-24 62-24 90 0M408 30c28-24 62-24 90 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
           </g>
         </svg>
       </div>
