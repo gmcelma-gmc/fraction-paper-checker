@@ -1182,6 +1182,7 @@
     }
 
     .lesson-cover {
+      position: relative;
       margin-bottom: 18px;
       border: 7px solid #fff;
       border-radius: 30px;
@@ -1194,6 +1195,44 @@
       display: block;
       width: 100%;
       height: auto;
+    }
+
+    .cover-actions {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 4%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .cover-action {
+      pointer-events: auto;
+      min-width: min(260px, 44%);
+      padding: 14px 22px;
+      border: 5px solid #fff;
+      border-radius: 999px;
+      background: #fff7d8;
+      color: #25405f;
+      font-size: clamp(20px, 2.4vw, 34px);
+      font-weight: 900;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 8px 0 rgba(47, 96, 78, .22), 0 14px 24px rgba(36, 54, 74, .18);
+      cursor: pointer;
+    }
+
+    .cover-action.primary {
+      background: #258be0;
+      color: #fff;
+      box-shadow: 0 8px 0 #1760a1, 0 14px 24px rgba(36, 54, 74, .18);
+    }
+
+    .cover-action:hover {
+      transform: translateY(-3px);
     }
 
     .topbar {
@@ -1370,6 +1409,10 @@
   <div class="app">
     <section class="lesson-cover" aria-label="9-1 一樣大才公平關卡主視覺">
       <img src="assets/lesson-9-1-cover.png" alt="9-1 一樣大才公平，公平小法官出發，透過切一切、疊一疊判斷每一份是否一樣大。">
+      <div class="cover-actions">
+        <button class="cover-action primary" type="button" onclick="document.querySelector('.layout').scrollIntoView({ behavior: 'smooth', block: 'start' });">開始操作</button>
+        <a class="cover-action" href="unit-fraction-learning-island.html">回冒險島</a>
+      </div>
     </section>
 
     <header class="topbar">
