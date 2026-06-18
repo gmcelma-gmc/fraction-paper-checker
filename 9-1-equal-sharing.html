@@ -354,6 +354,62 @@
       align-items: center;
     }
 
+    .entry-progress {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 13px;
+      border: 1px solid #bfe4cf;
+      border-radius: 16px;
+      background: #f3fff8;
+      color: #24604f;
+      font-weight: 900;
+    }
+
+    .entry-progress strong {
+      color: var(--ink);
+    }
+
+    .entry-answer-panel {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 2px solid #f1c46e;
+      border-radius: 18px;
+      background: #fff8dd;
+    }
+
+    .entry-answer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .entry-choice {
+      min-width: 128px;
+      min-height: 48px;
+      padding: 8px 14px;
+      border: 2px solid #dfb45f;
+      border-radius: 16px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .entry-choice.selected {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: #224d80;
+    }
+
+    .entry-choice.done {
+      border-color: var(--green);
+      background: var(--green-soft);
+      color: #24604f;
+    }
+
     .choice-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1565,6 +1621,8 @@
       shape: "rect",
       cut: "center",
       entryCutDone: false,
+      entryAnswer: "",
+      entryTrials: new Set(),
       wholePlaced: false,
       wholePosition: { x: 0, y: 0 },
       overlapDropped: false,
@@ -1685,8 +1743,41 @@
       renderGuide(step);
     }
 
+    const entryShapeLabels = { rect: "長方形", square: "正方形", circle: "圓形" };
+    const entryCutLabels = { center: "對半切", off: "偏一邊切", horizontal: "橫著切", diagonal: "斜斜切" };
+    const entryTotalTrials = Object.keys(entryShapeLabels).length * Object.keys(entryCutLabels).length;
+
+    function entryTrialKey(shape = state.shape, cut = state.cut) {
+      return `${shape}:${cut}`;
+    }
+
+    function currentEntryIsEqual() {
+      return entryPieces().equal;
+    }
+
+    function currentEntryAnswer() {
+      return currentEntryIsEqual() ? "equal" : "not";
+    }
+
+    function updateEntryProgress() {
+      const progress = document.getElementById("entryProgress");
+      if (!progress) return;
+      const currentDone = state.entryTrials.has(entryTrialKey());
+      const current = `${entryShapeLabels[state.shape]}＋${entryCutLabels[state.cut]}`;
+      progress.innerHTML = `<span>完成進度：<strong>${state.entryTrials.size} / ${entryTotalTrials}</strong></span>
+        <span>目前：${current}${currentDone ? " 已完成" : " 還沒判斷"}</span>`;
+    }
+
+    function selectEntryAnswer(answer) {
+      state.entryAnswer = answer;
+      document.querySelectorAll(".entry-choice").forEach(button => {
+        button.classList.toggle("selected", button.dataset.entryAnswer === answer);
+      });
+    }
+
     function renderEntry() {
       state.entryCutDone = false;
+      state.entryAnswer = "";
       state.wholePlaced = false;
       state.wholePosition = { x: 0, y: 0 };
       state.overlapDropped = false;
@@ -1703,6 +1794,7 @@
           <button class="cut-btn ${state.cut === "horizontal" ? "active" : ""}" type="button" data-cut="horizontal">${state.shape === "circle" ? "再對半切" : "橫著切"}</button>
           <button class="cut-btn ${state.cut === "diagonal" ? "active" : ""}" type="button" data-cut="diagonal">斜斜切</button>
         </div>
+        <div class="entry-progress" id="entryProgress"></div>
         <div class="paper-card">
           <div class="tool-board">
             <div class="work-board" id="cutStage"></div>
@@ -1721,15 +1813,26 @@
             </div>
           </div>
         </div>
+        <div class="entry-answer-panel">
+          <strong>我判斷這次切完是：</strong>
+          <div class="entry-answer-row">
+            <button class="entry-choice" type="button" data-entry-answer="equal">平分</button>
+            <button class="entry-choice" type="button" data-entry-answer="not">沒平分</button>
+            <button class="primary" type="button" id="checkOverlap">檢查結果</button>
+          </div>
+        </div>
         <div class="tool-row">
-          <button class="primary" type="button" id="checkOverlap">疊合評分</button>
           <button class="ghost" type="button" id="autoOverlap">幫我疊上去</button>
           <button class="ghost" type="button" id="flipPiece">翻轉黃色片</button>
         </div>
       </div>`;
       updateEntryVisual();
+      updateEntryProgress();
       wireShapeButtons();
       wireCutButtons();
+      document.querySelectorAll(".entry-choice").forEach(button => {
+        button.addEventListener("click", () => selectEntryAnswer(button.dataset.entryAnswer));
+      });
       document.getElementById("checkOverlap").addEventListener("click", checkOverlap);
       document.getElementById("mergePiece").addEventListener("click", handleCutTool);
       document.getElementById("prevCut").addEventListener("click", () => cycleCut(-1));
@@ -1744,7 +1847,7 @@
         state.movedPiece.rotation = 0;
         placePieces(true);
         state.overlapDropped = true;
-        setFeedback("", "已經疊上去", "請按「疊合評分」看看兩份是不是一樣大。");
+        setFeedback("", "已經疊上去", "請先選「平分」或「沒平分」，再按「檢查結果」。");
       });
       document.getElementById("flipPiece").addEventListener("click", () => {
         if (!state.entryCutDone) {
@@ -1885,9 +1988,11 @@
     function handleCutTool() {
       if (state.entryCutDone) {
         state.entryCutDone = false;
+        state.entryAnswer = "";
         state.overlapDropped = false;
         state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
         updateEntryVisual();
+        document.querySelectorAll(".entry-choice").forEach(button => button.classList.remove("selected"));
         setFeedback("", "合併回完整圖形", "可以再換切割線，或重新按切割圖形觀察。");
         return;
       }
@@ -1898,9 +2003,11 @@
         return;
       }
       state.entryCutDone = true;
+      state.entryAnswer = "";
       state.overlapDropped = false;
       state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
       updateEntryVisual();
+      document.querySelectorAll(".entry-choice").forEach(button => button.classList.remove("selected"));
       setFeedback("", "切好了", "現在把黃色這片拖去和藍色那片疊疊看。");
     }
 
@@ -2004,6 +2111,7 @@
       const current = cuts.indexOf(state.cut);
       state.cut = cuts[(current + direction + cuts.length) % cuts.length];
       state.entryCutDone = false;
+      state.entryAnswer = "";
       state.wholePlaced = false;
       state.wholePosition = { x: 0, y: 0 };
       state.overlapDropped = false;
@@ -2017,6 +2125,7 @@
         button.addEventListener("click", () => {
           state.shape = button.dataset.shape;
           state.entryCutDone = false;
+          state.entryAnswer = "";
           state.wholePlaced = false;
           state.wholePosition = { x: 0, y: 0 };
           state.overlapDropped = false;
@@ -2032,11 +2141,14 @@
         button.addEventListener("click", () => {
           state.cut = button.dataset.cut;
           state.entryCutDone = false;
+          state.entryAnswer = "";
           state.wholePlaced = false;
           state.wholePosition = { x: 0, y: 0 };
           state.overlapDropped = false;
           state.movedPiece = { x: 0, y: 0, flipped: false, rotation: 0 };
           updateEntryVisual();
+          updateEntryProgress();
+          document.querySelectorAll(".entry-choice").forEach(choice => choice.classList.remove("selected"));
           [...document.querySelectorAll(".cut-btn")].forEach(btn => btn.classList.toggle("active", btn === button));
           setFeedback("", "換一條切割線", "請先拖完整圖形到比較區，再按切割圖形。");
         });
@@ -2171,17 +2283,32 @@
         setFeedback("no", "還沒切割", "請先把完整圖形拖進比較區，按「切割圖形」後再疊合比較。");
         return;
       }
-      const data = entryPieces();
-      const same = data.equal && Math.abs(data.a.w - data.b.w) <= 8 && Math.abs(data.a.h - data.b.h) <= 8;
       if (!state.overlapDropped) {
         setFeedback("no", "還沒疊合", "請先拖拉黃色這份，放到藍色那份上面。");
         return;
       }
-      if (same) {
-        setFeedback("good", "入場券通過", "兩份可以疊合，一樣大，這就是平分。");
+      if (!state.entryAnswer) {
+        setFeedback("no", "還沒選答案", "請先在下方選「平分」或「沒平分」，再檢查結果。");
+        return;
+      }
+      const expected = currentEntryAnswer();
+      const correct = state.entryAnswer === expected;
+      if (!correct) {
+        const hint = expected === "equal"
+          ? "兩片能完全疊合，表示每一份一樣大，這次是平分。"
+          : "兩片疊起來會多出或少一塊，表示每一份不一樣大，這次沒有平分。";
+        setFeedback("no", "再想一下", hint);
+        return;
+      }
+      const key = entryTrialKey();
+      state.entryTrials.add(key);
+      updateEntryProgress();
+      if (state.entryTrials.size >= entryTotalTrials) {
+        setFeedback("good", "入場券通過", "你把長方形、正方形、圓形的每一種切法都判斷過了，能分辨平分和沒平分。");
         markDone("entry");
       } else {
-        setFeedback("no", "還不能通過", "疊合後會多出來或不夠，表示兩份不一樣大。請換一條切割線。");
+        const left = entryTotalTrials - state.entryTrials.size;
+        setFeedback("good", "這一組判斷正確", `已完成 ${state.entryTrials.size} / ${entryTotalTrials} 種，還有 ${left} 種要試。請換另一個圖形或切法繼續。`);
       }
     }
 
