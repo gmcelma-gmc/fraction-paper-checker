@@ -51,7 +51,6 @@
     }
 
     .lesson-cover {
-      position: relative;
       margin-bottom: 18px;
       border: 7px solid #fff;
       border-radius: 30px;
@@ -64,44 +63,6 @@
       display: block;
       width: 100%;
       height: auto;
-    }
-
-    .cover-actions {
-      position: absolute;
-      left: 4%;
-      right: 4%;
-      bottom: 4%;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .cover-action {
-      pointer-events: auto;
-      min-width: min(260px, 44%);
-      padding: 14px 22px;
-      border: 5px solid #fff;
-      border-radius: 999px;
-      background: #fff7d8;
-      color: #25405f;
-      font-size: clamp(20px, 2.4vw, 34px);
-      font-weight: 900;
-      text-align: center;
-      text-decoration: none;
-      box-shadow: 0 8px 0 rgba(47, 96, 78, .22), 0 14px 24px rgba(36, 54, 74, .18);
-      cursor: pointer;
-    }
-
-    .cover-action.primary {
-      background: #66b948;
-      color: #fff;
-      box-shadow: 0 8px 0 #3f842c, 0 14px 24px rgba(36, 54, 74, .18);
-    }
-
-    .cover-action:hover {
-      transform: translateY(-3px);
     }
 
     .hero {
@@ -1408,10 +1369,6 @@
   <main class="page">
     <section class="lesson-cover" aria-label="9-2 披薩分數店關卡主視覺">
       <img src="assets/lesson-9-2-cover.png" alt="9-2 披薩分數店，先看懂全部平分成幾份、拿其中一份，再用披薩點餐任務說清楚分數。">
-      <div class="cover-actions">
-        <button class="cover-action primary" type="button" onclick="document.getElementById('mainLayout').scrollIntoView({ behavior: 'smooth', block: 'start' });">開始操作</button>
-        <a class="cover-action" href="unit-fraction-learning-island.html">回冒險島</a>
-      </div>
     </section>
 
     <header class="hero">
