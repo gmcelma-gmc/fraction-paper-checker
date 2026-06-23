@@ -568,6 +568,7 @@
             autoReason: 'wrong-parts'
           };
         }
+        analysis.writtenCheck = detectWrittenFractionHint(data, canvas.width, canvas.height, bounds, selectedParts);
       } else {
         analysis = {
           ...findBestDetectedDivision(data, canvas.width, canvas.height, bounds),
@@ -756,12 +757,13 @@
       const stripCandidates = projections.map(projection => buildStripCandidate(data, width, height, bounds, projection, expectedParts));
       const vertical = projections.find(projection => projection.angle === 0);
       const horizontal = projections.find(projection => projection.angle === 90);
+      const halfCandidate = buildHalfCandidate(data, width, height, bounds, expectedParts);
       const gridCandidate = buildGridCandidate(data, width, height, bounds, vertical, horizontal, expectedParts);
       const rectGridCandidate = buildRectGridCandidate(data, width, height, bounds, vertical, horizontal, expectedParts);
       const centerCrossCandidate = buildCenterCrossCandidate(data, width, height, bounds, expectedParts);
       const diagonalFourCandidate = buildDiagonalFourCandidate(data, width, height, bounds, projections, expectedParts);
       const radialEighthCandidate = buildRadialEighthCandidate(data, width, height, bounds, projections, expectedParts);
-      const candidates = [radialEighthCandidate, rectGridCandidate, diagonalFourCandidate, gridCandidate, centerCrossCandidate, ...stripCandidates]
+      const candidates = [radialEighthCandidate, rectGridCandidate, diagonalFourCandidate, gridCandidate, centerCrossCandidate, halfCandidate, ...stripCandidates]
         .filter(Boolean)
         .filter(candidate => isCandidateAllowedForParts(candidate, expectedParts));
       candidates.sort((a, b) => b.score - a.score);
@@ -797,6 +799,67 @@
         lineCount: 0,
         lines: [],
         expectedParts
+      };
+    }
+
+    function buildHalfCandidate(data, width, height, bounds, expectedParts) {
+      if (expectedParts !== 2) return null;
+      const vertical = strongestWavyCenterLine(data, width, height, bounds, 'vertical');
+      const horizontal = strongestWavyCenterLine(data, width, height, bounds, 'horizontal');
+      const candidates = [vertical, horizontal].filter(Boolean);
+      candidates.sort((a, b) => b.score - a.score);
+      return candidates[0] || null;
+    }
+
+    function strongestWavyCenterLine(data, width, height, bounds, direction) {
+      const isVertical = direction === 'vertical';
+      const center = isVertical ? bounds.x + bounds.w / 2 : bounds.y + bounds.h / 2;
+      const paperLength = isVertical ? bounds.h : bounds.w;
+      const paperWidth = isVertical ? bounds.w : bounds.h;
+      const movingStart = isVertical ? bounds.y + bounds.h * 0.06 : bounds.x + bounds.w * 0.06;
+      const movingEnd = isVertical ? bounds.y + bounds.h * 0.94 : bounds.x + bounds.w * 0.94;
+      const searchRadius = Math.max(10, paperWidth * 0.10);
+      const segmentHits = new Array(8).fill(0);
+      const hitPositions = [];
+      let total = 0;
+      for (let moving = movingStart; moving <= movingEnd; moving += 4) {
+        total++;
+        let best = null;
+        for (let fixed = center - searchRadius; fixed <= center + searchRadius; fixed += 2) {
+          let localScore = 0;
+          for (let offset = -3; offset <= 3; offset++) {
+            const x = Math.round(isVertical ? fixed + offset : moving);
+            const y = Math.round(isVertical ? moving : fixed + offset);
+            if (x < 0 || y < 0 || x >= width || y >= height) continue;
+            const i = (y * width + x) * 4;
+            if (isDarkLinePixel(data[i], data[i + 1], data[i + 2])) localScore++;
+          }
+          if (localScore > 0 && (!best || localScore > best.score)) best = { fixed, score: localScore };
+        }
+        if (best) {
+          hitPositions.push(best.fixed);
+          const segmentIndex = Math.max(0, Math.min(segmentHits.length - 1, Math.floor(((moving - movingStart) / Math.max(1, movingEnd - movingStart)) * segmentHits.length)));
+          segmentHits[segmentIndex]++;
+        }
+      }
+      if (!hitPositions.length) return null;
+      const coverage = segmentHits.filter(hits => hits >= 2).length / segmentHits.length;
+      const averagePosition = hitPositions.reduce((sum, position) => sum + position, 0) / hitPositions.length;
+      const centerError = Math.abs(averagePosition - center) / Math.max(1, paperWidth / 2);
+      const wiggle = Math.sqrt(hitPositions.reduce((sum, position) => sum + Math.pow(position - averagePosition, 2), 0) / hitPositions.length);
+      const equalScore = Math.max(0, 1 - centerError * 1.45);
+      if (coverage < 0.55 || equalScore < 0.64 || wiggle > paperWidth * 0.12) return null;
+      const line = isVertical
+        ? { x1: averagePosition, y1: bounds.y, x2: averagePosition, y2: bounds.y + bounds.h }
+        : { x1: bounds.x, y1: averagePosition, x2: bounds.x + bounds.w, y2: averagePosition };
+      return {
+        pattern: 'half',
+        score: 0.94 + equalScore * 0.18 + coverage * 0.08,
+        equalScore,
+        hasEnoughLines: true,
+        estimatedParts: 2,
+        lineCount: 1,
+        lines: [line]
       };
     }
 
@@ -1284,6 +1347,86 @@
       return positions.reduce((best, position) => Math.abs(position - target) < Math.abs(best - target) ? position : best, positions[0]);
     }
 
+    function detectWrittenFractionHint(data, width, height, bounds, expectedParts) {
+      const search = {
+        x1: bounds.x + bounds.w * 0.23,
+        x2: bounds.x + bounds.w * 0.90,
+        y1: bounds.y + bounds.h * 0.15,
+        y2: bounds.y + bounds.h * 0.86
+      };
+      const bar = findFractionBar(data, width, height, bounds, search);
+      if (!bar) return { status: 'unknown' };
+      const topBox = measureDigitNearBar(data, width, height, {
+        x1: bar.x1 - bounds.w * 0.06,
+        x2: bar.x2 + bounds.w * 0.06,
+        y1: Math.max(bounds.y, bar.y - bounds.h * 0.22),
+        y2: bar.y - 6
+      });
+      const bottomBox = measureDigitNearBar(data, width, height, {
+        x1: bar.x1 - bounds.w * 0.06,
+        x2: bar.x2 + bounds.w * 0.06,
+        y1: bar.y + 6,
+        y2: Math.min(bounds.y + bounds.h, bar.y + bounds.h * 0.26)
+      });
+      if (!topBox || !bottomBox) return { status: 'unknown', bar };
+      const topLooksOne = looksLikeOne(topBox);
+      const bottomLooksOne = looksLikeOne(bottomBox);
+      if (!topLooksOne && bottomLooksOne) {
+        return { status: 'wrong-order', bar, topBox, bottomBox };
+      }
+      return { status: 'ok-or-unknown', bar, topBox, bottomBox };
+    }
+
+    function findFractionBar(data, width, height, bounds, search) {
+      const candidates = [];
+      for (let y = Math.round(search.y1); y <= Math.round(search.y2); y += 2) {
+        let runStart = null;
+        let runEnd = null;
+        for (let x = Math.round(search.x1); x <= Math.round(search.x2); x += 2) {
+          const i = (Math.max(0, Math.min(height - 1, y)) * width + Math.max(0, Math.min(width - 1, x))) * 4;
+          const dark = isDarkLinePixel(data[i], data[i + 1], data[i + 2]);
+          if (dark && runStart === null) runStart = x;
+          if (dark) runEnd = x;
+          if ((!dark || x >= search.x2 - 2) && runStart !== null) {
+            const runLength = runEnd - runStart;
+            const minLength = bounds.w * 0.07;
+            const maxLength = bounds.w * 0.34;
+            if (runLength >= minLength && runLength <= maxLength) {
+              candidates.push({ x1: runStart, x2: runEnd, y, score: runLength });
+            }
+            runStart = null;
+            runEnd = null;
+          }
+        }
+      }
+      if (!candidates.length) return null;
+      candidates.sort((a, b) => b.score - a.score);
+      return candidates[0];
+    }
+
+    function measureDigitNearBar(data, width, height, box) {
+      let minX = width, minY = height, maxX = 0, maxY = 0, count = 0;
+      for (let y = Math.round(box.y1); y <= Math.round(box.y2); y += 2) {
+        for (let x = Math.round(box.x1); x <= Math.round(box.x2); x += 2) {
+          if (x < 0 || y < 0 || x >= width || y >= height) continue;
+          const i = (y * width + x) * 4;
+          if (!isDarkLinePixel(data[i], data[i + 1], data[i + 2])) continue;
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+          count++;
+        }
+      }
+      if (count < 10 || maxX <= minX || maxY <= minY) return null;
+      return { minX, minY, maxX, maxY, count, w: maxX - minX, h: maxY - minY };
+    }
+
+    function looksLikeOne(box) {
+      const ratio = box.w / Math.max(1, box.h);
+      return ratio < 0.46 && box.h > 14;
+    }
+
     function lineSegmentForProjection(bounds, angle, position) {
       const radians = angle * Math.PI / 180;
       const nx = Math.cos(radians);
@@ -1332,7 +1475,18 @@
         { icon: '✓', text: `如果你要表示一份，正確的單位分數是 ${expectedFraction}。` }
       ];
 
-      if (analysis.isEqual) {
+      if (analysis.isEqual && analysis.writtenCheck?.status === 'wrong-order') {
+        showResult(
+          'try',
+          `${name}，平分對了，分數寫法要修正`,
+          `我看到每一份一樣大，平分是對的。不過紙上的分數看起來像把上面和下面寫反了；如果只取其中一份，要寫 ${expectedFraction}。`,
+          [
+            { icon: '✓', text: '平分正確：每一份一樣大。' },
+            { icon: '1', text: `分數上面的數字要寫 1，表示取其中 1 份。` },
+            { icon: '2', text: `分數下面的數字要寫 ${analysis.expectedParts}，表示全部分成 ${analysis.expectedParts} 等份。` }
+          ]
+        );
+      } else if (analysis.isEqual) {
         showResult(
           'good',
           `${name}，這樣可以！`,
