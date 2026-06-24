@@ -543,8 +543,9 @@
           ? findBestEqualDivision(data, canvas.width, canvas.height, bounds, 2)
           : null;
         const selectedLineCount = targetAnalysis.lineCount || 0;
+        const enoughTargetLinesVisible = selectedParts > 2 && selectedLineCount >= selectedParts - 1;
         analysis = targetAnalysis;
-        if (cleanHalfAnalysis && cleanHalfAnalysis.isEqual && selectedLineCount < Math.max(1, selectedParts - 1)) {
+        if (cleanHalfAnalysis && cleanHalfAnalysis.isEqual && !enoughTargetLinesVisible) {
           analysis = {
             ...cleanHalfAnalysis,
             expectedParts: selectedParts,
@@ -804,7 +805,7 @@
       if (expectedParts === 4) {
         if (candidate.pattern === 'grid') return candidate.equalScore >= 0.72 && candidate.lineCount === 2;
         if (candidate.pattern === 'diagonal4') return candidate.equalScore >= 0.74 && candidate.lineCount === 2;
-        if (candidate.pattern === 'strip') return candidate.lineCount >= 3 && candidate.equalScore >= 0.82 && candidate.minLineStrength >= 0.035;
+        if (candidate.pattern === 'strip') return candidate.lineCount >= 3 && candidate.equalScore >= 0.68 && candidate.minLineStrength >= 0.024;
         return false;
       }
       if (expectedParts === 8) {
@@ -961,15 +962,7 @@
 
     function buildStripCandidate(data, width, height, bounds, projection, expectedParts) {
       const needed = Math.max(1, expectedParts - 1);
-      const positions = projection.positions
-        .slice()
-        .sort((a, b) => {
-          const aStrength = projection.strengthByPosition.get(Math.round(a)) || 0;
-          const bStrength = projection.strengthByPosition.get(Math.round(b)) || 0;
-          return bStrength - aStrength;
-        })
-        .slice(0, needed)
-        .sort((a, b) => a - b);
+      const positions = chooseLikelyEqualCuts(projection, expectedParts);
       const equalScore = estimateProjectionEqualScore(positions, projection.minCoord, projection.maxCoord, expectedParts);
       const hasEnoughLines = positions.length >= needed;
       const lineAngle = (projection.angle + 90) % 180;
@@ -986,6 +979,37 @@
         lineCount: positions.length,
         lines: positions.map(position => lineSegmentForProjection(bounds, projection.angle, position))
       };
+    }
+
+    function chooseLikelyEqualCuts(projection, expectedParts) {
+      const needed = Math.max(1, expectedParts - 1);
+      const range = projection.maxCoord - projection.minCoord;
+      const tolerance = range * (expectedParts === 4 ? 0.10 : 0.065);
+      const chosen = [];
+      for (let cut = 1; cut <= needed; cut++) {
+        const target = projection.minCoord + range * (cut / expectedParts);
+        const best = projection.positions
+          .map(position => ({
+            position,
+            distance: Math.abs(position - target),
+            strength: projection.strengthByPosition.get(Math.round(position)) || 0
+          }))
+          .filter(item => item.distance <= tolerance && item.strength >= 0.024)
+          .sort((a, b) => a.distance - b.distance || b.strength - a.strength)[0];
+        if (best && !chosen.some(position => Math.abs(position - best.position) < range * 0.04)) {
+          chosen.push(best.position);
+        }
+      }
+      if (chosen.length >= needed) return chosen.sort((a, b) => a - b);
+      return projection.positions
+        .slice()
+        .sort((a, b) => {
+          const aStrength = projection.strengthByPosition.get(Math.round(a)) || 0;
+          const bStrength = projection.strengthByPosition.get(Math.round(b)) || 0;
+          return bStrength - aStrength;
+        })
+        .slice(0, needed)
+        .sort((a, b) => a - b);
     }
 
     function estimateProjectionEqualScore(positions, minCoord, maxCoord, expectedParts) {
