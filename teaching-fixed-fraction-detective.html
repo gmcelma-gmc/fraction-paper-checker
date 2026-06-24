@@ -542,8 +542,9 @@
         const cleanHalfAnalysis = selectedParts !== 2
           ? findBestEqualDivision(data, canvas.width, canvas.height, bounds, 2)
           : null;
+        const selectedLineCount = targetAnalysis.lineCount || 0;
         analysis = targetAnalysis;
-        if (cleanHalfAnalysis && cleanHalfAnalysis.isEqual) {
+        if (cleanHalfAnalysis && cleanHalfAnalysis.isEqual && selectedLineCount < Math.max(1, selectedParts - 1)) {
           analysis = {
             ...cleanHalfAnalysis,
             expectedParts: selectedParts,
@@ -610,7 +611,7 @@
     function detectPaperBounds(data, width, height) {
       const yellowBounds = detectConnectedColorBounds(data, width, height, isYellowPaperPixel);
       if (yellowBounds) return yellowBounds;
-      const whiteBounds = detectConnectedColorBounds(data, width, height, isWhitePaperPixel);
+      const whiteBounds = detectOverallPaperBounds(data, width, height, isWhitePaperPixel);
       if (whiteBounds) return whiteBounds;
 
       let minX = width, minY = height, maxX = 0, maxY = 0;
@@ -690,6 +691,32 @@
       const brightness = (r + g + b) / 3;
       const saturation = Math.max(r, g, b) - Math.min(r, g, b);
       return brightness > 158 && saturation < 58;
+    }
+
+    function detectOverallPaperBounds(data, width, height, predicate) {
+      let minX = width, minY = height, maxX = 0, maxY = 0, count = 0;
+      for (let y = 0; y < height; y += 3) {
+        for (let x = 0; x < width; x += 3) {
+          const i = (y * width + x) * 4;
+          if (!predicate(data[i], data[i + 1], data[i + 2])) continue;
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+          count++;
+        }
+      }
+      const boxWidth = maxX - minX;
+      const boxHeight = maxY - minY;
+      const aspect = boxWidth / Math.max(1, boxHeight);
+      if (count < 420 || boxWidth < width * 0.20 || boxHeight < height * 0.20 || aspect < 0.45 || aspect > 2.40) return null;
+      const pad = 14;
+      return {
+        x: Math.max(0, minX - pad),
+        y: Math.max(0, minY - pad),
+        w: Math.min(width - minX, boxWidth + pad * 2),
+        h: Math.min(height - minY, boxHeight + pad * 2)
+      };
     }
 
     function detectConnectedColorBounds(data, width, height, predicate) {
@@ -1475,15 +1502,15 @@
         { icon: '✓', text: `如果你要表示一份，正確的單位分數是 ${expectedFraction}。` }
       ];
 
-      if (analysis.isEqual && analysis.writtenCheck?.status === 'wrong-order') {
+      if (analysis.writtenCheck?.status === 'wrong-order') {
         showResult(
           'try',
           `${name}，平分對了，分數寫法要修正`,
-          `我看到每一份一樣大，平分是對的。不過紙上的分數看起來像把上面和下面寫反了；如果只取其中一份，要寫 ${expectedFraction}。`,
+          `這張作品的等分方式看起來可以再確認，但我先看到一個很重要的地方：紙上的分數像是把上面和下面寫反了。如果只取其中一份，要寫 ${expectedFraction}。`,
           [
-            { icon: '✓', text: '平分正確：每一份一樣大。' },
             { icon: '1', text: `分數上面的數字要寫 1，表示取其中 1 份。` },
-            { icon: '2', text: `分數下面的數字要寫 ${analysis.expectedParts}，表示全部分成 ${analysis.expectedParts} 等份。` }
+            { icon: '2', text: `分數下面的數字要寫 ${analysis.expectedParts}，表示全部分成 ${analysis.expectedParts} 等份。` },
+            { icon: '✓', text: '改好分數後，再看每一份是不是一樣大。' }
           ]
         );
       } else if (analysis.isEqual) {
