@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16324f">
+  <title>新環遊世界找分數</title>
+  <style>
+    :root {
+      --navy: #16324f;
+      --navy-2: #244b6e;
+      --paper: #fffdf7;
+      --sky: #dceef6;
+      --teal: #238b7b;
+      --teal-soft: #e4f5f0;
+      --coral: #d85d4d;
+      --coral-soft: #fff0ed;
+      --yellow: #f5c451;
+      --ink: #173047;
+      --muted: #5a7082;
+      --line: #c8d7e2;
+      --white: #fff;
+      --shadow: 0 10px 26px rgba(22, 50, 79, .14);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(220, 238, 246, .96), rgba(228, 245, 240, .96)),
+        repeating-linear-gradient(90deg, rgba(22, 50, 79, .04) 0 1px, transparent 1px 64px);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+    }
+
+    button { font: inherit; }
+
+    button:focus-visible {
+      outline: 4px solid var(--yellow);
+      outline-offset: 3px;
+    }
+
+    .app {
+      width: min(1360px, calc(100% - 16px));
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(6px, 1.3vh, 12px) 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(6px, 1.1vh, 10px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand { min-width: 0; }
+
+    .brand-kicker {
+      margin: 0 0 2px;
+      color: var(--coral);
+      font-size: clamp(11px, 1.2vw, 13px);
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: clamp(12px, 1.45vw, 15px);
+      line-height: 1.35;
+    }
+
+    .target {
+      flex: 0 0 auto;
+      min-width: 104px;
+      padding: 7px 10px;
+      color: var(--navy);
+      text-align: center;
+      background: var(--paper);
+      border: 2px solid var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .target strong {
+      display: block;
+      color: var(--coral);
+      font-size: clamp(25px, 3.2vw, 34px);
+      line-height: 1;
+    }
+
+    .target span { font-size: 12px; }
+
+    .screen {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    [hidden] { display: none !important; }
+
+    .start-screen {
+      height: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+      gap: 12px;
+      padding: 14px;
+      background: rgba(255, 253, 247, .96);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .briefing,
+    .start-actions {
+      min-height: 0;
+      border-radius: var(--radius);
+    }
+
+    .briefing {
+      padding: clamp(18px, 3vw, 36px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(135deg, #eef8fc, #e9f7f2);
+      border: 1px solid #cfe1e9;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .briefing::after {
+      content: "1/2   1/3   1/4";
+      position: absolute;
+      right: 18px;
+      bottom: 8px;
+      color: rgba(22, 50, 79, .07);
+      font-size: clamp(40px, 8vw, 104px);
+      font-weight: 950;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .briefing h2 {
+      margin: 0 0 10px;
+      font-size: clamp(23px, 3vw, 36px);
+    }
+
+    .briefing p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(15px, 1.7vw, 19px);
+      line-height: 1.55;
+    }
+
+    .rules {
+      margin: 18px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 9px;
+      list-style: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .rules li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: clamp(14px, 1.55vw, 17px);
+      line-height: 1.4;
+    }
+
+    .rule-mark {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      background: var(--teal);
+      border-radius: 50%;
+      font-weight: 900;
+    }
+
+    .start-actions {
+      padding: clamp(18px, 3vw, 34px);
+      display: grid;
+      align-content: center;
+      gap: 14px;
+      background: var(--navy);
+      border: 1px solid var(--navy);
+    }
+
+    .start-note {
+      margin: 0 0 4px;
+      color: #d8e8f3;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .command {
+      min-height: 62px;
+      padding: 12px 18px;
+      border: 0;
+      border-radius: var(--radius);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .command.primary {
+      color: var(--navy);
+      background: var(--yellow);
+    }
+
+    .command.secondary {
+      color: var(--white);
+      background: transparent;
+      border: 2px solid #9eb8ca;
+    }
+
+    .game-stage {
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(210px, .9fr) minmax(350px, 1.25fr) minmax(210px, .9fr);
+      gap: clamp(7px, 1.1vw, 12px);
+    }
+
+    .player,
+    .question-panel,
+    .summary {
+      min-height: 0;
+      overflow: hidden;
+      background: rgba(255, 253, 247, .97);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .player {
+      padding: clamp(8px, 1.3vw, 14px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 7px solid var(--teal);
+    }
+
+    .player.right { border-top-color: var(--coral); }
+
+    .player-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .player-name {
+      margin: 0;
+      font-size: clamp(18px, 2vw, 23px);
+    }
+
+    .score {
+      width: clamp(50px, 5.8vw, 66px);
+      height: clamp(50px, 5.8vw, 66px);
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      background: var(--navy);
+      border-radius: var(--radius);
+      font-size: clamp(28px, 3.5vw, 36px);
+      font-weight: 950;
+    }
+
+    .answer-grid {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: grid;
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .answer-btn {
+      min-height: 0;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--white);
+      background: var(--teal);
+      border: 0;
+      border-radius: var(--radius);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .right .answer-btn { background: var(--coral); }
+
+    .answer-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .fraction {
+      display: block;
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .fraction-help {
+      display: block;
+      margin-top: 4px;
+      font-size: clamp(11px, 1.25vw, 13px);
+      opacity: .9;
+    }
+
+    .answer-mark {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255,255,255,.7);
+      border-radius: 50%;
+      font-weight: 900;
+    }
+
+    .feedback {
+      min-height: 52px;
+      padding: 8px;
+      color: var(--muted);
+      background: #f3f7fa;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-size: clamp(11px, 1.25vw, 13px);
+      line-height: 1.35;
+    }
+
+    .feedback.good {
+      color: #1f6555;
+      background: var(--teal-soft);
+      border-color: #8fc8b8;
+    }
+
+    .feedback.wrong {
+      color: #8b382e;
+      background: var(--coral-soft);
+      border-color: #e4a098;
+    }
+
+    .question-panel {
+      padding: clamp(8px, 1.5vw, 16px);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: clamp(5px, 1vh, 9px);
+      text-align: center;
+    }
+
+    .trip-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: clamp(11px, 1.35vw, 14px);
+    }
+
+    .trip-tag {
+      padding: 4px 9px;
+      color: var(--navy);
+      background: var(--sky);
+      border: 1px solid #b9d4e1;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    .flag-wrap {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #eef4f7;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .flag-frame {
+      width: min(100%, 560px);
+      aspect-ratio: var(--flag-ratio, 3 / 2);
+      overflow: hidden;
+      background: var(--white);
+      border: clamp(3px, .4vw, 5px) solid var(--navy);
+      border-radius: 5px;
+      box-shadow: 0 10px 22px rgba(22, 50, 79, .18);
+    }
+
+    .flag-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      background: var(--white);
+    }
+
+    .flag-fallback {
+      display: none;
+      font-size: clamp(94px, 16vw, 170px);
+      line-height: 1;
+    }
+
+    .country {
+      margin: 0;
+      font-size: clamp(24px, 3.5vw, 39px);
+      line-height: 1.1;
+    }
+
+    .question-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(12px, 1.4vw, 15px);
+      line-height: 1.35;
+    }
+
+    .notice {
+      min-height: 40px;
+      padding: 7px 10px;
+      display: grid;
+      place-items: center;
+      color: #684b0d;
+      background: #fff4d4;
+      border: 1px solid #e7c669;
+      border-radius: var(--radius);
+      font-size: clamp(12px, 1.4vw, 14px);
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .teacher-tools {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .teacher-btn {
+      min-height: 36px;
+      padding: 6px 12px;
+      color: var(--navy);
+      background: #edf4f8;
+      border: 1px solid #bdceda;
+      border-radius: var(--radius);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .summary {
+      height: 100%;
+      padding: clamp(8px, 1.5vw, 14px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .summary-head {
+      padding: 9px 11px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      background: var(--teal-soft);
+      border: 1px solid #96cbbd;
+      border-radius: var(--radius);
+    }
+
+    .summary-head h2 {
+      margin: 0;
+      font-size: clamp(19px, 2.3vw, 27px);
+    }
+
+    .summary-head p {
+      margin: 3px 0 0;
+      color: #31685c;
+      font-size: clamp(11px, 1.3vw, 14px);
+      line-height: 1.35;
+    }
+
+    .review-heading {
+      margin: 0;
+      font-size: clamp(16px, 1.8vw, 20px);
+    }
+
+    .review-grid {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-rows: minmax(140px, auto);
+      align-content: start;
+      gap: 7px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding-right: 3px;
+      scrollbar-gutter: stable;
+    }
+
+    .review-card {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: minmax(50px, .9fr) auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .review-flag {
+      min-height: 0;
+      padding: 5px;
+      display: grid;
+      place-items: center;
+      background: #eef4f7;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .review-flag img {
+      max-width: 100%;
+      max-height: 100%;
+      border: 2px solid var(--navy);
+      background: var(--white);
+    }
+
+    .review-body { padding: 6px; }
+
+    .review-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 5px;
+    }
+
+    .review-body h3 {
+      min-width: 0;
+      margin: 0;
+      overflow: hidden;
+      font-size: clamp(12px, 1.5vw, 16px);
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fraction-chip {
+      flex: 0 0 auto;
+      padding: 3px 7px;
+      color: var(--white);
+      background: var(--navy);
+      border-radius: 999px;
+      font-size: clamp(11px, 1.25vw, 13px);
+      font-weight: 950;
+    }
+
+    .review-body p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: clamp(9px, 1.05vw, 11px);
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .summary-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .summary-actions .command {
+      min-height: 42px;
+      padding: 8px 16px;
+    }
+
+    @media (max-width: 920px) {
+      .game-stage {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, .82fr);
+        grid-template-areas:
+          "question question"
+          "left right";
+      }
+
+      .question-panel { grid-area: question; }
+      .player.left { grid-area: left; }
+      .player.right { grid-area: right; }
+
+      .answer-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: 1fr;
+      }
+
+      .answer-btn {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .answer-mark,
+      .fraction-help { display: none; }
+
+      .review-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .app {
+        width: calc(100% - 8px);
+        padding: 4px 0;
+        gap: 4px;
+      }
+
+      .topbar { gap: 6px; }
+      .brand-kicker, .subtitle { display: none; }
+
+      h1 { font-size: 22px; }
+
+      .target {
+        min-width: 62px;
+        padding: 4px 6px;
+      }
+
+      .target strong { font-size: 24px; }
+      .target span { font-size: 10px; }
+
+      .start-screen {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: 6px;
+        padding: 6px;
+      }
+
+      .briefing {
+        padding: 12px;
+        justify-content: flex-start;
+      }
+
+      .briefing h2 { font-size: 21px; }
+      .briefing p, .rules li { font-size: 12px; }
+      .rules { margin-top: 10px; gap: 6px; }
+      .rule-mark { width: 24px; height: 24px; flex-basis: 24px; }
+
+      .start-actions {
+        padding: 8px;
+        gap: 7px;
+      }
+
+      .start-note { display: none; }
+      .command { min-height: 44px; }
+
+      .game-stage {
+        gap: 4px;
+        grid-template-rows: minmax(0, 1fr) minmax(0, .68fr);
+      }
+
+      .player {
+        padding: 5px;
+        gap: 4px;
+        border-top-width: 5px;
+      }
+
+      .player-name { font-size: 13px; }
+
+      .score {
+        width: 34px;
+        height: 34px;
+        font-size: 21px;
+      }
+
+      .answer-grid { gap: 4px; }
+
+      .answer-btn {
+        padding: 4px;
+        min-width: 0;
+      }
+
+      .fraction { font-size: 17px; }
+
+      .feedback {
+        min-height: 0;
+        padding: 4px;
+        font-size: 9px;
+      }
+
+      .question-panel {
+        padding: 5px;
+        gap: 4px;
+      }
+
+      .trip-row { font-size: 10px; }
+      .trip-tag { padding: 3px 6px; }
+
+      .country { font-size: 22px; }
+      .question-text, .teacher-tools { display: none; }
+
+      .notice {
+        min-height: 0;
+        padding: 4px 6px;
+        font-size: 10px;
+      }
+
+      .summary { padding: 5px; gap: 5px; }
+
+      .summary-head {
+        padding: 5px 6px;
+        gap: 5px;
+      }
+
+      .summary-head h2 { font-size: 15px; }
+      .summary-head p { font-size: 9px; }
+      .summary-head .command { min-height: 36px; padding: 5px 8px; font-size: 12px; }
+      .review-heading { font-size: 13px; }
+
+      .review-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(96px, auto);
+        gap: 4px;
+      }
+
+      .review-card { grid-template-rows: minmax(30px, .65fr) auto; }
+      .review-flag { padding: 3px; }
+      .review-body { padding: 3px; }
+      .review-body h3 { font-size: 10px; }
+      .fraction-chip { padding: 2px 5px; font-size: 9px; }
+      .review-body p { margin-top: 2px; font-size: 8px; -webkit-line-clamp: 1; }
+      .summary-actions .command { min-height: 34px; padding: 4px 9px; font-size: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <p class="brand-kicker">純色國旗單位分數挑戰</p>
+        <h1>新環遊世界找分數</h1>
+        <p class="subtitle">只看沒有星星、徽章或圖騰的等分國旗，找出每一份是幾分之一。</p>
+      </div>
+      <div class="target" aria-label="目標分數">
+        <strong>10</strong>
+        <span>分獲勝</span>
+      </div>
+    </header>
+
+    <section id="startScreen" class="screen start-screen">
+      <div class="briefing">
+        <h2>觀察色帶，找出單位分數</h2>
+        <p>每一題都是沒有其他標誌的國旗，而且主要色帶都有清楚平分。兩位玩家看國旗，搶先判斷每一份是 1/2、1/3 還是 1/4。</p>
+        <ul class="rules">
+          <li><span class="rule-mark">1</span><span>答對加 1 分，答錯扣 1 分。</span></li>
+          <li><span class="rule-mark">2</span><span>先得到 10 分的玩家獲勝。</span></li>
+          <li><span class="rule-mark">3</span><span>本局題目不重複，下一局會優先換一批國旗。</span></li>
+          <li><span class="rule-mark">4</span><span>遊戲結束後，會列出本局所有國旗與單位分數。</span></li>
+        </ul>
+      </div>
+      <div class="start-actions">
+        <p class="start-note">新版題庫已移除日本等「沒有平分」題目，也不使用帶有星星、徽章、文字或圖騰的國旗。</p>
+        <button id="startBtn" class="command primary" type="button">開始對戰</button>
+        <button id="shuffleBtn" class="command secondary" type="button">重新洗牌後開始</button>
+      </div>
+    </section>
+
+    <section id="gameStage" class="screen game-stage" hidden>
+      <aside class="player left" aria-label="左邊玩家作答區">
+        <div class="player-head">
+          <h2 class="player-name">左邊玩家</h2>
+          <div id="scoreA" class="score">0</div>
+        </div>
+        <div class="answer-grid" data-player="A"></div>
+        <div id="feedbackA" class="feedback">觀察國旗被平均分成幾份。</div>
+      </aside>
+
+      <section class="question-panel" aria-label="國旗題目區">
+        <div class="trip-row">
+          <span id="roundInfo" class="trip-tag">第 1 題</span>
+          <span id="poolInfo">本局題目不重複</span>
+        </div>
+        <div class="flag-wrap">
+          <div id="flagFrame" class="flag-frame">
+            <img id="flagImg" class="flag-image" alt="">
+            <div id="flagFallback" class="flag-fallback" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div>
+          <h2 id="countryName" class="country">準備中</h2>
+          <p class="question-text">這面國旗平均分成幾份？其中一份是幾分之一？</p>
+        </div>
+        <div id="notice" class="notice" role="status">請任一邊先作答。</div>
+        <div class="teacher-tools">
+          <button id="skipBtn" class="teacher-btn" type="button">老師略過</button>
+          <button id="endBtn" class="teacher-btn" type="button">提前整理</button>
+        </div>
+      </section>
+
+      <aside class="player right" aria-label="右邊玩家作答區">
+        <div class="player-head">
+          <h2 class="player-name">右邊玩家</h2>
+          <div id="scoreB" class="score">0</div>
+        </div>
+        <div class="answer-grid" data-player="B"></div>
+        <div id="feedbackB" class="feedback">觀察國旗被平均分成幾份。</div>
+      </aside>
+    </section>
+
+    <section id="summary" class="screen summary" hidden>
+      <div class="summary-head">
+        <div>
+          <h2 id="winnerTitle">本局結束</h2>
+          <p id="winnerText">一起整理本局看過的國旗與單位分數。</p>
+        </div>
+        <button id="learnDoneBtn" class="command primary" type="button">完成學習</button>
+      </div>
+      <h3 class="review-heading">本局所有國旗與單位分數</h3>
+      <div id="reviewGrid" class="review-grid"></div>
+      <div class="summary-actions">
+        <button id="playAgainBtn" class="command primary" type="button" hidden>再玩一局</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TARGET_SCORE = 10;
+
+    const ANSWERS = [
+      { value: "1/2", label: "1/2", help: "分成 2 等份", mark: "2" },
+      { value: "1/3", label: "1/3", help: "分成 3 等份", mark: "3" },
+      { value: "1/4", label: "1/4", help: "分成 4 等份", mark: "4" }
+    ];
+
+    // 題庫只收錄等寬或等高的純色帶國旗，不含星星、徽章、文字或其他圖騰。
+    const FLAG_POOL = [
+      { code: "pl", emoji: "🇵🇱", country: "波蘭", answer: "1/2", direction: "上下", colors: ["白色", "紅色"] },
+      { code: "ua", emoji: "🇺🇦", country: "烏克蘭", answer: "1/2", direction: "上下", colors: ["藍色", "黃色"] },
+      { code: "id", emoji: "🇮🇩", country: "印尼", answer: "1/2", direction: "上下", colors: ["紅色", "白色"] },
+      { code: "mc", emoji: "🇲🇨", country: "摩納哥", answer: "1/2", direction: "上下", colors: ["紅色", "白色"] },
+
+      { code: "fr", emoji: "🇫🇷", country: "法國", answer: "1/3", direction: "左右", colors: ["藍色", "白色", "紅色"] },
+      { code: "it", emoji: "🇮🇹", country: "義大利", answer: "1/3", direction: "左右", colors: ["綠色", "白色", "紅色"] },
+      { code: "be", emoji: "🇧🇪", country: "比利時", answer: "1/3", direction: "左右", colors: ["黑色", "黃色", "紅色"] },
+      { code: "ie", emoji: "🇮🇪", country: "愛爾蘭", answer: "1/3", direction: "左右", colors: ["綠色", "白色", "橘色"] },
+      { code: "ng", emoji: "🇳🇬", country: "奈及利亞", answer: "1/3", direction: "左右", colors: ["綠色", "白色", "綠色"] },
+      { code: "pe", emoji: "🇵🇪", country: "祕魯", answer: "1/3", direction: "左右", colors: ["紅色", "白色", "紅色"] },
+      { code: "td", emoji: "🇹🇩", country: "查德", answer: "1/3", direction: "左右", colors: ["藍色", "黃色", "紅色"] },
+      { code: "ml", emoji: "🇲🇱", country: "馬利", answer: "1/3", direction: "左右", colors: ["綠色", "黃色", "紅色"] },
+      { code: "gn", emoji: "🇬🇳", country: "幾內亞", answer: "1/3", direction: "左右", colors: ["紅色", "黃色", "綠色"] },
+      { code: "ro", emoji: "🇷🇴", country: "羅馬尼亞", answer: "1/3", direction: "左右", colors: ["藍色", "黃色", "紅色"] },
+
+      { code: "de", emoji: "🇩🇪", country: "德國", answer: "1/3", direction: "上下", colors: ["黑色", "紅色", "黃色"] },
+      { code: "nl", emoji: "🇳🇱", country: "荷蘭", answer: "1/3", direction: "上下", colors: ["紅色", "白色", "藍色"] },
+      { code: "lu", emoji: "🇱🇺", country: "盧森堡", answer: "1/3", direction: "上下", colors: ["紅色", "白色", "淺藍色"] },
+      { code: "ru", emoji: "🇷🇺", country: "俄羅斯", answer: "1/3", direction: "上下", colors: ["白色", "藍色", "紅色"] },
+      { code: "hu", emoji: "🇭🇺", country: "匈牙利", answer: "1/3", direction: "上下", colors: ["紅色", "白色", "綠色"] },
+      { code: "bg", emoji: "🇧🇬", country: "保加利亞", answer: "1/3", direction: "上下", colors: ["白色", "綠色", "紅色"] },
+      { code: "ee", emoji: "🇪🇪", country: "愛沙尼亞", answer: "1/3", direction: "上下", colors: ["藍色", "黑色", "白色"] },
+      { code: "lt", emoji: "🇱🇹", country: "立陶宛", answer: "1/3", direction: "上下", colors: ["黃色", "綠色", "紅色"] },
+      { code: "am", emoji: "🇦🇲", country: "亞美尼亞", answer: "1/3", direction: "上下", colors: ["紅色", "藍色", "橘色"] },
+      { code: "ga", emoji: "🇬🇦", country: "加彭", answer: "1/3", direction: "上下", colors: ["綠色", "黃色", "藍色"] },
+      { code: "sl", emoji: "🇸🇱", country: "獅子山", answer: "1/3", direction: "上下", colors: ["綠色", "白色", "藍色"] },
+      { code: "at", emoji: "🇦🇹", country: "奧地利", answer: "1/3", direction: "上下", colors: ["紅色", "白色", "紅色"] },
+      { code: "ye", emoji: "🇾🇪", country: "葉門", answer: "1/3", direction: "上下", colors: ["紅色", "白色", "黑色"] },
+
+      { code: "mu", emoji: "🇲🇺", country: "模里西斯", answer: "1/4", direction: "上下", colors: ["紅色", "藍色", "黃色", "綠色"] }
+    ];
+
+    const state = {
+      scores: { A: 0, B: 0 },
+      current: null,
+      round: 0,
+      deck: [],
+      history: [],
+      usedAcrossGames: new Set(),
+      previousGameCodes: new Set(),
+      locked: false,
+      active: false
+    };
+
+    const el = {
+      startScreen: document.getElementById("startScreen"),
+      gameStage: document.getElementById("gameStage"),
+      summary: document.getElementById("summary"),
+      startBtn: document.getElementById("startBtn"),
+      shuffleBtn: document.getElementById("shuffleBtn"),
+      scoreA: document.getElementById("scoreA"),
+      scoreB: document.getElementById("scoreB"),
+      feedbackA: document.getElementById("feedbackA"),
+      feedbackB: document.getElementById("feedbackB"),
+      roundInfo: document.getElementById("roundInfo"),
+      poolInfo: document.getElementById("poolInfo"),
+      flagFrame: document.getElementById("flagFrame"),
+      flagImg: document.getElementById("flagImg"),
+      flagFallback: document.getElementById("flagFallback"),
+      countryName: document.getElementById("countryName"),
+      notice: document.getElementById("notice"),
+      skipBtn: document.getElementById("skipBtn"),
+      endBtn: document.getElementById("endBtn"),
+      winnerTitle: document.getElementById("winnerTitle"),
+      winnerText: document.getElementById("winnerText"),
+      reviewGrid: document.getElementById("reviewGrid"),
+      learnDoneBtn: document.getElementById("learnDoneBtn"),
+      playAgainBtn: document.getElementById("playAgainBtn")
+    };
+
+    function shuffle(items) {
+      const result = [...items];
+      for (let i = result.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function buildAnswerButtons() {
+      document.querySelectorAll(".answer-grid").forEach((grid) => {
+        const player = grid.dataset.player;
+        ANSWERS.forEach((answer) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "answer-btn";
+          button.dataset.player = player;
+          button.dataset.answer = answer.value;
+          button.innerHTML = `
+            <span>
+              <span class="fraction">${answer.label}</span>
+              <span class="fraction-help">${answer.help}</span>
+            </span>
+            <span class="answer-mark">${answer.mark}</span>
+          `;
+          button.addEventListener("click", () => answerQuestion(player, answer.value));
+          grid.appendChild(button);
+        });
+      });
+    }
+
+    function resetFeedback() {
+      [el.feedbackA, el.feedbackB].forEach((box) => {
+        box.className = "feedback";
+        box.textContent = "觀察國旗被平均分成幾份。";
+      });
+    }
+
+    function setAnswerButtonsDisabled(disabled) {
+      document.querySelectorAll(".answer-btn").forEach((button) => {
+        button.disabled = disabled;
+      });
+    }
+
+    function updateScores() {
+      el.scoreA.textContent = state.scores.A;
+      el.scoreB.textContent = state.scores.B;
+    }
+
+    function startGame(forceFreshShuffle = false) {
+      state.previousGameCodes = forceFreshShuffle
+        ? new Set()
+        : new Set(state.history.map((flag) => flag.code));
+      if (forceFreshShuffle) state.usedAcrossGames.clear();
+
+      state.scores = { A: 0, B: 0 };
+      state.current = null;
+      state.round = 0;
+      state.history = [];
+      state.locked = false;
+      state.active = true;
+
+      const unseen = FLAG_POOL.filter((flag) => !state.usedAcrossGames.has(flag.code));
+      const earlierGames = FLAG_POOL.filter((flag) =>
+        state.usedAcrossGames.has(flag.code) && !state.previousGameCodes.has(flag.code)
+      );
+      const previousGame = FLAG_POOL.filter((flag) => state.previousGameCodes.has(flag.code));
+
+      // 新題優先，其次才回收更早玩過的題目；上一局題目一律排在最後。
+      state.deck = [
+        ...shuffle(unseen),
+        ...shuffle(earlierGames),
+        ...shuffle(previousGame)
+      ];
+      updateScores();
+      resetFeedback();
+      el.learnDoneBtn.disabled = false;
+      el.playAgainBtn.hidden = true;
+      el.startScreen.hidden = true;
+      el.summary.hidden = true;
+      el.gameStage.hidden = false;
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      if (!state.active) return;
+      if (state.deck.length === 0) {
+        finishGame("本批國旗已全部完成");
+        return;
+      }
+
+      state.locked = false;
+      state.current = state.deck.shift();
+      state.round += 1;
+      state.history.push(state.current);
+      state.usedAcrossGames.add(state.current.code);
+      setAnswerButtonsDisabled(false);
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const flag = state.current;
+      el.roundInfo.textContent = `第 ${state.round} 題`;
+      el.poolInfo.textContent = `本局已看過 ${state.history.length} 面國旗`;
+      el.countryName.textContent = flag.country;
+      el.notice.textContent = "請任一邊先作答。";
+      el.flagFallback.textContent = flag.emoji;
+      el.flagFallback.style.display = "none";
+      el.flagImg.style.display = "block";
+      el.flagImg.alt = `${flag.country}國旗`;
+      el.flagFrame.style.removeProperty("--flag-ratio");
+      el.flagImg.src = `https://flagcdn.com/w640/${flag.code}.png`;
+    }
+
+    function syncFlagRatio() {
+      if (!el.flagImg.naturalWidth || !el.flagImg.naturalHeight) return;
+      el.flagFrame.style.setProperty(
+        "--flag-ratio",
+        `${el.flagImg.naturalWidth} / ${el.flagImg.naturalHeight}`
+      );
+    }
+
+    function answerQuestion(player, answer) {
+      if (!state.active || state.locked || !state.current) return;
+
+      state.locked = true;
+      setAnswerButtonsDisabled(true);
+
+      const correct = answer === state.current.answer;
+      state.scores[player] += correct ? 1 : -1;
+      updateScores();
+
+      const playerName = player === "A" ? "左邊玩家" : "右邊玩家";
+      const ownFeedback = player === "A" ? el.feedbackA : el.feedbackB;
+      const otherFeedback = player === "A" ? el.feedbackB : el.feedbackA;
+
+      ownFeedback.className = `feedback ${correct ? "good" : "wrong"}`;
+      ownFeedback.textContent = correct
+        ? `答對！${state.current.country}每一份是 ${state.current.answer}。`
+        : `答錯。正確答案是 ${state.current.answer}。`;
+      otherFeedback.className = "feedback";
+      otherFeedback.textContent = "這題已由對方作答，準備下一題。";
+
+      el.notice.textContent = correct
+        ? `${playerName}答對了！答案是 ${state.current.answer}。`
+        : `${playerName}答錯了，答案是 ${state.current.answer}。`;
+
+      if (state.scores[player] >= TARGET_SCORE) {
+        window.setTimeout(() => finishGame(`${playerName}達到 ${TARGET_SCORE} 分`), 750);
+      } else {
+        window.setTimeout(nextQuestion, 950);
+      }
+    }
+
+    function finishGame(reason) {
+      state.active = false;
+      state.locked = true;
+      setAnswerButtonsDisabled(true);
+      el.gameStage.hidden = true;
+      el.summary.hidden = false;
+      el.playAgainBtn.hidden = true;
+
+      const left = state.scores.A;
+      const right = state.scores.B;
+      el.winnerTitle.textContent = left === right
+        ? "平手，一起完成整理"
+        : left > right ? "左邊玩家獲勝" : "右邊玩家獲勝";
+      el.winnerText.textContent = `${reason}。比分：左邊 ${left} 分，右邊 ${right} 分。以下是本局全部 ${state.history.length} 面國旗。`;
+      renderSummary();
+    }
+
+    function renderSummary() {
+      el.reviewGrid.innerHTML = "";
+      state.history.forEach((flag, index) => {
+        const card = document.createElement("article");
+        card.className = "review-card";
+        card.innerHTML = `
+          <div class="review-flag">
+            <img src="https://flagcdn.com/w320/${flag.code}.png" alt="${flag.country}國旗">
+          </div>
+          <div class="review-body">
+            <div class="review-title-row">
+              <h3>${index + 1}. ${flag.country}</h3>
+              <span class="fraction-chip">${flag.answer}</span>
+            </div>
+            <p>${flag.direction}平均分成 ${flag.answer.split("/")[1]} 份，每一份是 ${flag.answer}。</p>
+          </div>
+        `;
+        const image = card.querySelector("img");
+        image.addEventListener("error", () => {
+          image.replaceWith(document.createTextNode(flag.emoji));
+        });
+        el.reviewGrid.appendChild(card);
+      });
+    }
+
+    el.flagImg.addEventListener("load", syncFlagRatio);
+    el.flagImg.addEventListener("error", () => {
+      el.flagImg.style.display = "none";
+      el.flagFallback.style.display = "block";
+    });
+
+    el.startBtn.addEventListener("click", () => startGame(false));
+    el.shuffleBtn.addEventListener("click", () => startGame(true));
+    el.skipBtn.addEventListener("click", () => {
+      if (!state.active || state.locked) return;
+      state.locked = true;
+      setAnswerButtonsDisabled(true);
+      el.notice.textContent = `老師略過：${state.current.country}的答案是 ${state.current.answer}。`;
+      window.setTimeout(nextQuestion, 650);
+    });
+    el.endBtn.addEventListener("click", () => finishGame("老師提前結束本局"));
+    el.learnDoneBtn.addEventListener("click", () => {
+      el.learnDoneBtn.disabled = true;
+      el.playAgainBtn.hidden = false;
+      el.winnerText.textContent += " 已完成本局學習整理，可以再玩一局。";
+    });
+    el.playAgainBtn.addEventListener("click", () => startGame(false));
+
+    buildAnswerButtons();
+  </script>
+</body>
+</html>
